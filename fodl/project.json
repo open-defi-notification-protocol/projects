@@ -1,0 +1,9 @@
+{
+  "name": "FODL",
+  "category": "lending",
+  "website": "https://fodl.finance",
+  "logo": "https://static.example.com/logo.png",
+  "background": "#191919",
+  "foreground": "#ffffff",
+  "network": "ethereum"
+}

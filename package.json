@@ -1,0 +1,15 @@
+{
+  "name": "open-defi-notification-protocol-testing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test-helper.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bignumber.js": "^9.0.1",
+    "web3": "^1.5.2"
+  }
+}

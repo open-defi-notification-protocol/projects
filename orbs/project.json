@@ -1,0 +1,9 @@
+{
+  "name": "Orbs",
+  "category": "staking",
+  "website": "https://orbs.com",
+  "logo": "https://www.orbs.com/assets/img/common/logo.svg",
+  "background": "#000010",
+  "foreground": "#ffffff",
+  "network": "ethereum"
+}

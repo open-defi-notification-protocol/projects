@@ -1,0 +1,9 @@
+{
+  "name": "Aave",
+  "category": "lending",
+  "website": "https://aave.com",
+  "logo": "https://cryptologos.cc/logos/aave-aave-logo.png?v=013",
+  "background": ["#3BB0C2", "#B253A0"],
+  "foreground": "#ffffff",
+  "network": "ethereum"
+}

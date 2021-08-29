@@ -1,0 +1,9 @@
+{
+  "name": "Sushi",
+  "category": "amm",
+  "website": "https://sushi.com",
+  "logo": "https://sushi.com/static/media/logo.dec926df.png",
+  "background": "#0C0414",
+  "foreground": "#ffffff",
+  "network": "ethereum"
+}

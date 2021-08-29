@@ -1,0 +1,9 @@
+{
+  "name": "Opensea",
+  "category": "marketplace",
+  "website": "https://opensea.io",
+  "logo": "https://opensea.io/static/images/logos/opensea.svg",
+  "background": "#3D81DB",
+  "foreground": "#ffffff",
+  "network": "ethereum"
+}
