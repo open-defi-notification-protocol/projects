@@ -57,7 +57,7 @@ module.exports = LowHealth;
 
 ### Documentation and more examples
 
-Formal TypeScript type definitions for the class interface are available [here](projects/interfaces.ts). Explore example integrations to different projects by browsing the different directories in this repo.
+Formal TypeScript type definitions for the class interface are available [here](interfaces.ts). Explore example integrations to different projects by browsing the different directories in this repo.
 
 &nbsp;
 
