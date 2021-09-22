@@ -14,13 +14,13 @@ class PendingReward {
     const pairs = await this._getAllUserPairs(args);
     return [
       { type: "input-select", label: "Pair", values: pairs },
-      { type: "input-number", label: "Minimum Sushi", default: 10, description: "Minimum amount of claimable CAKE to be notified about" }
+      { type: "input-number", label: "Minimum SUSHI", default: 10, description: "Minimum amount of claimable SUSHI to be notified about" }
     ];
   }
 
   async onBlocks(args) {
     const pendingReward = await this.contract.methods.pendingSushi(args.subscription["Pair"], args.address).call();
-    if (new BigNumber(pendingReward).dividedBy("1e18").toNumber() > parseFloat(args.subscription["Minimum Sushi"])) return {
+    if (new BigNumber(pendingReward).dividedBy("1e18").toNumber() > parseFloat(args.subscription["Minimum SUSHI"])) return {
       notification: "You have lots of Sushi ready to claim"
     };
     return [];
