@@ -59,6 +59,26 @@ module.exports = LowHealth;
 
 Formal TypeScript type definitions for the class interface are available [here](interfaces.ts). Explore example integrations to different projects by browsing the different directories in this repo.
 
+### Testing your integration
+
+Before submitting the PR, you should test your integration manually. Let's assume that you're integrating a new lending project called "SuperLend". You've git cloned this repo locally, created your new integration in the new directory `superlend` and created the following new files:
+
+`/superlend/project.json`
+
+`/superlend/near-liquidation.js`
+
+To test your integration for the near liquidation notification do the following:
+
+1. Make sure you're in the repo root
+
+2. Run `npm install`
+
+3. Create `/_test/dev-keys.json` (see example in that directory) containing your API key for a web3 service like Infura or Alchemy
+
+4. Create `/_test/test-superlend.js` for your test, you can copy one of the other example test files
+
+5. Run `node ./_test/test-superlend.js`
+
 &nbsp;
 
 ## Execution environment
