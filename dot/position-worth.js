@@ -24,8 +24,6 @@ class PositionWorth {
 
   // runs when new blocks are added to the mainnet chain - notification scanning happens here
   async onBlocks(args) {
-    // Read the user's vaults address subscription.Vault and the Initial USD Value
-    // _getSharesUSDValue on subscription.Vault and compare
     const parts = args.subscription["Vault"].split("-");
     const vaultAddress = parts[0];
     const sharesValue = parts[1];
