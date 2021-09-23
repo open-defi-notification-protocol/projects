@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "bignumber.js": "^9.0.1",
+    "node-fetch": "^3.0.0",
     "web3": "^1.5.2"
   }
 }
