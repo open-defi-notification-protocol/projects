@@ -1,5 +1,5 @@
 const BigNumber = require("bignumber.js");
-const Fetch = require('node-fetch');
+const Fetch = require("node-fetch");
 
 class PositionWorth {
 
