@@ -12,8 +12,8 @@ async function testAaveLowHealth() {
 
   // simulate on blocks event
   return lowHealth.onBlocks({
-      web3,
-      address: '0xC81bD599a66dA6dcc3A64399f8025C19fFC42888'
+    web3,
+    address: '0xC81bD599a66dA6dcc3A64399f8025C19fFC42888'
   });
 }
 
