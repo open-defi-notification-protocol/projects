@@ -1,5 +1,5 @@
 const BigNumber = require("bignumber.js");
-const Fetch = require("node-fetch");
+const fetch = require("node-fetch");
 
 class PositionWorth {
 
@@ -7,10 +7,7 @@ class PositionWorth {
   static description = "Get notified when the USD worth of the position is below than expected";
 
   // runs when class is initialized
-  async onInit(args) {
-    const abi = [{"inputs":[{"internalType":"contract SushiToken","name":"_sushi","type":"address"},{"internalType":"address","name":"_devaddr","type":"address"},{"internalType":"uint256","name":"_sushiPerBlock","type":"uint256"},{"internalType":"uint256","name":"_startBlock","type":"uint256"},{"internalType":"uint256","name":"_bonusEndBlock","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint256","name":"pid","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Deposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint256","name":"pid","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"EmergencyWithdraw","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":true,"internalType":"uint256","name":"pid","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Withdraw","type":"event"},{"inputs":[],"name":"BONUS_MULTIPLIER","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_allocPoint","type":"uint256"},{"internalType":"contract IERC20","name":"_lpToken","type":"address"},{"internalType":"bool","name":"_withUpdate","type":"bool"}],"name":"add","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"bonusEndBlock","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"deposit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_devaddr","type":"address"}],"name":"dev","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"devaddr","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"}],"name":"emergencyWithdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_from","type":"uint256"},{"internalType":"uint256","name":"_to","type":"uint256"}],"name":"getMultiplier","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"massUpdatePools","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"}],"name":"migrate","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"migrator","outputs":[{"internalType":"contract IMigratorChef","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"},{"internalType":"address","name":"_user","type":"address"}],"name":"pendingSushi","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"poolInfo","outputs":[{"internalType":"contract IERC20","name":"lpToken","type":"address"},{"internalType":"uint256","name":"allocPoint","type":"uint256"},{"internalType":"uint256","name":"lastRewardBlock","type":"uint256"},{"internalType":"uint256","name":"accSushiPerShare","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"poolLength","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"},{"internalType":"uint256","name":"_allocPoint","type":"uint256"},{"internalType":"bool","name":"_withUpdate","type":"bool"}],"name":"set","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"contract IMigratorChef","name":"_migrator","type":"address"}],"name":"setMigrator","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"startBlock","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"sushi","outputs":[{"internalType":"contract SushiToken","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"sushiPerBlock","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalAllocPoint","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"}],"name":"updatePool","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"address","name":"","type":"address"}],"name":"userInfo","outputs":[{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint256","name":"rewardDebt","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"_pid","type":"uint256"},{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}];
-    this.contract = new args.web3.eth.Contract(abi, "0xc2EdaD668740f1aA35E4D8f227fB8E17dcA888Cd");
-  }
+  async onInit(args) {}
 
   // runs right before user subscribes to new notifications and populates subscription form
   async onSubscribeForm(args) {
@@ -18,7 +15,7 @@ class PositionWorth {
     (args);
     return [
       { type: "input-select", label: "Vault", values: vaults },
-      { type: "input-number", label: "Minimum USD Shares Value", default: 1000, description: "Minimum USD value of shares in vault to be notified about" }
+      { type: "input-number", label: "Percent Drop", default: 15, description: "Percent change in position worth" }
     ];
   }
 
@@ -26,32 +23,32 @@ class PositionWorth {
   async onBlocks(args) {
     const parts = args.subscription["Vault"].split("-");
     const vaultAddress = parts[0];
-    const sharesValue = parts[1];
+    const sharesValueDuringRegistration = parts[1];
+    const sharesValueNow = await this._getSharesUSDValue(args, vaultAddress);
+    const minFraction = 1 - (parseInt(args.subscription["Percent Drop"]) / 100);
     if (
-        new BigNumber(sharesValue).minus(args.subscription["Minimum USD Shares Value"]).isPositive() 
+      new BigNumber(sharesValueDuringRegistration).multipliedBy(minFraction).minus(new BigNumber(sharesValueNow)).isPositive()
     ) return {
-      notification: `Your shares holdings in %{vaultAddress} is below %${args.subscription["Minimum USD Shares Value"]}`
+      notification: `Your shares holdings in ${vaultAddress} is below %${args.subscription["Percent Drop"]}`
     };
     return [];
   }
 
   async _getAllUserVaults(args) {
     const vaults = [];
-    try {
-      const response = await fetch('https://api.dot.finance/farms')
-      const json = await response.json()
-      json.forEach(function(vault) {
-          const vaultProxy = vault.proxyAddress;
-          const sharesValue = await _getSharesUSDValue(vaultProxy);
-          if (new BigNumber(sharesValue).isPositive()) {
-            vaults.push({
-              value: vaultProxy + "-" + parseInt(sharesValue),
-              label: this._getVaultLabel(args, vaultProxy)
-            });
-          }
-      });
-    } catch (error) {
-      console.log(error.response.body);
+    const response = await fetch('https://api.dot.finance/farms');
+    const json = await response.json();
+    for (let vid = 0; vid < json.length; vid++) {
+      const vault = json[vid];
+      const vaultProxy = vault.proxyAddress;
+      if (!vaultProxy) continue;
+      const sharesValue = await this._getSharesUSDValue(args, vaultProxy);
+      if (new BigNumber(sharesValue).isPositive()) {
+        vaults.push({
+          value: vaultProxy + "-" + sharesValue,
+          label: await this._getVaultLabel(args, vaultProxy)
+        });
+      }
     }
     return vaults;
   }
@@ -64,7 +61,7 @@ class PositionWorth {
     const lpBalance = await vaultContract.methods.balanceOf(args.address).call();
     const stakingToken = await vaultContract.methods.stakingToken().call();
     const sharesUSDValue = await calculatorContract.methods.valueOfAsset(stakingToken, lpBalance).call();    
-    return sharesUSDValue;
+    return sharesUSDValue.valueInUSD;
   }
   
   async _getVaultLabel(args, vaultAddress) {
