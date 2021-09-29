@@ -46,8 +46,8 @@ async function testOnBlocks() {
 
   // simulate user filling in the subscription form in the app
   const subscription = {
-    "Vault": form.find(o => o.label === "Vault").values[0].value,
-    "Percent Drop": form.find(o => o.label === "Percent Drop").default
+    vault: form.find(o => o.id === 'vault').values[0].value,
+    drop: form.find(o => o.id === 'drop').default
   };
 
   return positionWorth.onBlocks({

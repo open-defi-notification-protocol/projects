@@ -53,18 +53,18 @@ export interface OnBlocksArgs {
   fromBlock: number;
   // the last block in the range to be scanned for potential notifications
   toBlock: number;
-  // key-value of the onBeforeSubscribe params the user chose when subscribing (label -> value)
+  // key-value of the onBeforeSubscribe params the user chose when subscribing (id -> value)
   subscription: SubscriptionValues;
 }
 
-// key-value of the onBeforeSubscribe params the user chose when subscribing (label -> value)
+// key-value of the onBeforeSubscribe params the user chose when subscribing (id -> value)
 export type SubscriptionValues = { [label: string]: string };
 
 // field in the form presented to the user when subscribing to a new notification
 export interface SubscribeFormField {
   // the type of the field in the form, eg. "input-number" is a numerical input field
   type: FormFieldType;
-  // label of the field as displayed to the user
+  // label of the field as displayed to the user (can be changed over time)
   label: string;
   // optional one sentence description explaining this field to the user
   description?: string;
@@ -74,6 +74,8 @@ export interface SubscribeFormField {
   values?: LabelAndValue[];
   // required for "hidden" and contains the value of the field
   value?: any;
+  // internal id of the field when storing the subscription persistently (cannot change over time), see SubscriptionValues 
+  id: string;
 }
 
 // the type of the field in the form, eg. "input-number" is a numerical input field

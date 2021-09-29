@@ -18,8 +18,8 @@ async function testSushiPendingRewards() {
 
   // simulate user filling in the subscription form in the app
   const subscription = {
-    "Pair": form.find(o => o.label === "Pair").values[0].value,
-    "Minimum SUSHI": form.find(o => o.label === "Minimum SUSHI").default
+    pair: form.find(o => o.id === 'pair').values[0].value,
+    minimum: form.find(o => o.id === 'minimum').default
   };
 
   // simulate on blocks event
@@ -47,8 +47,8 @@ async function testSushiPositionWorth() {
 
   // simulate user filling in the subscription form in the app
   const subscription = {
-    "Pair": form.find(o => o.label === "Pair").values[0].value,
-    "Percent Drop": form.find(o => o.label === "Percent Drop").default
+    pair: form.find(o => o.id === 'pair').values[0].value,
+    drop: form.find(o => o.id === 'drop').default
   };
   
   // simulate on blocks event
@@ -76,8 +76,8 @@ async function testSushiTokenAmount() {
 
   // simulate user filling in the subscription form in the app
   const subscription = {
-    "Pair": form.find(o => o.label === "Pair").values[0].value,
-    "Percent Drop": form.find(o => o.label === "Percent Drop").default
+    pair: form.find(o => o.id === 'pair').values[0].value,
+    drop: form.find(o => o.id === 'drop').default
   };
 
   // simulate on blocks event

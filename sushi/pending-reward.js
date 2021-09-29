@@ -15,15 +15,15 @@ class PendingReward {
   async onSubscribeForm(args) {
     const pairs = await this._getAllUserPairs(args);
     return [
-      { type: "input-select", label: "Pair", values: pairs },
-      { type: "input-number", label: "Minimum SUSHI", default: 100, description: "Minimum amount of claimable SUSHI to be notified about" }
+      { type: "input-select", id: "pair", label: "Pair", values: pairs },
+      { type: "input-number", id: "minimum", label: "Minimum SUSHI", default: 100, description: "Minimum amount of claimable SUSHI to be notified about" }
     ];
   }
 
   // runs when new blocks are added to the mainnet chain - notification scanning happens here
   async onBlocks(args) {
-    const pendingReward = await this.contract.methods.pendingSushi(args.subscription["Pair"], args.address).call();
-    if (new BigNumber(pendingReward).dividedBy("1e18").toNumber() > parseFloat(args.subscription["Minimum SUSHI"])) return {
+    const pendingReward = await this.contract.methods.pendingSushi(args.subscription["pair"], args.address).call();
+    if (new BigNumber(pendingReward).dividedBy("1e18").toNumber() > parseFloat(args.subscription["minimum"])) return {
       notification: "You have lots of Sushi ready to claim"
     };
     return [];
