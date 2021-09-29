@@ -14,22 +14,22 @@ class PositionWorth {
     const vaults = await this._getAllUserVaults(args);
     (args);
     return [
-      { type: "input-select", label: "Vault", values: vaults },
-      { type: "input-number", label: "Percent Drop", default: 15, description: "Percent change in position worth" }
+      { type: "input-select", id: "vault", label: "Vault", values: vaults },
+      { type: "input-number", id: "drop", label: "Percent Drop", default: 15, description: "Percent change in position worth" }
     ];
   }
 
   // runs when new blocks are added to the mainnet chain - notification scanning happens here
   async onBlocks(args) {
-    const parts = args.subscription["Vault"].split("-");
+    const parts = args.subscription["vault"].split("-");
     const vaultAddress = parts[0];
     const sharesValueDuringRegistration = parts[1];
     const sharesValueNow = await this._getSharesUSDValue(args, vaultAddress);
-    const minFraction = 1 - (parseInt(args.subscription["Percent Drop"]) / 100);
+    const minFraction = 1 - (parseInt(args.subscription["drop"]) / 100);
     if (
       new BigNumber(sharesValueDuringRegistration).multipliedBy(minFraction).minus(new BigNumber(sharesValueNow)).isPositive()
     ) return {
-      notification: `Your shares holdings in ${vaultAddress} is below %${args.subscription["Percent Drop"]}`
+      notification: `Your shares holdings in ${vaultAddress} is below %${args.subscription["drop"]}`
     };
     return [];
   }

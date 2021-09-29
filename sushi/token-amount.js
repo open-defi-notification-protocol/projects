@@ -14,23 +14,23 @@ class TokenAmount {
     const pairs = await this._getAllUserPairs(args);
 
     return [
-      { type: "input-select", label: "Pair", values: pairs },
-      { type: "input-number", label: "Percent Drop", default: 5, description: "Percent change in amount of token" }
+      { type: "input-select", id: "pair", label: "Pair", values: pairs },
+      { type: "input-number", id: "drop", label: "Percent Drop", default: 5, description: "Percent change in amount of token" }
     ];
   }
 
   async onBlocks(args) {
-    const parts = args.subscription["Pair"].split("-");
+    const parts = args.subscription["pair"].split("-");
     const lpToken = parts[0];
     const initialLiquidityToken0 = parts[1];
     const initialLiquidityToken1 = parts[2];
     const liquidity = await this._getLiquidity(args, lpToken);
-    const minFraction = 1 - (parseInt(args.subscription["Percent Drop"]) / 100);
+    const minFraction = 1 - (parseInt(args.subscription["drop"]) / 100);
     if (
         new BigNumber(initialLiquidityToken0).multipliedBy(minFraction).minus(liquidity.token0).isPositive() ||
         new BigNumber(initialLiquidityToken1).multipliedBy(minFraction).minus(liquidity.token1).isPositive()
     ) return {
-      notification: `Your original holdings in one of the tokens dropped by more than %${args.subscription["Percent Drop"]}`
+      notification: `Your original holdings in one of the tokens dropped by more than %${args.subscription["drop"]}`
     };
     return [];
   }

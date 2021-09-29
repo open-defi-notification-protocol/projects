@@ -13,21 +13,21 @@ class PositionWorth {
   async onSubscribeForm(args) {
     const pairs = await this._getAllUserPairs(args);
     return [
-      { type: "input-select", label: "Pair", values: pairs },
-      { type: "input-number", label: "Percent Drop", default: 25, description: "Percent change in position worth" }
+      { type: "input-select", id: "pair", label: "Pair", values: pairs },
+      { type: "input-number", id: "drop", label: "Percent Drop", default: 25, description: "Percent change in position worth" }
     ];
   }
 
   async onBlocks(args) {
-    const parts = args.subscription["Pair"].split("-");
+    const parts = args.subscription["pair"].split("-");
     const lpToken = parts[0];
     const initialLiquidityToken0 = new BigNumber(parts[1]);
     const liquidity = await this._getLiquidity(args, lpToken);
-    const minFraction = 1 - (parseInt(args.subscription["Percent Drop"]) / 100);
+    const minFraction = 1 - (parseInt(args.subscription["drop"]) / 100);
     if (
       initialLiquidityToken0.multipliedBy(2).multipliedBy(minFraction).minus(new BigNumber(liquidity.token0).multipliedBy(2)).isPositive()
     ) return {
-      notification: `Your original holdings in one of the tokens dropped by more than %${args.subscription["Percent Drop"]}`
+      notification: `Your original holdings in one of the tokens dropped by more than %${args.subscription["drop"]}`
     };
     return [];
   }
