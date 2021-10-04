@@ -29,8 +29,8 @@ async function testGetAllUserVaults() {
   const positionWorth = new PositionWorth();
 
   return positionWorth._getAllUserVaults({
-      web3,
-      address: '0x975bd5f5de010d385709b8ff8fc439a588ed4bca'
+    web3,
+    address: '0x975bd5f5de010d385709b8ff8fc439a588ed4bca'
   });
 }
 
@@ -51,9 +51,9 @@ async function testOnBlocks() {
   };
 
   return positionWorth.onBlocks({
-      web3,
-      address: '0x975bd5f5de010d385709b8ff8fc439a588ed4bca',
-      subscription
+    web3,
+    address: '0x975bd5f5de010d385709b8ff8fc439a588ed4bca',
+    subscription
   });
 }
 
