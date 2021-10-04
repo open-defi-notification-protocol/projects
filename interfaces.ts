@@ -74,7 +74,7 @@ export interface SubscribeFormField {
   values?: LabelAndValue[];
   // required for "hidden" and contains the value of the field
   value?: any;
-  // internal id of the field when storing the subscription persistently (cannot change over time), see SubscriptionValues 
+  // internal ID of the field when storing the subscription persistently (cannot change over time), see SubscriptionValues 
   id: string;
 }
 
@@ -95,4 +95,6 @@ export interface PushNotification {
   notification: string;
   // optional link to visit when the user wants to act on the push notification
   link?: string;
+  // optional unique ID for this notification to prevent sending duplicate notifications to users about the same event
+  uniqueId?: string;
 }
