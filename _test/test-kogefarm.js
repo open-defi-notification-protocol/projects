@@ -2,7 +2,7 @@ const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3));
 
 async function testGetSharesUSDValue() {
-  const PositionWorth = require('../koge/position-worth');
+  const PositionWorth = require('../kogefarm/position-worth');
   const positionWorth = new PositionWorth();
 
   return positionWorth._getSharesUSDValue({
@@ -14,7 +14,7 @@ async function testGetSharesUSDValue() {
 }
 
 async function testGetVaultLabel() {
-  const PositionWorth = require('../koge/position-worth');
+  const PositionWorth = require('../kogefarm/position-worth');
   const positionWorth = new PositionWorth();
 
   return positionWorth._getVaultLabel({
@@ -25,17 +25,17 @@ async function testGetVaultLabel() {
 }
 
 async function testGetAllUserVaults() {
-  const PositionWorth = require('../koge/position-worth');
+  const PositionWorth = require('../kogefarm/position-worth');
   const positionWorth = new PositionWorth();
 
   return positionWorth._getAllUserVaults({
-      web3,
-      address: '0xa64b93801560c2b47a4e318417e26cdaf08254f7'
+    web3,
+    address: '0xa64b93801560c2b47a4e318417e26cdaf08254f7'
   });
 }
 
 async function testOnBlocks() {
-  const PositionWorth = require('../koge/position-worth');
+  const PositionWorth = require('../kogefarm/position-worth');
   const positionWorth = new PositionWorth();
 
   // simulate subscribe form event
@@ -46,14 +46,14 @@ async function testOnBlocks() {
 
   // simulate user filling in the subscription form in the app
   const subscription = {
-    "Vault": form.find(o => o.label === "Vault").values[3].value,
-    "Percent Drop": form.find(o => o.label === "Percent Drop").default
+    vault: form.find(o => o.id === 'vault').values[3].value,
+    drop: form.find(o => o.id === 'drop').default
   };
 
   return positionWorth.onBlocks({
-      web3,
-      address: '0xa64b93801560c2b47a4e318417e26cdaf08254f7',
-      subscription
+    web3,
+    address: '0xa64b93801560c2b47a4e318417e26cdaf08254f7',
+    subscription
   });
 }
 
