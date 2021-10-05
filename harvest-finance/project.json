@@ -1,6 +1,6 @@
 {
   "name": "Harvest Finance",
-  "type": "vault",
+  "category": "vault",
   "website": "https://harvest.finance",
   "logo": "https://s2.coinmarketcap.com/static/img/coins/200x200/6859.png",
   "background": "#C5E3E2",
