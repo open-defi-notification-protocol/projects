@@ -2,7 +2,7 @@
   "name": "Dot Finance",
   "category": "vault",
   "website": "https://dot.finance",
-  "logo": "http://api.dot.finance/images/PINK.png",
+  "logo": "logo.png",
   "background": "#2c1f40",
   "foreground": "#ffffff",
   "network": "bsc",
