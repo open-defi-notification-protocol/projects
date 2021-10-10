@@ -1,9 +1,9 @@
 {
-  "name": "Aave",
+  "name": "Compound",
   "category": "lending",
-  "website": "https://aave.com",
+  "website": "https://compound.finance",
   "logo": "logo.png",
-  "background": ["#3BB0C2", "#B253A0"],
+  "background": "#070a0e",
   "foreground": "#ffffff",
   "network": "ethereum"
 }

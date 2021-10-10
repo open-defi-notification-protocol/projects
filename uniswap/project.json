@@ -1,9 +1,9 @@
 {
-  "name": "Sushi",
+  "name": "Uniswap",
   "category": "amm",
-  "website": "https://sushi.com",
+  "website": "https://uniswap.org",
   "logo": "logo.png",
-  "background": "#0e0f24",
+  "background": "#ff007a",
   "foreground": "#ffffff",
   "network": "ethereum"
 }

@@ -1,9 +1,9 @@
 {
-  "name": "Opensea",
-  "category": "marketplace",
+  "name": "OpenSea",
+  "category": "nft",
   "website": "https://opensea.io",
-  "logo": "https://opensea.io/static/images/logos/opensea.svg",
-  "background": "#3D81DB",
+  "logo": "logo.png",
+  "background": "#0081e9",
   "foreground": "#ffffff",
   "network": "ethereum"
 }

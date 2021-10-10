@@ -1,2 +1,2 @@
-// Get notified about pending rewards TBD
+// Get notified about pending rewards
 // Work in progress

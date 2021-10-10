@@ -2,8 +2,9 @@
   "name": "FODL",
   "category": "lending",
   "website": "https://fodl.finance",
-  "logo": "https://static.example.com/logo.png",
-  "background": "#191919",
+  "logo": "logo.png",
+  "background": "#e2226f",
   "foreground": "#ffffff",
-  "network": "ethereum"
+  "network": "ethereum",
+  "dev": true
 }

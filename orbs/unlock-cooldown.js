@@ -1,2 +1,2 @@
-// Get notified about the unlock cooldown timer TBD
+// Get notified when the unlock cooldown timer reaches zero
 // Work in progress

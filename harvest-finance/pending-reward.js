@@ -1,1 +1,2 @@
-// similar to sushi/pending-reward.js TBD
+// Get notified when enough pending FARM rewards have accumulated
+// Work in progress

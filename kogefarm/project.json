@@ -1,9 +1,9 @@
 {
-  "name": "Dot Finance",
+  "name": "KogeFarm",
   "category": "vault",
-  "website": "https://dot.finance",
-  "logo": "https://dot.finance/assets/logo.svg",
-  "background": "#372e54",
+  "website": "https://kogefarm.io",
+  "logo": "logo.png",
+  "background": "#00a93a",
   "foreground": "#ffffff",
-  "network": "bsc"
+  "network": "polygon"
 }
