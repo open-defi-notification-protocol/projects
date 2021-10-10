@@ -1,9 +1,9 @@
 {
-  "name": "Harvest Finance",
+  "name": "Harvest",
   "category": "vault",
   "website": "https://harvest.finance",
-  "logo": "https://s2.coinmarketcap.com/static/img/coins/200x200/6859.png",
-  "background": "#C5E3E2",
-  "foreground": "#ffffff",
+  "logo": "logo.png",
+  "background": "#d6f1f1",
+  "foreground": "#48453b",
   "network": "ethereum"
 }

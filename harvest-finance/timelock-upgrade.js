@@ -1,1 +1,2 @@
-// similar to aave/new-vote.js TBD
+// Get notified when vault timelocks have a new pending upgrade
+// Work in progress

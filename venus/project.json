@@ -1,0 +1,9 @@
+{
+  "name": "Venus",
+  "category": "lending",
+  "website": "https://venus.io",
+  "logo": "logo.png",
+  "background": "#ffb625",
+  "foreground": "#ffffff",
+  "network": "bsc"
+}
