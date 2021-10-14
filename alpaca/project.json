@@ -1,0 +1,9 @@
+{
+  "name": "Alpaca",
+  "category": "farming",
+  "website": "https://alpacafinance.org",
+  "logo": "https://alpaca-app-asset.s3-ap-southeast-1.amazonaws.com/logo512.png",
+  "background": ["#e5e7eb"],
+  "foreground": "#ffffff",
+  "network": "bsc"
+}
