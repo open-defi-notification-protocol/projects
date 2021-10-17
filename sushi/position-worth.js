@@ -38,7 +38,7 @@ class PositionWorth {
   async _getAllUserPairs(args) {
     const pairs = [];
     // this.contract.methods.poolLength().call(); is taking a lot of time
-    const pools = 30; // await this.contract.methods.poolLength().call();
+    const pools = await this.contract.methods.poolLength().call();
     for (let pid = 0; pid < pools; pid++) {
       const userInfo = await this.contract.methods.userInfo(pid, args.address).call();
       if (parseInt(userInfo.amount) > 0) {
@@ -47,7 +47,7 @@ class PositionWorth {
         if (parseInt(userInfo.amount) > 0) {
           pairs.push({
             value: poolInfo.lpToken + "-" + liquidity.token0,
-            label: this._getPairLabel(args, poolInfo.lpToken)
+            label: await this._getPairLabel(args, poolInfo.lpToken)
           });
         }
       }

@@ -16,7 +16,7 @@ class PendingReward {
     const pairs = await this._getAllUserPairs(args);
     return [
       { type: "input-select", id: "pair", label: "Pair", values: pairs },
-      { type: "input-number", id: "minimum", label: "Minimum SUSHI", default: 100, description: "Minimum amount of claimable SUSHI to be notified about" }
+      { type: "input-number", id: "minimum", label: "Minimum SUSHI", default: 0, description: "Minimum amount of claimable SUSHI to be notified about" }
     ];
   }
 
@@ -33,13 +33,13 @@ class PendingReward {
   async _getAllUserPairs(args) {
     const pairs = [];
     // this.contract.methods.poolLength().call(); is taking a lot of time
-    const pools = 30; // await this.contract.methods.poolLength().call();
+    const pools = await this.contract.methods.poolLength().call();
     for (let pid = 0; pid < pools; pid++) {
       const userInfo = await this.contract.methods.userInfo(pid, args.address).call();
       if (parseInt(userInfo.amount) > 0) {
         pairs.push({
           value: pid,
-          label: this._getPairLabel(args, pid)
+          label: await this._getPairLabel(args, pid)
         });
       }
     }
