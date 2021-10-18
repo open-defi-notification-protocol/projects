@@ -20,7 +20,7 @@ class PositionWorth {
 
   // runs when new blocks are added to the mainnet chain - notification scanning happens here
   async onBlocks(args) {
-    const parts = args.subscription["Vault"].split("-");
+    const parts = args.subscription["vault"].split("-");
     const vaultAddress = parts[0];
     const sharesValueDuringRegistration = parts[1];
     const sharesValueNow = await this._getSharesUSDValue(args, vaultAddress);
