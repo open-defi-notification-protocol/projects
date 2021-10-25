@@ -1,6 +1,5 @@
 const Web3 = require('web3');
-require('dotenv').config();
-const web3 = new Web3(process.env.ENDPOINT_HTTPS);
+const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3));
 
 
 
@@ -35,7 +34,7 @@ async function testUniswapPositionWorth() {
   subscription.pair = subscription.pair.split('-')[0] + '-' + subscription.pair.split('-')[1] * 2
 
   // simulate on blocks event with drop
-  return positionWorth.onBlocks({
+  positionWorth.onBlocks({
     web3,
     address: '0xEcaa8f3636270Ee917C5b08D6324722c2C4951c7',
     subscription
