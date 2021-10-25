@@ -58,10 +58,39 @@ async function testRevaultPendingRewards() {
     });
 }
 
+async function testRevaultStakingUnlock() {
+    const StakingUnlock = require('../revault/staking-unlock');
+    const stakingUnlock = new StakingUnlock();
+
+    // simulate init event
+    await stakingUnlock.onInit({
+        web3
+    });
+
+    // simulate subscribe form event
+    const form = await stakingUnlock.onSubscribeForm({
+        web3,
+        address: '0x825c9b788f475F17E2Cbfcc200de8dBd0ea3D68D'
+    });
+
+    // simulate user filling in the subscription form in the app
+    const subscription = {
+        pool: form.find(o => o.id === 'pool').values[0].value,
+    };
+
+    // simulate on blocks event
+    return stakingUnlock.onBlocks({
+        web3,
+        address: '0x825c9b788f475F17E2Cbfcc200de8dBd0ea3D68D',
+        subscription
+    });
+}
+
 async function main() {
     console.log('Running manual test:');
     //console.log(await testRevaultChangeStrategy());
     console.log(await testRevaultPendingRewards());
+    //console.log(await testRevaultStakingUnlock());
 }
 
 main();
