@@ -29,10 +29,39 @@ async function testRevaultChangeStrategy() {
     });
 }
 
+async function testRevaultPendingRewards() {
+    const PendingRewards = require('../revault/pending-reward');
+    const pendingReward = new PendingRewards();
+
+    // simulate init event
+    await pendingReward.onInit({
+        web3
+    });
+
+    // simulate subscribe form event
+    const form = await pendingReward.onSubscribeForm({
+        web3,
+        address: '0x825c9b788f475F17E2Cbfcc200de8dBd0ea3D68D'
+    });
+
+    // simulate user filling in the subscription form in the app
+    const subscription = {
+        pool: form.find(o => o.id === 'pool').values[0].value,
+        frequency: form.find(o => o.id === 'frequency').default
+    };
+
+    // simulate on blocks event
+    return pendingReward.onBlocks({
+        web3,
+        address: '0x825c9b788f475F17E2Cbfcc200de8dBd0ea3D68D',
+        subscription
+    });
+}
 
 async function main() {
     console.log('Running manual test:');
-    console.log(await testRevaultChangeStrategy());
+    //console.log(await testRevaultChangeStrategy());
+    console.log(await testRevaultPendingRewards());
 }
 
 main();

@@ -229,7 +229,6 @@ class ChangeStrategy {
     return arr.join(delimiter);
   }
 
-  // returns all the MasterChef pairs that the user has LPs deposited in
   async _getAllUserStrategies(args) {
     const strategies = [];
     const vaults = await this.contract.methods.vaultLength().call();
