@@ -1,0 +1,18 @@
+{
+	"0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc": {"pairLabel": "USDC-ETH"},
+	"0x21b8065d10f73EE2e260e5B47D3344d3Ced7596E": {"pairLabel": "WISE-ETH"},
+	"0x9928e4046d7c6513326ccea028cd3e7a91c7590a": {"pairLabel": "FEI-TRIBE"},
+	"0x94b0a3d511b6ecdb17ebf877278ab030acb0a878": {"pairLabel": "FEI-ETH"},
+	"0xbb2b8038a1640196fbe3e38816f3e67cba72d940": {"pairLabel": "WBTC-ETH"},
+	"0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852": {"pairLabel": "ETH-USDT"},
+	"0x5fa464cefe8901d66c09b85d5fcdc55b3738c688": {"pairLabel": "TOKE-ETH"},
+	"0xd3d2e2692501a5c9ca623199d38826e513033a17": {"pairLabel": "UNI-ETH"},
+	"0x811beed0119b4afce20d2583eb608c6f7af1954f": {"pairLabel": "SHIB-ETH"},
+	"0x9cbfb60a09a9a33a10312da0f39977cbdb7fde23": {"pairLabel": "SAITAMA-ETH"},
+	"0xe1573b9d29e2183b1af0e743dc2754979a40d237": {"pairLabel": "FXS-FRAX"},
+	"0x79fd3e7fe3e832c66a0c005fbc99319b5e851f04": {"pairLabel": "KOKO-ETH"},
+	"0x21c5918ccb42d20a2368bdca8feda0399ebfd2f6": {"pairLabel": "GRO-USDC"},
+	"0xc5be99a02c6857f9eac67bbce58df5572498f40c": {"pairLabel": "ETH-AMPL"},
+	"0xa5e9c917b4b821e4e0a5bbefce078ab6540d6b5e": {"pairLabel": "STARL-ETH"},
+	"0x7b73644935b8e68019ac6356c40661e1bc315860": {"pairLabel": "ELON-ETH"}
+}
