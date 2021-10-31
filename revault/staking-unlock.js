@@ -2,8 +2,8 @@ const BigNumber = require("bignumber.js");
 
 class PendingReward {
 
-    static displayName = "Pending Reward";
-    static description = "Get notified about your pending REVA rewards";
+    static displayName = "Staking unlock";
+    static description = "Get notified when your staking position unlocked";
 
     // runs when class is initialized
     async onInit(args) {
@@ -16,18 +16,43 @@ class PendingReward {
         const pools = await this._getAllUserPools(args);
         return [
             { type: "input-select", id: "pool", label: "Pool", values: pools },
-            { type: "input-number", id: "frequency", label: "Frequency (every x REVA)", default: 10, description: "Get notified every x REVA you accrue" }
         ];
     }
 
     async onBlocks(args) {
-        const pendingReward = await this.contract.methods.pendingReva(args.subscription["pool"], args.address).call();
-        const normalizedPendingRewards = Math.ceil((new BigNumber(pendingReward).dividedBy("1e18").toNumber() - (parseInt(args.subscription.frequency) - 0.00000000001)) / 10) * 10;
-        return [
-            {
-                notification: `You have ${normalizedPendingRewards} pending REVA reward, go to app.revault.network to claim it`
-            }
-        ];
+        const poolInfo = await this.contract.methods.poolInfo(args.subscription["pool"]).call();
+        const userInfo = await this.contract.methods.userPoolInfo(args.subscription["pool"], args.address).call();
+
+        const unlockWithinDays = Math.max(0, Math.ceil((parseInt(userInfo.timeDeposited) + parseInt(poolInfo.timeLocked) - (new Date().getTime() / 1000)) / 24 / 60 / 60));
+        const unlockWithinWeeks = Math.floor(unlockWithinDays / 7);
+        const unlockWithinMonths = Math.floor(unlockWithinDays / 30);
+
+        if (unlockWithinMonths > 0) {
+            return [
+                {
+                    notification: `Your X${poolInfo.vRevaMultiplier} staking position will be unlock in ${unlockWithinMonths} ${unlockWithinMonths === 1 ? 'month' : 'months'}`
+                }
+            ];
+        } else if (unlockWithinWeeks > 0) {
+            return [
+                {
+                    notification: `Your X${poolInfo.vRevaMultiplier} staking position will be unlock in ${unlockWithinWeeks} ${unlockWithinWeeks === 1 ? 'week' : 'weeks'}`
+                }
+            ];
+        } else if (unlockWithinDays > 0) {
+            return [
+                {
+                    notification: `Your X${poolInfo.vRevaMultiplier} staking position will be unlock in ${unlockWithinDays} ${unlockWithinDays === 1 ? 'day' : 'days'}`
+                }
+            ];
+        } else {
+            return [
+                {
+                    notification: `Your X${poolInfo.vRevaMultiplier} staking position is unlocked, go to app.revault.network to restake`
+                }
+            ];
+        }
+
     }
 
     async _getAllUserPools(args) {
