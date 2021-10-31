@@ -3,7 +3,7 @@ const BN = require("bignumber.js");
 
 class GasPrice {
 
-    static displayName = "Block Height";
+    static displayName = "Gas Price";
     static description = "Get notified when the last block base fee per gas price is above or below a certain threshold";
     static displayIcon = "hand";
 
@@ -27,8 +27,8 @@ class GasPrice {
                 id: "above-below",
                 label: "Above/Below",
                 values: [
-                    {value: 0, label: 'Above'},
-                    {value: 1, label: 'Below'}
+                    {value: "0", label: "Above"},
+                    {value: "1", label: "Below"}
                 ]
             }
         ];
