@@ -41,7 +41,7 @@ async function testGasPriceAboveBelow(price, above) {
     // simulate user filling in the subscription form in the app
     const subscription = {
         "price": price,
-        "above-below": {value: above ? 0 : 1, label: above ? 'Above' : 'Below'}
+        "above-below": above ? "0" : "1"
     };
 
     // simulate init event
@@ -62,9 +62,14 @@ async function main() {
 
     console.log('Running manual test:');
     console.log(await testBlockHeightMatch());
+    console.log("test price ABOVE 1000 gwei");
     console.log(await testGasPriceAboveBelow('1000', true));
+    console.log("test price ABOVE 10 gwei");
     console.log(await testGasPriceAboveBelow('10', true));
+    console.log("");
+    console.log("test price BELOW 1000 gwei");
     console.log(await testGasPriceAboveBelow('1000', false));
+    console.log("test price BELOW 10 gwei");
     console.log(await testGasPriceAboveBelow('10', false));
 
 }
