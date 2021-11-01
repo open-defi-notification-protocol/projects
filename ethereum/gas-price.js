@@ -19,7 +19,7 @@ class GasPrice {
                 type: "input-number",
                 id: "price",
                 label: "Gas Price (Gwei)",
-                default: 0,
+                default: "0",
                 description: "The gas price threshold"
             },
             {
@@ -40,7 +40,7 @@ class GasPrice {
         const subscription = args.subscription;
 
         const price = subscription["price"];
-        const above = subscription["above-below"].value === 0;
+        const above = subscription["above-below"].value === "0";
 
         const block = await args.web3.eth.getBlock("pending");
 
