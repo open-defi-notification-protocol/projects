@@ -40,7 +40,7 @@ class GasPrice {
         const subscription = args.subscription;
 
         const price = subscription["price"];
-        const above = subscription["above-below"].value === "0";
+        const above = subscription["above-below"] === "0";
 
         const block = await args.web3.eth.getBlock("pending");
 
