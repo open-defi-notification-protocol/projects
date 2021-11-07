@@ -53,12 +53,47 @@ async function testGasPriceAboveBelow(price, above) {
     return gasPrice.onBlocks({
         web3,
         address: "0xC81bD599a66dA6dcc3A64399f8025C19fFC42888",
+        subscription: subscription,
+        toBlock: 13569998
+    });
+
+}
+
+
+async function testTransactionConfirmations(txHash, confirmations) {
+
+    const GasPrice = require('../ethereum/transaction-confirmations');
+
+    const gasPrice = new GasPrice();
+
+    // simulate subscribe form event
+    await gasPrice.onSubscribeForm({
+        web3,
+        address: '0xC81bD599a66dA6dcc3A64399f8025C19fFC42888'
+    });
+
+    // simulate user filling in the subscription form in the app
+    const subscription = {
+        "price": price,
+        "above-below": above ? "0" : "1"
+    };
+
+    // simulate init event
+    await gasPrice.onInit({
+        web3
+    });
+
+    // simulate on blocks event
+    return gasPrice.onBlocks({
+        web3,
+        address: "0xC81bD599a66dA6dcc3A64399f8025C19fFC42888",
         subscription: subscription
     });
 
 }
 
 async function main() {
+
 
     console.log('Running manual test:');
     console.log(await testBlockHeightMatch());
