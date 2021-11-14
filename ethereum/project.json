@@ -3,7 +3,6 @@
   "category": "blockchain",
   "website": "https://ethereum.org",
   "logo": "logo.png",
-  "dev": true,
   "background": "#454a75",
   "foreground": "#ffffff",
   "network": "ethereum"
