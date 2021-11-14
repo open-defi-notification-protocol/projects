@@ -25,7 +25,7 @@ class PositionWorth {
 
   // runs when new blocks are added to the mainnet chain - notification scanning happens here
   async onBlocks(args) {
-    let selectedPair = args.subscription["pair"];
+    const selectedPair = args.subscription["pair"];
     if (!selectedPair) {
         console.error("subscription with no selected pair. skipping");
         return
