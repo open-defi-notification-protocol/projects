@@ -566,6 +566,11 @@ class ChangeStrategy {
     async onBlocks(args) {
 
         const userVault = this.vaults.find(v => parseInt(v.additionalData.vid) === parseInt(args.subscription["strategy"]));
+        if (!userVault) {
+            console.error("subscription with no valid strategy. skipping");
+            return
+        }
+
         const promises = this.vaults.filter(v => v.depositTokenSymbol === userVault.depositTokenSymbol).map(v => this.getApy(v.additionalData.vid).then((apy) => {
             return {
                 vaultProvider: v.vaultProvider,
