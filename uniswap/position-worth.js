@@ -25,7 +25,13 @@ class PositionWorth {
 
   // runs when new blocks are added to the mainnet chain - notification scanning happens here
   async onBlocks(args) {
-    const parts = args.subscription["pair"].split("-");
+    let selectedPair = args.subscription["pair"];
+    if (!selectedPair) {
+        console.error("subscription with no selected pair. skipping");
+        return
+    }
+
+    const parts = selectedPair.split("-");
     const lpToken = parts[0];
     const initialLiquidityToken0 = new BigNumber(parts[1]);
     const liquidity = await this._getLiquidity(args, lpToken);
