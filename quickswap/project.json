@@ -1,0 +1,9 @@
+{
+  "name": "Quickswap",
+  "category": "farm",
+  "website": "https://quickswap.exchange",
+  "logo": "logo.png",
+  "background": "#418aca",
+  "foreground": "#ffffff",
+  "network": "polygon"
+}
