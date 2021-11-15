@@ -48,40 +48,12 @@ async function testQiuckPositionWorth(address) {
     // simulate user filling in the subscription form in the app
     const subscription = {
         pair: form.find(o => o.id === 'pair').values[0].value,
+        initialToken0LiquidityMap: form.find(o => o.id === 'initialToken0LiquidityMap').value,
         drop: form.find(o => o.id === 'drop').default
     };
 
     // simulate on blocks event
     return positionWorth.onBlocks({
-        web3,
-        address: address,
-        subscription
-    });
-}
-
-async function testQiuckTokenAmount(address) {
-    const TokenAmount = require('../quickswap/token-amount');
-    const tokenAmount = new TokenAmount();
-
-    // simulate init event
-    await tokenAmount.onInit({
-        web3
-    });
-
-    // simulate subscribe form event
-    const form = await tokenAmount.onSubscribeForm({
-        web3,
-        address: address
-    });
-
-    // simulate user filling in the subscription form in the app
-    const subscription = {
-        pair: form.find(o => o.id === 'pair').values[0].value,
-        drop: form.find(o => o.id === 'drop').default
-    };
-
-    // simulate on blocks event
-    return tokenAmount.onBlocks({
         web3,
         address: address,
         subscription
@@ -96,7 +68,6 @@ async function main() {
 
     console.log(await testQiuckPendingRewards(address));
     console.log(await testQiuckPositionWorth(address));
-    console.log(await testQiuckTokenAmount(address));
 
 }
 
