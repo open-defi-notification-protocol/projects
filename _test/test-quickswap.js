@@ -48,7 +48,8 @@ async function testQiuckPositionWorth(address) {
     // simulate user filling in the subscription form in the app
     const subscription = {
         pair: form.find(o => o.id === 'pair').values[0].value,
-        initialToken0LiquidityMap: form.find(o => o.id === 'initialToken0LiquidityMap').value,
+        baseToken: form.find(o => o.id === 'baseToken').values[1].value,
+        initialReservesMap: form.find(o => o.id === 'initialReservesMap').value,
         drop: form.find(o => o.id === 'drop').default
     };
 
