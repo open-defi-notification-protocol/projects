@@ -7,10 +7,10 @@ const LP_ABI = [{"inputs":[],"payable":false,"stateMutability":"nonpayable","typ
 /**
  *
  */
-class PendingReward {
+class PositionWorth {
 
-  static displayName = "Pending Reward";
-  static description = "Get notified when enough reward is ready to claim";
+  static displayName = "Position Worth";
+  static description = "Track your position's total worth to protect against loss";
 
   /**
    * runs when class is initialized
@@ -30,7 +30,7 @@ class PendingReward {
    */
   async onSubscribeForm(args) {
 
-    const {pairs,  initialToken0LiquidityMap} = await this._getAllUserPairsAndInitialToken0LiquidityMap(args);
+    const {pairs,  initialReservesMap} = await this._getAllUserPairsAndInitialReservesMap(args);
 
     return [
       {
@@ -40,10 +40,26 @@ class PendingReward {
         values: pairs
       },
       {
+        type: "input-select",
+        id: "baseToken",
+        label: "Base Token",
+        description: "Will be used to calculate the position worth",
+        values: [
+          {
+            value: "token0",
+            label: "Token A"
+          },
+          {
+            value: "token1",
+            label: "Token B"
+          }
+        ]
+      },
+      {
         type: "hidden",
-        id: "initialToken0LiquidityMap",
+        id: "initialReservesMap",
         label: "",
-        value: JSON.stringify(initialToken0LiquidityMap)
+        value: JSON.stringify(initialReservesMap)
       },
       {
         type: "input-number",
@@ -66,29 +82,33 @@ class PendingReward {
 
     const poolInfo = this.poolsInfo[args.subscription['pair']];
 
-    const initialLiquidity = await this._getInitialLiquidity(
+    const currentReserves = await this._getReserves(
         args.web3,
         null,
         poolInfo.poolAddress
     );
 
-    const currentToken0Liquidity = initialLiquidity._reserve0;
+    const baseToken = args.subscription['baseToken'];
 
-    const initialToken0LiquidityMap = JSON.parse(args.subscription['initialToken0LiquidityMap']);
+    const currentBaseTokenReserves = currentReserves[baseToken];
 
-    const initialToken0Liquidity = initialToken0LiquidityMap[poolInfo.poolAddress];
+    const initialReservesMap = JSON.parse(args.subscription['initialReservesMap']);
+
+    const initialReserves = initialReservesMap[poolInfo.poolAddress];
+
+    const initialBaseTokenReserves = initialReserves[baseToken];
 
     const minFraction = 1 - (parseInt(args.subscription["drop"]) / 100);
 
-    const positionWorthDroppedBelowThreshold = new BN(initialToken0Liquidity)
+    const positionWorthDroppedBelowThreshold = new BN(initialBaseTokenReserves)
         .multipliedBy(2)
         .multipliedBy(minFraction)
-        .minus(new BN(currentToken0Liquidity).multipliedBy(2))
+        .minus(new BN(currentBaseTokenReserves).multipliedBy(2))
         .isPositive();
 
     if (positionWorthDroppedBelowThreshold) {
 
-      return {notification: `Your original holdings in one of the tokens dropped by more than ${args.subscription["drop"]}%`}
+      return {notification: `Your original holdings of Token ${baseToken === 'token0' ? 'A' : 'B'} of pair ${poolInfo.pairLabel} has dropped by more than ${args.subscription["drop"]}%`}
 
     } else {
 
@@ -103,14 +123,14 @@ class PendingReward {
    *          all the pairs that the user has LPs deposited in or staked on rewards contract
    *          all initial liquidities of token 0 of relevant pools
    * @param args
-   * @returns {Promise<{initialToken0LiquidityMap: {}, pairs: *[]}>}
+   * @returns {Promise<{initialReservesMap: {}, pairs: *[]}>}
    * @private
    */
-  async _getAllUserPairsAndInitialToken0LiquidityMap(args) {
+  async _getAllUserPairsAndInitialReservesMap(args) {
 
     const pairs = [];
 
-    const initialToken0LiquidityMap = {};
+    const initialReservesMap = {};
 
     for (const poolInfo of Object.values(this.poolsInfo)) {
 
@@ -127,28 +147,27 @@ class PendingReward {
           label: poolInfo.pairLabel
         });
 
-        const initialLiquidity = await this._getInitialLiquidity(
+        initialReservesMap[poolInfo.poolAddress] = await this._getReserves(
             args.web3,
             poolContract
         );
-
-        initialToken0LiquidityMap[poolInfo.poolAddress] = initialLiquidity._reserve0;
 
       }
 
     }
 
-    return {pairs, initialToken0LiquidityMap};
+    return {pairs, initialReservesMap};
   }
 
   /**
    *
+   * @param web3
    * @param poolContract (optional)
    * @param poolAddress (non optional if poolContract is not defined)
    * @returns {Promise<*>}
    * @private
    */
-  async _getInitialLiquidity(web3, poolContract, poolAddress) {
+  async _getReserves(web3, poolContract, poolAddress) {
 
     if (!poolContract) {
 
@@ -156,10 +175,15 @@ class PendingReward {
 
     }
 
-    return await poolContract.methods.getReserves().call();
+    const reserves = await poolContract.methods.getReserves().call();
+
+    return {
+      token0: reserves._reserve0,
+      token1: reserves._reserve1,
+    };
 
   }
 
 }
 
-module.exports = PendingReward;
+module.exports = PositionWorth;
