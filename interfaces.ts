@@ -21,7 +21,7 @@ export abstract class Notification {
 export type DisplayIcon = "hand" | "wallet" | "up-arrow" | "down-arrow"; // TODO: add more
 
 // network the project is running on
-export type Network = "ethereum" | "bsc" | "polygon"; // TODO: add more
+export type Network = "ethereum" | "bsc" | "polygon" | "avalanche"; // TODO: add more
 
 // arguments for onInit()
 export interface OnInitArgs {
@@ -74,7 +74,7 @@ export interface SubscribeFormField {
   values?: LabelAndValue[];
   // required for "hidden" and contains the value of the field
   value?: any;
-  // internal ID of the field when storing the subscription persistently (cannot change over time), see SubscriptionValues 
+  // internal ID of the field when storing the subscription persistently (cannot change over time), see SubscriptionValues
   id: string;
 }
 
