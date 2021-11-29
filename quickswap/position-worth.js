@@ -1,6 +1,6 @@
 const ABIs = require('./abis.json');
+const POOLS_INFO = require('./pools-info.json');
 const BN = require("bignumber.js");
-const fetch = require("node-fetch");
 
 /**
  *
@@ -18,8 +18,10 @@ class PositionWorth {
      */
     async onInit(args) {
 
-        const response = await fetch("https://quickswap.exchange/staking.json");
-        this.poolsInfo = JSON.parse(await response.json());
+        // cause DDOS response when run on firebase, using cached version for now.
+        // const response = await fetch("http://quickswap.exchange/staking.json");
+
+        this.poolsInfo = POOLS_INFO;
 
     }
 

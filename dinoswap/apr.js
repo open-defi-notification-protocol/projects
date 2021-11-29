@@ -2,7 +2,7 @@ const BigNumber = require("bignumber.js");
 
 class PendingReward {
 
-    static displayName = "Pending Reward";
+    static displayName = "APR";
     static description = "Get notified when enough reward is ready to claim";
 
     // runs when class is initialized
