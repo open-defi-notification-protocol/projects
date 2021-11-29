@@ -1,7 +1,7 @@
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3Polygon));
 
-async function testQiuckPendingRewards(address) {
+async function testQuickPendingRewards(address) {
     const PendingRewards = require('../quickswap/pending-reward');
     const pendingRewards = new PendingRewards();
 
@@ -30,7 +30,7 @@ async function testQiuckPendingRewards(address) {
     });
 }
 
-async function testQiuckPositionWorth(address) {
+async function testQuickPositionWorth(address) {
     const PositionWorth = require('../quickswap/position-worth');
     const positionWorth = new PositionWorth();
 
@@ -67,8 +67,8 @@ async function main() {
 
     const address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
 
-    console.log(await testQiuckPendingRewards(address));
-    console.log(await testQiuckPositionWorth(address));
+    // console.log(await testQuickPendingRewards(address));
+    console.log(await testQuickPositionWorth(address));
 
 }
 
