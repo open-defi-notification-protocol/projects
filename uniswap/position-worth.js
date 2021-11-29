@@ -14,6 +14,7 @@ class PositionWorth {
 	this.poolsInfo = JSON.parse(fs.readFileSync(`${__dirname}/poolsInfo.json`));
   }
 
+
   // runs right before user subscribes to new notifications and populates subscription form
   async onSubscribeForm(args) {
     const pairs = await this._getAllUserPairs(args);
