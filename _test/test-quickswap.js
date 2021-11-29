@@ -49,7 +49,7 @@ async function testQiuckPositionWorth(address) {
     const subscription = {
         pair: form.find(o => o.id === 'pair').values[0].value,
         baseToken: form.find(o => o.id === 'baseToken').values[1].value,
-        initialReservesMap: form.find(o => o.id === 'initialReservesMap').value,
+        initialInfoMap: form.find(o => o.id === 'initialInfoMap').value,
         drop: form.find(o => o.id === 'drop').default
     };
 
