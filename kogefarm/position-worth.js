@@ -14,7 +14,7 @@ class PositionWorth {
     // runs right before user subscribes to new notifications and populates subscription form
     async onSubscribeForm(args) {
 
-        const vaults = await this._getAllUserVaults(
+        const {vaults, initialInfoMap} = await this._getAllUserVaultsAndInitialInfoMap(
             args
         );
 
@@ -24,6 +24,12 @@ class PositionWorth {
                 id: "vault",
                 label: "Vault",
                 values: vaults
+            },
+            {
+                type: "hidden",
+                id: "initialInfoMap",
+                label: "",
+                value: JSON.stringify(initialInfoMap)
             },
             {
                 type: "input-number",
@@ -38,10 +44,12 @@ class PositionWorth {
     // runs when new blocks are added to the mainnet chain - notification scanning happens here
     async onBlocks(args) {
 
-        const parts = args.subscription["vault"].split("-");
+        const vaultAddress = args.subscription["vault"];
 
-        const vaultAddress = parts[0];
-        const sharesValueDuringRegistration = parts[1];
+        const initialInfoMap = JSON.parse(args.subscription["initialInfoMap"]);
+
+        const sharesValueDuringRegistration = initialInfoMap[vaultAddress].shares;
+
         const sharesValueNow = await this._getSharesUSDValue(args, vaultAddress);
         const minFraction = 1 - (parseInt(args.subscription["drop"]) / 100);
 
@@ -58,13 +66,15 @@ class PositionWorth {
     }
 
     // returns all kogefarm vaults where the user has some shares
-    async _getAllUserVaults(args) {
+    async _getAllUserVaultsAndInitialInfoMap(args) {
 
         const vaults = [];
 
         const response = await fetch("https://raw.githubusercontent.com/kogecoin/vault-contracts/main/vaultaddresses");
 
         const json = await response.json();
+
+        const initialInfoMap = {};
 
         for (let vid = 0; vid < json.length; vid++) {
 
@@ -78,14 +88,20 @@ class PositionWorth {
             if (new BigNumber(sharesValue).isGreaterThan(0)) {
 
                 vaults.push({
-                    value: vault + "-" + sharesValue,
+                    value: vault,
                     label: await this._getVaultLabel(args, vault)
                 });
+
+                initialInfoMap[vault] = {
+                    shares: sharesValue
+                };
 
             }
 
         }
-        return vaults;
+
+        return {vaults, initialInfoMap};
+
     }
 
     // returns the total value in USD of the user's shares in a vault
