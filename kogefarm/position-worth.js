@@ -5,7 +5,7 @@ const ABIs = require('./abis.json');
 class PositionWorth {
 
     static displayName = "Position Worth";
-    static description = "Get notified when the USD worth of your position drops below somes threshold";
+    static description = "Get notified when the USD worth of your position drops below a certain threshold";
 
     // runs when class is initialized
     async onInit(args) {
@@ -14,7 +14,7 @@ class PositionWorth {
     // runs right before user subscribes to new notifications and populates subscription form
     async onSubscribeForm(args) {
 
-        const {vaults, initialInfoMap} = await this._getAllUserVaultsAndInitialInfoMap(
+        const vaults = await this._getAllUserVaults(
             args
         );
 
@@ -26,17 +26,11 @@ class PositionWorth {
                 values: vaults
             },
             {
-                type: "hidden",
-                id: "initialInfoMap",
-                label: "",
-                value: JSON.stringify(initialInfoMap)
-            },
-            {
                 type: "input-number",
-                id: "drop",
-                label: "Percent Drop",
-                default: 15,
-                description: "Percent change in position worth"
+                id: "threshold",
+                label: "Threshold price",
+                default: 0,
+                description: "Notify me when the price of my position goes below this value in USD"
             }
         ];
     }
@@ -45,19 +39,15 @@ class PositionWorth {
     async onBlocks(args) {
 
         const vaultAddress = args.subscription["vault"];
-
-        const initialInfoMap = JSON.parse(args.subscription["initialInfoMap"]);
-
-        const sharesValueDuringRegistration = initialInfoMap[vaultAddress].shares;
+        const threshold = args.subscription["threshold"];
 
         const sharesValueNow = await this._getSharesUSDValue(args, vaultAddress);
-        const minFraction = 1 - (parseInt(args.subscription["drop"]) / 100);
 
-        if (new BigNumber(sharesValueDuringRegistration).multipliedBy(minFraction).minus(new BigNumber(sharesValueNow)).isGreaterThan(0)) {
+        if (new BigNumber(threshold).minus(new BigNumber(sharesValueNow)).isGreaterThan(0)) {
 
-            const vaultLabel = await this._getVaultLabel(args, vaultAddress);
+            const vaultLabel = await this._getVaultLabel(args, vaultAddress, sharesValueNow);
 
-            return {notification: `Your shares holdings in ${vaultLabel} has dropped by more than ${args.subscription["drop"]}%`};
+            return {notification: `Your shares holdings in ${vaultLabel} has dropped below ${threshold} USD`};
 
         }
 
@@ -66,15 +56,13 @@ class PositionWorth {
     }
 
     // returns all kogefarm vaults where the user has some shares
-    async _getAllUserVaultsAndInitialInfoMap(args) {
+    async _getAllUserVaults(args) {
 
         const vaults = [];
 
         const response = await fetch("https://raw.githubusercontent.com/kogecoin/vault-contracts/main/vaultaddresses");
 
         const json = await response.json();
-
-        const initialInfoMap = {};
 
         for (let vid = 0; vid < json.length; vid++) {
 
@@ -89,18 +77,14 @@ class PositionWorth {
 
                 vaults.push({
                     value: vault,
-                    label: await this._getVaultLabel(args, vault)
+                    label: await this._getVaultLabel(args, vault, sharesValue)
                 });
-
-                initialInfoMap[vault] = {
-                    shares: sharesValue
-                };
 
             }
 
         }
 
-        return {vaults, initialInfoMap};
+        return vaults;
 
     }
 
@@ -151,7 +135,7 @@ class PositionWorth {
     }
 
     // takes a kogefarm vault address and returns a string label of the underlying deposit tokens (like ETH-USDC)
-    async _getVaultLabel(args, vaultAddress) {
+    async _getVaultLabel(args, vaultAddress, sharesValue) {
 
         const vaultContract = new args.web3.eth.Contract(ABIs.vault, vaultAddress);
 
@@ -167,7 +151,9 @@ class PositionWorth {
         const token0Symbol = await token0Contract.methods.symbol().call();
         const token1Symbol = await token1Contract.methods.symbol().call();
 
-        return token0Symbol + "-" + token1Symbol;
+        const formatter = Intl.NumberFormat('en', {notation: 'compact'});
+
+        return `${token0Symbol} - ${token1Symbol} (${formatter.format(sharesValue)} USD)`;
 
     }
 }
