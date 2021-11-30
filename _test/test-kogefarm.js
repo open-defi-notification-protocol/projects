@@ -28,7 +28,7 @@ async function testGetAllUserVaults(address) {
     const PositionWorth = require('../kogefarm/position-worth');
     const positionWorth = new PositionWorth();
 
-    return positionWorth._getAllUserVaultsAndInitialInfoMap({
+    return positionWorth._getAllUserVaults({
         web3,
         address: address
     });
@@ -47,8 +47,7 @@ async function testOnBlocks(address) {
     // simulate user filling in the subscription form in the app
     const subscription = {
         vault: form.find(o => o.id === 'vault').values[0].value,
-        initialInfoMap: form.find(o => o.id === 'initialInfoMap').value,
-        drop: "0"
+        threshold: "100"
     };
 
     return positionWorth.onBlocks({
@@ -65,9 +64,9 @@ async function main() {
 
     console.log('Running manual test:');
 
-    console.log(await testGetSharesUSDValue(address, vaultAddress));
+    // console.log(await testGetSharesUSDValue(address, vaultAddress));
     console.log(await testGetAllUserVaults(address));
-    console.log(await testGetVaultLabel(vaultaddress));
+    // console.log(await testGetVaultLabel(vaultaddress));
     console.log(await testOnBlocks(address));
 }
 
