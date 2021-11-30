@@ -34,7 +34,7 @@ async function testGetAllUserVaults(address) {
     });
 }
 
-async function testOnBlocks(address) {
+async function testOnBlocks(address, threshold) {
     const PositionWorth = require('../kogefarm/position-worth');
     const positionWorth = new PositionWorth();
 
@@ -47,7 +47,7 @@ async function testOnBlocks(address) {
     // simulate user filling in the subscription form in the app
     const subscription = {
         vault: form.find(o => o.id === 'vault').values[0].value,
-        threshold: "100"
+        threshold: threshold
     };
 
     return positionWorth.onBlocks({
@@ -67,7 +67,7 @@ async function main() {
     // console.log(await testGetSharesUSDValue(address, vaultAddress));
     console.log(await testGetAllUserVaults(address));
     // console.log(await testGetVaultLabel(vaultaddress));
-    console.log(await testOnBlocks(address));
+    console.log(await testOnBlocks(address, "86"));
 }
 
 main();
