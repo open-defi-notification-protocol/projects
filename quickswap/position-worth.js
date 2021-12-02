@@ -2,6 +2,12 @@ const ABIs = require('./abis.json');
 const POOLS_INFO = require('./pools-info.json');
 const BN = require("bignumber.js");
 
+const ROUTER_ADDRESS = '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff';
+const USDC_TOKEN_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
+const WMATIC_TOKEN_ADDRESS = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270';
+
+const MAX_POOLS = 100;
+
 /**
  *
  */
@@ -23,6 +29,10 @@ class PositionWorth {
 
         this.poolsInfo = POOLS_INFO;
 
+        const usdcContract = new args.web3.eth.Contract(ABIs.token, USDC_TOKEN_ADDRESS);
+
+        this.usdcDecimals = await usdcContract.methods.decimals().call();
+
     }
 
     /**
@@ -33,43 +43,21 @@ class PositionWorth {
      */
     async onSubscribeForm(args) {
 
-        const {pairs, initialInfoMap} = await this._getAllUserPairsAndInitialInfoMap(args);
+        const pairs = await this._getAllUserPairs(args);
 
         return [
             {
                 type: "input-select",
                 id: "pair",
-                label: "Pair",
+                label: "Pool",
                 values: pairs
             },
             {
-                type: "input-select",
-                id: "baseToken",
-                label: "Base Token",
-                description: "Will be used to calculate the position worth",
-                values: [
-                    {
-                        value: "token0",
-                        label: "Token A"
-                    },
-                    {
-                        value: "token1",
-                        label: "Token B"
-                    }
-                ]
-            },
-            {
-                type: "hidden",
-                id: "initialInfoMap",
-                label: "",
-                value: JSON.stringify(initialInfoMap)
-            },
-            {
                 type: "input-number",
-                id: "drop",
-                label: "Percent Drop",
+                id: "threshold",
+                label: "Threshold price",
                 default: 0,
-                description: "Percent change in position worth"
+                description: "Notify me when the price of my position goes below this value in USD"
             }
         ];
 
@@ -84,36 +72,27 @@ class PositionWorth {
     async onBlocks(args) {
 
         const selectedPairAddress = args.subscription['pair'];
+        const threshold = args.subscription['threshold'];
 
         const poolInfo = this.poolsInfo.find(_poolInfo => _poolInfo.pair === selectedPairAddress)
 
-        const poolContract = new args.web3.eth.Contract(ABIs.lp, poolInfo.pair);
-
-        const baseToken = args.subscription['baseToken'];
-
-        const currentReserves = await this._getReserves(
-            poolContract
+        const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
+            args.web3,
+            args.address,
+            poolInfo
         );
 
-        const currentBaseTokenReserves = currentReserves[baseToken];
+        const uniqueId = poolInfo.pair + "-" + threshold;
 
-        const initialInfoMap = JSON.parse(args.subscription['initialInfoMap']);
 
-        const initialInfo = initialInfoMap[poolInfo.pair];
+        if (new BN(threshold).minus(new BN(positionWorthInUsdBN)).isGreaterThan(0)) {
 
-        const initialBaseTokenReserves = initialInfo.reserves[baseToken];
+            const poolLabel = await this._getPoolLabel(poolInfo, positionWorthInUsdBN);
 
-        const thresholdPercentage = 1 - (parseInt(args.subscription["drop"]) / 100);
-
-        const initialPositionWorth = new BN(initialBaseTokenReserves).multipliedBy(initialInfo.shares);
-
-        const currentPositionWorth = new BN(currentBaseTokenReserves).multipliedBy(initialInfo.shares);
-
-        const positionWorthDroppedBelowThreshold = currentPositionWorth.isLessThan(initialPositionWorth.multipliedBy(thresholdPercentage));
-
-        if (positionWorthDroppedBelowThreshold) {
-
-            return {notification: `Your original holdings of Token ${baseToken === 'token0' ? 'A' : 'B'} of pair ${this._getPoolLabel(poolInfo)} has dropped by more than ${args.subscription["drop"]}%`}
+            return {
+                uniqueId: uniqueId,
+                notification: `Your shares holdings in ${poolLabel} has dropped below ${threshold} USD`
+            };
 
         } else {
 
@@ -126,14 +105,17 @@ class PositionWorth {
     /**
      *
      * @param poolInfo
+     * @param positionWorthInUSDBN
      * @returns {string}
      * @private
      */
-    _getPoolLabel(poolInfo) {
+    _getPoolLabel(poolInfo, positionWorthInUSDBN) {
 
         const tokens = poolInfo.tokens;
 
-        return tokens[0].symbol + '-' + tokens[1].symbol;
+        const formatter = Intl.NumberFormat('en', {notation: 'compact'});
+
+        return `${tokens[0].symbol} - ${tokens[1].symbol} (${formatter.format(positionWorthInUSDBN)} USD)`;
 
     }
 
@@ -145,60 +127,95 @@ class PositionWorth {
      * @returns {Promise<{initialInfoMap: {}, pairs: *[]}>}
      * @private
      */
-    async _getAllUserPairsAndInitialInfoMap(args) {
+    async _getAllUserPairs(args) {
 
         const pairs = [];
 
         const walletAddress = args.address;
 
-        const initialInfoMap = {};
+        let poolIndex = 0;
 
         for (const poolInfo of this.poolsInfo) {
 
+            if (poolIndex >= MAX_POOLS) {
+                break;
+            }
+
+            poolIndex++;
+
             if (poolInfo.pair) {
 
-                const poolContract = new args.web3.eth.Contract(ABIs.lp, poolInfo.pair);
-
-                let stakingRewardContract = null;
-
-                if (poolInfo.stakingRewardAddress) {
-                    stakingRewardContract = new args.web3.eth.Contract(ABIs.rewards, poolInfo.stakingRewardAddress);
-                }
-
-                const walletTotalLpBalanceBN = await this._getWalletTotalLpBalanceBN(
+                const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
+                    args.web3,
                     walletAddress,
-                    poolContract,
-                    stakingRewardContract
+                    poolInfo
                 );
 
-                if (walletTotalLpBalanceBN.isGreaterThan(0)) {
+                if (positionWorthInUsdBN.isGreaterThan(0)) {
 
                     pairs.push({
                         value: poolInfo.pair,
-                        label: this._getPoolLabel(poolInfo)
+                        label: this._getPoolLabel(poolInfo, positionWorthInUsdBN)
                     });
 
-                    const reserves = await this._getReserves(
-                        poolContract
-                    );
-
-                    const sharesBN = await this._getUserSharesBN(
-                        walletTotalLpBalanceBN,
-                        poolContract,
-                    );
-
-                    initialInfoMap[poolInfo.pair] = {
-                        shares: sharesBN.toString(),
-                        reserves: reserves
-                    };
 
                 }
+
 
             }
 
         }
 
-        return {pairs, initialInfoMap};
+        return pairs;
+    }
+
+    async _getPositionWorthInUsdBN(web3, walletAddress, poolInfo) {
+
+        const poolContract = new web3.eth.Contract(ABIs.lp, poolInfo.pair);
+
+        let stakingRewardContract = null;
+
+        if (poolInfo.stakingRewardAddress) {
+            stakingRewardContract = new web3.eth.Contract(ABIs.rewards, poolInfo.stakingRewardAddress);
+        }
+
+        const walletTotalLpBalanceBN = await this._getWalletTotalLpBalanceBN(
+            walletAddress,
+            poolContract,
+            stakingRewardContract
+        );
+
+        if (walletTotalLpBalanceBN.isGreaterThan(0)) {
+
+            const token0Info = poolInfo.tokens[0];
+
+            const token0Reserve = await this._getToken0Reserve(
+                poolContract,
+                token0Info
+            );
+
+            const routerContract = new web3.eth.Contract(ABIs.router, ROUTER_ADDRESS);
+
+            const singleTokenWorthInUSD = await routerContract.methods.getAmountsOut(
+                (new BN("10").pow(token0Info.decimals)), // single whole unit
+                [token0Info.address, WMATIC_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS]
+            ).call();
+
+            const lpWorthInUsdBN = ((new BN(singleTokenWorthInUSD[2]).div(new BN("10").pow(this.usdcDecimals)))
+                .multipliedBy(new BN(token0Reserve).div(new BN("10").pow(token0Info.decimals)))).multipliedBy(2);
+
+            const sharesBN = await this._getUserSharesBN(
+                walletTotalLpBalanceBN,
+                poolContract,
+            );
+
+            return lpWorthInUsdBN.multipliedBy(sharesBN);
+
+
+        }
+
+        return new BN(0);
+
     }
 
     /**
@@ -248,14 +265,14 @@ class PositionWorth {
      * @returns {Promise<{token0: *, token1: *}>}
      * @private
      */
-    async _getReserves(poolContract) {
+    async _getToken0Reserve(poolContract, token0Info) {
 
         const reserves = await poolContract.methods.getReserves().call();
+        const token0Address = await poolContract.methods.token0().call();
 
-        return {
-            token0: reserves._reserve0,
-            token1: reserves._reserve1
-        }
+
+        return token0Address === token0Info.address ? reserves._reserve0 : reserves._reserve1;
+
 
     }
 
