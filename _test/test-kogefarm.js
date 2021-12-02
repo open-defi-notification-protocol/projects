@@ -5,6 +5,11 @@ async function testGetSharesUSDValue(address, vaultaddress) {
     const PositionWorth = require('../kogefarm/position-worth');
     const positionWorth = new PositionWorth();
 
+    // simulate init event
+    await positionWorth.onInit({
+        web3
+    });
+
     return positionWorth._getSharesUSDValue({
             web3,
             address: address,
@@ -17,16 +22,27 @@ async function testGetVaultLabel(vaultaddress) {
     const PositionWorth = require('../kogefarm/position-worth');
     const positionWorth = new PositionWorth();
 
+    // simulate init event
+    await positionWorth.onInit({
+        web3
+    });
+
     return positionWorth._getVaultLabel({
             web3
         },
-        vaultaddress
+        vaultaddress,
+        "20"
     );
 }
 
 async function testGetAllUserVaults(address) {
     const PositionWorth = require('../kogefarm/position-worth');
     const positionWorth = new PositionWorth();
+
+    // simulate init event
+    await positionWorth.onInit({
+        web3
+    });
 
     return positionWorth._getAllUserVaults({
         web3,
@@ -37,6 +53,11 @@ async function testGetAllUserVaults(address) {
 async function testOnBlocks(address, threshold) {
     const PositionWorth = require('../kogefarm/position-worth');
     const positionWorth = new PositionWorth();
+
+    // simulate init event
+    await positionWorth.onInit({
+        web3
+    });
 
     // simulate subscribe form event
     const form = await positionWorth.onSubscribeForm({
