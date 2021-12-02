@@ -30,7 +30,7 @@ async function testQuickPendingRewards(address) {
     });
 }
 
-async function testQuickPositionWorth(address) {
+async function testQuickPositionWorth(address, threshold) {
     const PositionWorth = require('../quickswap/position-worth');
     const positionWorth = new PositionWorth();
 
@@ -45,12 +45,12 @@ async function testQuickPositionWorth(address) {
         address: address
     });
 
+    console.log(form);
+
     // simulate user filling in the subscription form in the app
     const subscription = {
         pair: form.find(o => o.id === 'pair').values[0].value,
-        baseToken: form.find(o => o.id === 'baseToken').values[1].value,
-        initialInfoMap: form.find(o => o.id === 'initialInfoMap').value,
-        drop: form.find(o => o.id === 'drop').default
+        threshold: threshold
     };
 
     // simulate on blocks event
@@ -68,7 +68,7 @@ async function main() {
     const address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
 
     // console.log(await testQuickPendingRewards(address));
-    console.log(await testQuickPositionWorth(address));
+    console.log(await testQuickPositionWorth(address, "50"));
 
 }
 
