@@ -1,7 +1,7 @@
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3Polygon));
 
-async function testQuickPendingRewards(address) {
+async function testQuickPendingRewards(address, minimum) {
     const PendingRewards = require('../quickswap/pending-reward');
     const pendingRewards = new PendingRewards();
 
@@ -16,10 +16,12 @@ async function testQuickPendingRewards(address) {
         address: address
     });
 
+    console.log(form);
+
     // simulate user filling in the subscription form in the app
     const subscription = {
         pair: form.find(o => o.id === 'pair').values[0].value,
-        minimum: form.find(o => o.id === 'minimum').default
+        minimum: minimum
     };
 
     // simulate on blocks event
@@ -67,8 +69,8 @@ async function main() {
 
     const address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
 
-    // console.log(await testQuickPendingRewards(address));
-    console.log(await testQuickPositionWorth(address, "50"));
+    console.log(await testQuickPendingRewards(address, "0"));
+    // console.log(await testQuickPositionWorth(address, "50"));
 
 }
 

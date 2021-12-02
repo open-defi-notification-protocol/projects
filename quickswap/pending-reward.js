@@ -1,7 +1,10 @@
-const fs = require('fs');
 const BN = require("bignumber.js");
+const POOLS_INFO = require('./pools-info.json');
+const ABIs = require('./abis.json');
 
-const REWARDS_CONTRACT_ABI = [{"inputs":[{"internalType":"address","name":"_rewardsDistribution","type":"address"},{"internalType":"address","name":"_rewardsToken","type":"address"},{"internalType":"address","name":"_stakingToken","type":"address"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"reward","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"periodFinish","type":"uint256"}],"name":"RewardAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"reward","type":"uint256"}],"name":"RewardPaid","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Staked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Withdrawn","type":"event"},{"constant":true,"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"earned","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"exit","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"getReward","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"lastTimeRewardApplicable","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"lastUpdateTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"reward","type":"uint256"},{"internalType":"uint256","name":"rewardsDuration","type":"uint256"}],"name":"notifyRewardAmount","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"periodFinish","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"rewardPerToken","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"rewardPerTokenStored","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"rewardRate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"rewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"rewardsDistribution","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"rewardsToken","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"stake","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint256","name":"deadline","type":"uint256"},{"internalType":"uint8","name":"v","type":"uint8"},{"internalType":"bytes32","name":"r","type":"bytes32"},{"internalType":"bytes32","name":"s","type":"bytes32"}],"name":"stakeWithPermit","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"stakingToken","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"userRewardPerTokenPaid","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}];
+const REWARD_TOKEN_ADDRESS = "0xf28164A485B0B2C90639E47b0f377b4a438a16B1";
+
+const MAX_POOLS = 100;
 
 /**
  *
@@ -18,7 +21,11 @@ class PendingReward {
      * @returns {Promise<void>}
      */
     async onInit(args) {
-        this.poolsInfo = JSON.parse(fs.readFileSync(`${__dirname}/poolsInfo.json`));
+
+        // cause DDOS response when run on firebase, using cached version for now.
+        // const response = await fetch("http://quickswap.exchange/staking.json");
+
+        this.poolsInfo = POOLS_INFO;
     }
 
     /**
@@ -57,14 +64,22 @@ class PendingReward {
      */
     async onBlocks(args) {
 
-        const poolInfo = this.poolsInfo[args.subscription['pair']];
+        const selectedPairAddress = args.subscription['pair'];
+        const minimumTokens = args.subscription["minimum"];
 
-        const lpRewardContract = new args.web3.eth.Contract(REWARDS_CONTRACT_ABI, poolInfo.rewardContractAddress);
+        const poolInfo = this.poolsInfo.find(_poolInfo => _poolInfo.pair === selectedPairAddress)
+
+        const lpRewardContract = new args.web3.eth.Contract(ABIs.rewards, poolInfo.stakingRewardAddress);
         const userPendingRewards = new BN(await lpRewardContract.methods.earned(args.address).call());
 
-        if (userPendingRewards.dividedBy("1e18").toNumber() > parseFloat(args.subscription["minimum"])) {
+        const rewardTokenContract = new args.web3.eth.Contract(ABIs.token, REWARD_TOKEN_ADDRESS);
+        const rewardTokenDecimals = await rewardTokenContract.methods.decimals().call();
 
-            return {notification: "You have lots of dQUICK ready to claim"}
+        const pendingReward = userPendingRewards.dividedBy("1e" + rewardTokenDecimals);
+
+        if (pendingReward.isGreaterThan(minimumTokens)) {
+
+            return {notification: `You have lots of dQUICK ready to claim`};
 
         } else {
 
@@ -85,16 +100,24 @@ class PendingReward {
 
         const pairs = [];
 
-        for (const poolInfo of Object.values(this.poolsInfo)) {
+        let poolIndex = 0;
 
-            const lpRewardContract = new args.web3.eth.Contract(REWARDS_CONTRACT_ABI, poolInfo.rewardContractAddress);
+        for (const poolInfo of this.poolsInfo) {
+
+            if (poolIndex >= MAX_POOLS) {
+                break;
+            }
+
+            poolIndex++;
+
+            const lpRewardContract = new args.web3.eth.Contract(ABIs.rewards, poolInfo.stakingRewardAddress);
             const userStakedBalanceBN = new BN(await lpRewardContract.methods.balanceOf(args.address).call());
 
             if (userStakedBalanceBN.isGreaterThan(0)) {
 
                 pairs.push({
-                    value: poolInfo.poolAddress,
-                    label: poolInfo.pairLabel
+                    value: poolInfo.pair,
+                    label: this._getPoolLabel(poolInfo)
                 });
 
             }
@@ -103,6 +126,22 @@ class PendingReward {
         return pairs;
     }
 
+
+    /**
+     *
+     * @param poolInfo
+     * @returns {string}
+     * @private
+     */
+    _getPoolLabel(poolInfo) {
+
+        const tokens = poolInfo.tokens;
+
+        return `${tokens[0].symbol} - ${tokens[1].symbol}`;
+
+    }
+
 }
+
 
 module.exports = PendingReward;
