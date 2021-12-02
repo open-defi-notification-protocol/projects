@@ -2,6 +2,10 @@ const BigNumber = require("bignumber.js");
 const fetch = require("node-fetch");
 const ABIs = require('./abis.json');
 
+const ROUTER_ADDRESS = '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff';
+const USDC_TOKEN_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
+const WMATIC_TOKEN_ADDRESS = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270';
+
 class PositionWorth {
 
     static displayName = "Position Worth";
@@ -9,6 +13,11 @@ class PositionWorth {
 
     // runs when class is initialized
     async onInit(args) {
+
+        const response = await fetch("https://raw.githubusercontent.com/kogecoin/vault-contracts/main/vaultaddresses");
+
+        this.vaultsInfo = await response.json();
+
     }
 
     // runs right before user subscribes to new notifications and populates subscription form
@@ -41,13 +50,18 @@ class PositionWorth {
         const vaultAddress = args.subscription["vault"];
         const threshold = args.subscription["threshold"];
 
+        const uniqueId = vaultAddress + "-" + threshold;
+
         const sharesValueNow = await this._getSharesUSDValue(args, vaultAddress);
 
         if (new BigNumber(threshold).minus(new BigNumber(sharesValueNow)).isGreaterThan(0)) {
 
             const vaultLabel = await this._getVaultLabel(args, vaultAddress, sharesValueNow);
 
-            return {notification: `Your shares holdings in ${vaultLabel} has dropped below ${threshold} USD`};
+            return {
+                uniqueId: uniqueId,
+                notification: `Your shares holdings in ${vaultLabel} has dropped below ${threshold} USD`
+            };
 
         }
 
@@ -60,24 +74,18 @@ class PositionWorth {
 
         const vaults = [];
 
-        const response = await fetch("https://raw.githubusercontent.com/kogecoin/vault-contracts/main/vaultaddresses");
-
-        const json = await response.json();
-
-        for (let vid = 0; vid < json.length; vid++) {
-
-            const vault = json[vid];
+        for (const vaultInfo of this.vaultsInfo) {
 
             const sharesValue = await this._getSharesUSDValue(
                 args,
-                vault
+                vaultInfo
             );
 
             if (new BigNumber(sharesValue).isGreaterThan(0)) {
 
                 vaults.push({
-                    value: vault,
-                    label: await this._getVaultLabel(args, vault, sharesValue)
+                    value: vaultInfo,
+                    label: await this._getVaultLabel(args, vaultInfo, sharesValue)
                 });
 
             }
@@ -101,7 +109,7 @@ class PositionWorth {
 
                 const vaultToken = await vaultContract.methods.token().call();
                 const lpContract = new args.web3.eth.Contract(ABIs.lp, vaultToken);
-                const routerContract = new args.web3.eth.Contract(ABIs.router, "0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff");
+                const routerContract = new args.web3.eth.Contract(ABIs.router, ROUTER_ADDRESS);
 
                 const token0 = await lpContract.methods.token0().call();
                 const lpSupply = await lpContract.methods.totalSupply().call();
@@ -113,7 +121,7 @@ class PositionWorth {
                 const token0Decimals = await token0Contract.methods.decimals().call();
 
                 // get vault usd value
-                const singleTokenWorthInUSD = await routerContract.methods.getAmountsOut((new BigNumber("10").pow(token0Decimals)), [token0, "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270", "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"]).call();
+                const singleTokenWorthInUSD = await routerContract.methods.getAmountsOut((new BigNumber("10").pow(token0Decimals)), [token0, WMATIC_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS]).call();
                 const lpWorthInUSD = ((new BigNumber(singleTokenWorthInUSD[2]).div(new BigNumber("10").pow("6"))).multipliedBy(new BigNumber(token0Balance).div(new BigNumber("10").pow(token0Decimals)))).multipliedBy(2);
                 const vaultWorthInUSD = (new BigNumber(lpWorthInUSD).multipliedBy(new BigNumber(vaultLpBalance)).div(new BigNumber(lpSupply)));
 
