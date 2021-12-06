@@ -5,6 +5,5 @@
   "logo": "logo.png",
   "background": "#e8f2e8",
   "foreground": "#84b378",
-  "dev": true,
   "network": "polygon"
 }
