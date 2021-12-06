@@ -1,6 +1,7 @@
-const BigNumber = require("bignumber.js");
+const BN = require("bignumber.js");
 const fetch = require("node-fetch");
 const ABIs = require('./abis.json');
+const EthereumMulticall = require('ethereum-multicall');
 
 const ROUTER_ADDRESS = '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff';
 const USDC_TOKEN_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
@@ -17,6 +18,10 @@ class PositionWorth {
         const response = await fetch("https://raw.githubusercontent.com/kogecoin/vault-contracts/main/vaultaddresses");
 
         this.vaultsInfo = await response.json();
+
+        const usdcContract = new args.web3.eth.Contract(ABIs.token, USDC_TOKEN_ADDRESS);
+
+        this.usdcDecimals = await usdcContract.methods.decimals().call();
 
     }
 
@@ -52,9 +57,9 @@ class PositionWorth {
 
         const uniqueId = vaultAddress + "-" + threshold;
 
-        const sharesValueNow = await this._getSharesUSDValue(args, vaultAddress);
+        const sharesValueNow = await this._getSharesUSDValueBN(args, vaultAddress);
 
-        if (new BigNumber(threshold).minus(new BigNumber(sharesValueNow)).isGreaterThan(0)) {
+        if (new BN(threshold).minus(new BN(sharesValueNow)).isGreaterThan(0)) {
 
             const vaultLabel = await this._getVaultLabel(args, vaultAddress, sharesValueNow);
 
@@ -74,18 +79,42 @@ class PositionWorth {
 
         const vaults = [];
 
+        const multicall = new EthereumMulticall.Multicall({web3Instance: args.web3, tryAggregate: true});
+
+        const contractCallContext = [];
+
         for (const vaultInfo of this.vaultsInfo) {
 
-            const sharesValue = await this._getSharesUSDValue(
-                args,
-                vaultInfo
-            );
+            contractCallContext.push({
+                reference: 'router-vault-' + vaultInfo,
+                contractAddress: vaultInfo,
+                abi: ABIs.vault,
+                calls: [{reference: 'balanceOfCall', methodName: 'balanceOf', methodParameters: [args.address]}],
+                context: {
+                    vaultInfo: vaultInfo
+                }
+            });
 
-            if (new BigNumber(sharesValue).isGreaterThan(0)) {
+        }
+
+        const results = (await multicall.call(contractCallContext)).results;
+
+        for (const result of Object.values(results)) {
+
+            const sharesValueBN = new BN(result.callsReturnContext[0].returnValues[0].hex);
+
+            if (sharesValueBN.isGreaterThan(0)) {
+
+                const vaultAddress = result.originalContractCallContext.context.vaultInfo;
+
+                const sharesValueUSDBN = await this._getSharesUSDValueBN(
+                    args,
+                    vaultAddress
+                );
 
                 vaults.push({
-                    value: vaultInfo,
-                    label: await this._getVaultLabel(args, vaultInfo, sharesValue)
+                    value: vaultAddress,
+                    label: await this._getVaultLabel(args, vaultAddress, sharesValueUSDBN)
                 });
 
             }
@@ -97,13 +126,17 @@ class PositionWorth {
     }
 
     // returns the total value in USD of the user's shares in a vault
-    async _getSharesUSDValue(args, vaultAddress) {
+    async _getSharesUSDValueBN(args, vaultAddress, userSharesBN = null) {
 
         const vaultContract = new args.web3.eth.Contract(ABIs.vault, vaultAddress);
 
-        const userShares = await vaultContract.methods.balanceOf(args.address).call();
+        if (userSharesBN === null) {
 
-        if (parseInt(userShares) > 0) {
+            userSharesBN = new BN(await vaultContract.methods.balanceOf(args.address).call());
+
+        }
+
+        if (userSharesBN.isGreaterThan("0")) {
 
             try {
 
@@ -121,29 +154,29 @@ class PositionWorth {
                 const token0Decimals = await token0Contract.methods.decimals().call();
 
                 // get vault usd value
-                const singleTokenWorthInUSD = await routerContract.methods.getAmountsOut((new BigNumber("10").pow(token0Decimals)), [token0, WMATIC_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS]).call();
-                const lpWorthInUSD = ((new BigNumber(singleTokenWorthInUSD[2]).div(new BigNumber("10").pow("6"))).multipliedBy(new BigNumber(token0Balance).div(new BigNumber("10").pow(token0Decimals)))).multipliedBy(2);
-                const vaultWorthInUSD = (new BigNumber(lpWorthInUSD).multipliedBy(new BigNumber(vaultLpBalance)).div(new BigNumber(lpSupply)));
+                const singleTokenWorthInUSD = await routerContract.methods.getAmountsOut((new BN("10").pow(token0Decimals)), [token0, WMATIC_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS]).call();
+                const lpWorthInUSD = ((new BN(singleTokenWorthInUSD[2]).div(new BN("10").pow(this.usdcDecimals))).multipliedBy(new BN(token0Balance).div(new BN("10").pow(token0Decimals)))).multipliedBy(2);
+                const vaultWorthInUSD = (new BN(lpWorthInUSD).multipliedBy(new BN(vaultLpBalance)).div(new BN(lpSupply)));
 
                 // calculate user shares usd value
                 const totalShares = await vaultContract.methods.totalSupply().call();
 
-                return new BigNumber(vaultWorthInUSD).multipliedBy(new BigNumber(userShares)).div(new BigNumber(totalShares));
+                return new BN(vaultWorthInUSD).multipliedBy(userSharesBN).div(totalShares);
 
             } catch (error) {
-                return 0;
+                return new BN(0);
             }
 
         } else {
 
-            return 0;
+            return new BN(0);
 
         }
 
     }
 
     // takes a kogefarm vault address and returns a string label of the underlying deposit tokens (like ETH-USDC)
-    async _getVaultLabel(args, vaultAddress, sharesValue) {
+    async _getVaultLabel(args, vaultAddress, sharesValueUSD) {
 
         const vaultContract = new args.web3.eth.Contract(ABIs.vault, vaultAddress);
 
@@ -161,7 +194,7 @@ class PositionWorth {
 
         const formatter = Intl.NumberFormat('en', {notation: 'compact'});
 
-        return `${token0Symbol} - ${token1Symbol} (${formatter.format(sharesValue)} USD)`;
+        return `${token0Symbol} - ${token1Symbol} (${formatter.format(sharesValueUSD)} USD)`;
 
     }
 }

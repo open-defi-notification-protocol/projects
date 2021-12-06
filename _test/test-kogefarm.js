@@ -10,7 +10,7 @@ async function testGetSharesUSDValue(address, vaultaddress) {
         web3
     });
 
-    return positionWorth._getSharesUSDValue({
+    return positionWorth._getSharesUSDValueBN({
             web3,
             address: address,
         },

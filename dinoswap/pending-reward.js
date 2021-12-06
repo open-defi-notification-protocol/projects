@@ -1,5 +1,8 @@
 const BN = require("bignumber.js");
 const ABIs = require('./abis.json');
+const EthereumMulticall = require('ethereum-multicall');
+
+const ROUTER_ADDRESS = "0x1948abc5400aa1d72223882958da3bec643fb4e5";
 
 /**
  *
@@ -87,13 +90,35 @@ class PendingReward {
 
         const pairs = [];
 
-        const pools = await this.contract.methods.poolLength().call();
+        const multicall = new EthereumMulticall.Multicall({web3Instance: args.web3, tryAggregate: true});
 
-        for (let pid = 0; pid < pools; pid++) {
+        const poolsLength = await this.contract.methods.poolLength().call();
 
-            const userInfo = await this.contract.methods.userInfo(pid, args.address).call();
+        const contractCallContext = [];
 
-            if (parseInt(userInfo.amount) > 0) {
+        for (let pid = 0; pid < poolsLength; pid++) {
+
+            contractCallContext.push({
+                reference: 'router-pid-' + pid,
+                contractAddress: ROUTER_ADDRESS,
+                abi: ABIs.router,
+                calls: [{reference: 'userInfoCall', methodName: 'userInfo', methodParameters: [pid, args.address]}],
+                context: {
+                    pid: pid
+                }
+            });
+
+        }
+
+        const results = (await multicall.call(contractCallContext)).results;
+
+        for (const result of Object.values(results)) {
+
+            const amount = new BN(result.callsReturnContext[0].returnValues[0].hex);
+
+            if (amount.isGreaterThan("0")) {
+
+                const pid = result.originalContractCallContext.context.pid;
 
                 pairs.push({
                     value: pid,
@@ -103,6 +128,7 @@ class PendingReward {
             }
 
         }
+
         return pairs;
     }
 
