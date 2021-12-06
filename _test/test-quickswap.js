@@ -69,8 +69,8 @@ async function main() {
 
     const address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
 
-    console.log(await testQuickPendingRewards(address, "0"));
-    // console.log(await testQuickPositionWorth(address, "50"));
+    // console.log(await testQuickPendingRewards(address, "0"));
+    console.log(await testQuickPositionWorth(address, "25"));
 
 }
 

@@ -1,12 +1,11 @@
 const ABIs = require('./abis.json');
 const POOLS_INFO = require('./pools-info.json');
 const BN = require("bignumber.js");
+const EthereumMulticall = require('ethereum-multicall');
 
 const ROUTER_ADDRESS = '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff';
 const USDC_TOKEN_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
 const WMATIC_TOKEN_ADDRESS = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270';
-
-const MAX_POOLS = 100;
 
 /**
  *
@@ -74,7 +73,7 @@ class PositionWorth {
         const selectedPairAddress = args.subscription['pair'];
         const threshold = args.subscription['threshold'];
 
-        const poolInfo = this.poolsInfo.find(_poolInfo => _poolInfo.pair === selectedPairAddress)
+        const poolInfo = this.poolsInfo.find(_poolInfo => !_poolInfo.ended && _poolInfo.pair === selectedPairAddress)
 
         const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
             args.web3,
@@ -133,57 +132,112 @@ class PositionWorth {
 
         const walletAddress = args.address;
 
-        let poolIndex = 0;
+        const multicall = new EthereumMulticall.Multicall({web3Instance: args.web3, tryAggregate: true});
+
+        const contractCallContext = [];
 
         for (const poolInfo of this.poolsInfo) {
 
-            if (poolIndex >= MAX_POOLS) {
-                break;
+            const pairAddress = poolInfo.pair;
+
+            if (pairAddress) {
+
+                contractCallContext.push({
+                    reference: JSON.stringify({stakingRewardAddress: poolInfo.stakingRewardAddress, isReward: false}),
+                    contractAddress: pairAddress,
+                    abi: ABIs.lp,
+                    calls: [{reference: 'balanceOfCall', methodName: 'balanceOf', methodParameters: [args.address]}],
+                    context: {
+                        poolInfo: poolInfo
+                    }
+                });
+
+                contractCallContext.push({
+                    reference: JSON.stringify({stakingRewardAddress: poolInfo.stakingRewardAddress, isReward: true}),
+                    contractAddress: poolInfo.stakingRewardAddress,
+                    abi: ABIs.rewards,
+                    calls: [{reference: 'balanceOfCall', methodName: 'balanceOf', methodParameters: [args.address]}],
+                    context: {
+                        poolInfo: poolInfo
+                    }
+                });
+
             }
 
-            poolIndex++;
+        }
 
-            if (poolInfo.pair) {
+        const results = (await multicall.call(contractCallContext)).results;
 
-                const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
-                    args.web3,
-                    walletAddress,
-                    poolInfo
-                );
+        for (const reference in results) {
 
-                if (positionWorthInUsdBN.isGreaterThan(0)) {
+            const rewardResult = results[reference];
 
-                    pairs.push({
-                        value: poolInfo.pair,
-                        label: this._getPoolLabel(poolInfo, positionWorthInUsdBN)
-                    });
+            const poolInfo = rewardResult.originalContractCallContext.context.poolInfo;
 
+            const key = JSON.parse(reference);
+
+            // going over active reward contracts and finding their respective pair
+            if (!poolInfo.ended && key.isReward) {
+
+                const pairKey = JSON.parse(reference)
+
+                pairKey.isReward = false;
+
+                const pairResult = results[JSON.stringify(pairKey)];
+
+                const userStakedBalanceBN = new BN(rewardResult.callsReturnContext[0].returnValues[0].hex);
+
+                const userUnstakedBalanceBN = new BN(pairResult.callsReturnContext[0].returnValues[0].hex);
+
+                const walletTotalLpBalanceBN = userUnstakedBalanceBN.plus(userStakedBalanceBN);
+
+                if (walletTotalLpBalanceBN.isGreaterThan("0")) {
+
+                    const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
+                        args.web3,
+                        walletAddress,
+                        poolInfo,
+                        walletTotalLpBalanceBN
+                    );
+
+                    if (positionWorthInUsdBN.isGreaterThan(0)) {
+
+                        pairs.push({
+                            value: poolInfo.pair,
+                            label: this._getPoolLabel(poolInfo, positionWorthInUsdBN)
+                        });
+
+                    }
 
                 }
-
 
             }
 
         }
 
         return pairs;
+
     }
 
-    async _getPositionWorthInUsdBN(web3, walletAddress, poolInfo) {
+    async _getPositionWorthInUsdBN(web3, walletAddress, poolInfo, walletTotalLpBalanceBN = null) {
 
         const poolContract = new web3.eth.Contract(ABIs.lp, poolInfo.pair);
 
-        let stakingRewardContract = null;
+        if (walletTotalLpBalanceBN === null) {
 
-        if (poolInfo.stakingRewardAddress) {
-            stakingRewardContract = new web3.eth.Contract(ABIs.rewards, poolInfo.stakingRewardAddress);
+            let stakingRewardContract = null;
+
+            if (poolInfo.stakingRewardAddress) {
+                stakingRewardContract = new web3.eth.Contract(ABIs.rewards, poolInfo.stakingRewardAddress);
+            }
+
+            walletTotalLpBalanceBN = await this._getWalletTotalLpBalanceBN(
+                walletAddress,
+                poolContract,
+                stakingRewardContract
+            );
+
         }
-
-        const walletTotalLpBalanceBN = await this._getWalletTotalLpBalanceBN(
-            walletAddress,
-            poolContract,
-            stakingRewardContract
-        );
 
         if (walletTotalLpBalanceBN.isGreaterThan(0)) {
 

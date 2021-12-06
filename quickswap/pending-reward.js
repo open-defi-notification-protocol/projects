@@ -1,10 +1,9 @@
 const BN = require("bignumber.js");
 const POOLS_INFO = require('./pools-info.json');
 const ABIs = require('./abis.json');
+const EthereumMulticall = require('ethereum-multicall');
 
 const REWARD_TOKEN_ADDRESS = "0xf28164A485B0B2C90639E47b0f377b4a438a16B1";
-
-const MAX_POOLS = 100;
 
 /**
  *
@@ -100,20 +99,37 @@ class PendingReward {
 
         const pairs = [];
 
-        let poolIndex = 0;
+        const multicall = new EthereumMulticall.Multicall({web3Instance: args.web3, tryAggregate: true});
+
+        const contractCallContext = [];
 
         for (const poolInfo of this.poolsInfo) {
 
-            if (poolIndex >= MAX_POOLS) {
-                break;
+            if (poolInfo.pair) {
+
+                contractCallContext.push({
+                    reference: 'router-pid-' + poolInfo.stakingRewardAddress,
+                    contractAddress: poolInfo.stakingRewardAddress,
+                    abi: ABIs.rewards,
+                    calls: [{reference: 'balanceOfCall', methodName: 'balanceOf', methodParameters: [args.address]}],
+                    context: {
+                        poolInfo: poolInfo
+                    }
+                });
+
             }
 
-            poolIndex++;
+        }
 
-            const lpRewardContract = new args.web3.eth.Contract(ABIs.rewards, poolInfo.stakingRewardAddress);
-            const userStakedBalanceBN = new BN(await lpRewardContract.methods.balanceOf(args.address).call());
+        const results = (await multicall.call(contractCallContext)).results;
 
-            if (userStakedBalanceBN.isGreaterThan(0)) {
+        for (const result of Object.values(results)) {
+
+            const userStakedBalanceBN = new BN(result.callsReturnContext[0].returnValues[0].hex);
+
+            if (userStakedBalanceBN.isGreaterThan("0")) {
+
+                const poolInfo = result.originalContractCallContext.context.poolInfo;
 
                 pairs.push({
                     value: poolInfo.pair,
@@ -121,6 +137,7 @@ class PendingReward {
                 });
 
             }
+
         }
 
         return pairs;
