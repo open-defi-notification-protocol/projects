@@ -204,7 +204,10 @@ class PositionWorth {
 
                         pairs.push({
                             value: poolInfo.pair,
-                            label: this._getPoolLabel(poolInfo, positionWorthInUsdBN)
+                            label: this._getPoolLabel(
+                                poolInfo,
+                                positionWorthInUsdBN
+                            )
                         });
 
                     }
@@ -266,9 +269,11 @@ class PositionWorth {
             return lpWorthInUsdBN.multipliedBy(sharesBN);
 
 
-        }
+        } else {
 
-        return new BN(0);
+            return new BN(0);
+
+        }
 
     }
 
