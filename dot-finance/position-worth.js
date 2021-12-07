@@ -1,84 +1,225 @@
-const BigNumber = require("bignumber.js");
+const BN = require("bignumber.js");
 const fetch = require("node-fetch");
+const ABIs = require('./abis.json');
+const EthereumMulticall = require('ethereum-multicall');
 
+const CALCULATOR_ADDRESS = "0xba2dda52741b2ea5b57a118f43cf6ff02d932531";
+
+/**
+ * Get notified when the USD worth of your position drops below a certain threshold *
+ */
 class PositionWorth {
 
-  static displayName = "Position Worth";
-  static description = "Get notified when the USD worth of the position is below than expected";
+    static displayName = "Position Worth";
+    static description = "Get notified when the USD worth of your position drops below a certain threshold";
 
-  // runs when class is initialized
-  async onInit(args) {}
+    /**
+     * runs when class is initialized
+     *
+     * @param args
+     * @returns {Promise<void>}
+     */
+    async onInit(args) {
 
-  // runs right before user subscribes to new notifications and populates subscription form
-  async onSubscribeForm(args) {
-    const vaults = await this._getAllUserVaults(args);
-    (args);
-    return [
-      { type: "input-select", id: "vault", label: "Vault", values: vaults },
-      { type: "input-number", id: "drop", label: "Percent Drop", default: 15, description: "Percent change in position worth" }
-    ];
-  }
+        const response = await fetch('https://api.dot.finance/farms');
 
-  // runs when new blocks are added to the mainnet chain - notification scanning happens here
-  async onBlocks(args) {
-    const parts = args.subscription["vault"].split("-");
-    const vaultAddress = parts[0];
-    const sharesValueDuringRegistration = parts[1];
-    const sharesValueNow = await this._getSharesUSDValue(args, vaultAddress);
-    const minFraction = 1 - (parseInt(args.subscription["drop"]) / 100);
-    if (
-      new BigNumber(sharesValueDuringRegistration).multipliedBy(minFraction).minus(new BigNumber(sharesValueNow)).isPositive()
-    ) return {
-      notification: `Your shares holdings in ${vaultAddress} is below %${args.subscription["drop"]}`
-    };
-    return [];
-  }
+        this.vaultsInfo = await response.json();
 
-  async _getAllUserVaults(args) {
-    const vaults = [];
-    const response = await fetch('https://api.dot.finance/farms');
-    const json = await response.json();
-    for (let vid = 0; vid < json.length; vid++) {
-      const vault = json[vid];
-      const vaultProxy = vault.proxyAddress;
-      if (!vaultProxy) continue;
-      const sharesValue = await this._getSharesUSDValue(args, vaultProxy);
-      if (new BigNumber(sharesValue).isPositive()) {
-        vaults.push({
-          value: vaultProxy + "-" + sharesValue,
-          label: await this._getVaultLabel(args, vaultProxy)
-        });
-      }
     }
-    return vaults;
-  }
 
-  async _getSharesUSDValue(args, vaultAddress) {
-    const vaultAbi = [{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"stakingToken","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}];
-    const calculatorAbi = [{"inputs":[{"internalType":"address","name":"asset","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"valueOfAsset","outputs":[{"internalType":"uint256","name":"valueInBNB","type":"uint256"},{"internalType":"uint256","name":"valueInUSD","type":"uint256"}],"stateMutability":"view","type":"function"}];
-    const vaultContract = new args.web3.eth.Contract(vaultAbi, vaultAddress);
-    const calculatorContract = new args.web3.eth.Contract(calculatorAbi, "0xba2dda52741b2ea5b57a118f43cf6ff02d932531");
-    const lpBalance = await vaultContract.methods.balanceOf(args.address).call();
-    const stakingToken = await vaultContract.methods.stakingToken().call();
-    const sharesUSDValue = await calculatorContract.methods.valueOfAsset(stakingToken, lpBalance).call();    
-    return sharesUSDValue.valueInUSD;
-  }
-  
-  async _getVaultLabel(args, vaultAddress) {
-    const vaultAbi = [{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"stakingToken","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}];
-    const lpAbi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"sender","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount0","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount1","type":"uint256"},{"indexed":true,"internalType":"address","name":"to","type":"address"}],"name":"Burn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"sender","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount0","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount1","type":"uint256"}],"name":"Mint","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"sender","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount0In","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount1In","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount0Out","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount1Out","type":"uint256"},{"indexed":true,"internalType":"address","name":"to","type":"address"}],"name":"Swap","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint112","name":"reserve0","type":"uint112"},{"indexed":false,"internalType":"uint112","name":"reserve1","type":"uint112"}],"name":"Sync","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[],"name":"DOMAIN_SEPARATOR","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"MINIMUM_LIQUIDITY","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"PERMIT_TYPEHASH","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"address","name":"","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"}],"name":"burn","outputs":[{"internalType":"uint256","name":"amount0","type":"uint256"},{"internalType":"uint256","name":"amount1","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"factory","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getReserves","outputs":[{"internalType":"uint112","name":"_reserve0","type":"uint112"},{"internalType":"uint112","name":"_reserve1","type":"uint112"},{"internalType":"uint32","name":"_blockTimestampLast","type":"uint32"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_token0","type":"address"},{"internalType":"address","name":"_token1","type":"address"}],"name":"initialize","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"kLast","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"}],"name":"mint","outputs":[{"internalType":"uint256","name":"liquidity","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"nonces","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"uint256","name":"deadline","type":"uint256"},{"internalType":"uint8","name":"v","type":"uint8"},{"internalType":"bytes32","name":"r","type":"bytes32"},{"internalType":"bytes32","name":"s","type":"bytes32"}],"name":"permit","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"price0CumulativeLast","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"price1CumulativeLast","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"}],"name":"skim","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"amount0Out","type":"uint256"},{"internalType":"uint256","name":"amount1Out","type":"uint256"},{"internalType":"address","name":"to","type":"address"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"swap","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"sync","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"token0","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"token1","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}];
-    const vaultContract = new args.web3.eth.Contract(vaultAbi, vaultAddress);
-    const lpToken = await vaultContract.methods.stakingToken().call();
-    const lpContract = new args.web3.eth.Contract(lpAbi, lpToken);
-    const token0 = await lpContract.methods.token0().call();
-    const token1 = await lpContract.methods.token1().call();
-    const erc20Abi = [{"constant":true,"inputs":[],"name":"mintingFinished","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_token","type":"address"}],"name":"reclaimToken","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"unpause","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"}],"name":"mint","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"value","type":"uint256"}],"name":"burn","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"claimOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"paused","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_subtractedValue","type":"uint256"}],"name":"decreaseApproval","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"renounceOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"finishMinting","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"pause","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_addedValue","type":"uint256"}],"name":"increaseApproval","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"pendingOwner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"anonymous":false,"inputs":[],"name":"Pause","type":"event"},{"anonymous":false,"inputs":[],"name":"Unpause","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"burner","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Burn","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"Mint","type":"event"},{"anonymous":false,"inputs":[],"name":"MintFinished","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"previousOwner","type":"address"}],"name":"OwnershipRenounced","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"previousOwner","type":"address"},{"indexed":true,"name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"owner","type":"address"},{"indexed":true,"name":"spender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"}];
-    const token0Contract = new args.web3.eth.Contract(erc20Abi, token0);
-    const token1Contract = new args.web3.eth.Contract(erc20Abi, token1);
-    const token0Symbol = await token0Contract.methods.symbol().call();
-    const token1Symbol = await token1Contract.methods.symbol().call();
-    return token0Symbol + "-" + token1Symbol;
-  }
+    /**
+     * runs right before user subscribes to new notifications and populates subscription form
+     *
+     * @param args
+     * @returns {Promise<[{values: *[], id: string, label: string, type: string}, {default: number, description: string, id: string, label: string, type: string}]>}
+     */
+    async onSubscribeForm(args) {
+
+        const vaults = await this._getAllUserVaults(args);
+
+        return [
+            {
+                type: "input-select",
+                id: "vault",
+                label: "Vault",
+                values: vaults
+            },
+            {
+                type: "input-number",
+                id: "threshold",
+                label: "Threshold price",
+                default: 0,
+                description: "Notify me when the price of my position goes below this value in USD"
+            }
+        ];
+    }
+
+    /**
+     * runs when new blocks are added to the mainnet chain - notification scanning happens here
+     *
+     * @param args
+     * @returns {Promise<*[]|{notification: string, uniqueId: string}>}
+     */
+    async onBlocks(args) {
+
+        const vaultAddress = args.subscription["vault"];
+        const threshold = args.subscription["threshold"];
+
+        const uniqueId = vaultAddress + "-" + threshold;
+
+        const sharesValueNow = await this._getSharesUSDValueBN(args, vaultAddress);
+
+        if (new BN(threshold).minus(new BN(sharesValueNow)).isGreaterThan(0)) {
+
+            const vaultLabel = await this._getVaultLabel(args, vaultAddress, sharesValueNow);
+
+            return {
+                uniqueId: uniqueId,
+                notification: `Your shares holdings in ${vaultLabel} has dropped below ${threshold} USD`
+            };
+
+        }
+
+        return [];
+
+    }
+
+    /**
+     * returns all kogefarm vaults where the user has some shares
+     *
+     * @param args
+     * @returns {Promise<*[]>}
+     * @private
+     */
+    async _getAllUserVaults(args) {
+
+        const vaults = [];
+
+        const multicall = new EthereumMulticall.Multicall({web3Instance: args.web3, tryAggregate: true});
+
+        const contractCallContext = [];
+
+        for (const vaultInfo of this.vaultsInfo) {
+
+            const vaultAddress = vaultInfo.proxyAddress;
+
+            if (!vaultAddress) continue;
+
+            contractCallContext.push({
+                reference: 'vault-' + vaultAddress,
+                contractAddress: vaultAddress,
+                abi: ABIs.vault,
+                calls: [{reference: 'balanceOfCall', methodName: 'balanceOf', methodParameters: [args.address]}],
+                context: {
+                    vaultAddress: vaultAddress
+                }
+            });
+
+        }
+
+        const results = (await multicall.call(contractCallContext)).results;
+
+        for (const result of Object.values(results)) {
+
+            const sharesValueBN = new BN(result.callsReturnContext[0].returnValues[0].hex);
+
+            if (sharesValueBN.isGreaterThan(0)) {
+
+                const vaultAddress = result.originalContractCallContext.context.vaultAddress;
+
+                const sharesValueUsdBN = await this._getSharesUSDValueBN(
+                    args,
+                    vaultAddress,
+                    sharesValueBN
+                );
+
+                vaults.push({
+                    value: vaultAddress,
+                    label: await this._getVaultLabel(
+                        args,
+                        vaultAddress,
+                        sharesValueUsdBN
+                    )
+                });
+
+            }
+
+        }
+
+        return vaults;
+
+    }
+
+    /**
+     * returns the total value in USD of the user's shares in a vault
+     *
+     * @param args
+     * @param vaultAddress
+     * @param userSharesBN
+     * @returns {Promise<BigNumber|*>}
+     * @private
+     */
+    async _getSharesUSDValueBN(args, vaultAddress, userSharesBN = null) {
+
+        const vaultContract = new args.web3.eth.Contract(ABIs.vault, vaultAddress);
+
+        if (userSharesBN === null) {
+
+            userSharesBN = new BN(await vaultContract.methods.balanceOf(args.address).call());
+
+        }
+
+        if (userSharesBN.isGreaterThan("0")) {
+
+            const calculatorContract = new args.web3.eth.Contract(ABIs.calculator, CALCULATOR_ADDRESS);
+
+            const lpBalance = await vaultContract.methods.balanceOf(args.address).call();
+
+            const stakingToken = await vaultContract.methods.stakingToken().call();
+
+            const sharesUSDValue = await calculatorContract.methods.valueOfAsset(stakingToken, lpBalance).call();
+
+            return new BN(sharesUSDValue.valueInUSD).dividedBy("1e18");
+
+        } else {
+
+
+            return new BN("0");
+
+        }
+
+    }
+
+    /**
+     * takes a kogefarm vault address and returns a string label of the underlying deposit tokens (like ETH-USDC)
+     *
+     * @param args
+     * @param vaultAddress
+     * @param sharesValueUsdBN
+     * @returns {Promise<string>}
+     * @private
+     */
+    async _getVaultLabel(args, vaultAddress, sharesValueUsdBN) {
+
+        const vaultContract = new args.web3.eth.Contract(ABIs.vault, vaultAddress);
+
+        const lpToken = await vaultContract.methods.stakingToken().call();
+        const lpContract = new args.web3.eth.Contract(ABIs.lp, lpToken);
+
+        const token0 = await lpContract.methods.token0().call();
+        const token1 = await lpContract.methods.token1().call();
+
+        const token0Contract = new args.web3.eth.Contract(ABIs.erc20, token0);
+        const token1Contract = new args.web3.eth.Contract(ABIs.erc20, token1);
+
+        const token0Symbol = await token0Contract.methods.symbol().call();
+        const token1Symbol = await token1Contract.methods.symbol().call();
+
+        const formatter = Intl.NumberFormat('en', {notation: 'compact'});
+
+        return `${token0Symbol} - ${token1Symbol} (${formatter.format(sharesValueUsdBN)} USD)`;
+
+    }
 }
 
 module.exports = PositionWorth;

@@ -5,6 +5,5 @@
   "logo": "logo.png",
   "background": "#2c1f40",
   "foreground": "#ffffff",
-  "network": "bsc",
-  "dev": true
+  "network": "bsc"
 }

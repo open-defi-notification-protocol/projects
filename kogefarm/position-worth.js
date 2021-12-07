@@ -7,12 +7,20 @@ const ROUTER_ADDRESS = '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff';
 const USDC_TOKEN_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
 const WMATIC_TOKEN_ADDRESS = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270';
 
+/**
+ * Get notified when the USD worth of your position drops below a certain threshold *
+ */
 class PositionWorth {
 
     static displayName = "Position Worth";
     static description = "Get notified when the USD worth of your position drops below a certain threshold";
 
-    // runs when class is initialized
+    /**
+     * runs when class is initialized
+     *
+     * @param args
+     * @returns {Promise<void>}
+     */
     async onInit(args) {
 
         const response = await fetch("https://raw.githubusercontent.com/kogecoin/vault-contracts/main/vaultaddresses");
@@ -25,7 +33,12 @@ class PositionWorth {
 
     }
 
-    // runs right before user subscribes to new notifications and populates subscription form
+    /**
+     * runs right before user subscribes to new notifications and populates subscription form
+     *
+     * @param args
+     * @returns {Promise<[{values: *[], id: string, label: string, type: string}, {default: number, description: string, id: string, label: string, type: string}]>}
+     */
     async onSubscribeForm(args) {
 
         const vaults = await this._getAllUserVaults(
@@ -49,7 +62,12 @@ class PositionWorth {
         ];
     }
 
-    // runs when new blocks are added to the mainnet chain - notification scanning happens here
+    /**
+     * runs when new blocks are added to the mainnet chain - notification scanning happens here
+     *
+     * @param args
+     * @returns {Promise<*[]|{notification: string, uniqueId: string}>}
+     */
     async onBlocks(args) {
 
         const vaultAddress = args.subscription["vault"];
@@ -74,7 +92,13 @@ class PositionWorth {
 
     }
 
-    // returns all kogefarm vaults where the user has some shares
+    /**
+     * returns all kogefarm vaults where the user has some shares
+     *
+     * @param args
+     * @returns {Promise<*[]>}
+     * @private
+     */
     async _getAllUserVaults(args) {
 
         const vaults = [];
@@ -107,14 +131,19 @@ class PositionWorth {
 
                 const vaultAddress = result.originalContractCallContext.context.vaultInfo;
 
-                const sharesValueUSDBN = await this._getSharesUSDValueBN(
+                const sharesValueUsdBN = await this._getSharesUSDValueBN(
                     args,
-                    vaultAddress
+                    vaultAddress,
+                    sharesValueBN
                 );
 
                 vaults.push({
                     value: vaultAddress,
-                    label: await this._getVaultLabel(args, vaultAddress, sharesValueUSDBN)
+                    label: await this._getVaultLabel(
+                        args,
+                        vaultAddress,
+                        sharesValueUsdBN
+                    )
                 });
 
             }
@@ -125,7 +154,15 @@ class PositionWorth {
 
     }
 
-    // returns the total value in USD of the user's shares in a vault
+    /**
+     * returns the total value in USD of the user's shares in a vault
+     *
+     * @param args
+     * @param vaultAddress
+     * @param userSharesBN
+     * @returns {Promise<BigNumber>}
+     * @private
+     */
     async _getSharesUSDValueBN(args, vaultAddress, userSharesBN = null) {
 
         const vaultContract = new args.web3.eth.Contract(ABIs.vault, vaultAddress);
@@ -175,8 +212,16 @@ class PositionWorth {
 
     }
 
-    // takes a kogefarm vault address and returns a string label of the underlying deposit tokens (like ETH-USDC)
-    async _getVaultLabel(args, vaultAddress, sharesValueUSD) {
+    /**
+     * takes a kogefarm vault address and returns a string label of the underlying deposit tokens (like ETH-USDC)
+     *
+     * @param args
+     * @param vaultAddress
+     * @param sharesValueUsdBN
+     * @returns {Promise<string>}
+     * @private
+     */
+    async _getVaultLabel(args, vaultAddress, sharesValueUsdBN) {
 
         const vaultContract = new args.web3.eth.Contract(ABIs.vault, vaultAddress);
 
@@ -194,7 +239,7 @@ class PositionWorth {
 
         const formatter = Intl.NumberFormat('en', {notation: 'compact'});
 
-        return `${token0Symbol} - ${token1Symbol} (${formatter.format(sharesValueUSD)} USD)`;
+        return `${token0Symbol} - ${token1Symbol} (${formatter.format(sharesValueUsdBN)} USD)`;
 
     }
 }
