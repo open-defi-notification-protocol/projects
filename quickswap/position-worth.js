@@ -32,6 +32,11 @@ class PositionWorth {
 
         this.usdcDecimals = await usdcContract.methods.decimals().call();
 
+        this.routerContract = new args.web3.eth.Contract(
+            ABIs.router,
+            ROUTER_ADDRESS
+        );
+
     }
 
     /**
@@ -200,7 +205,7 @@ class PositionWorth {
                         walletTotalLpBalanceBN
                     );
 
-                    if (positionWorthInUsdBN.isGreaterThan(0)) {
+                    if (positionWorthInUsdBN.isGreaterThan("0")) {
 
                         pairs.push({
                             value: poolInfo.pair,
@@ -222,6 +227,15 @@ class PositionWorth {
 
     }
 
+    /**
+     *
+     * @param web3
+     * @param walletAddress
+     * @param poolInfo
+     * @param walletTotalLpBalanceBN
+     * @returns {Promise<BigNumber>}
+     * @private
+     */
     async _getPositionWorthInUsdBN(web3, walletAddress, poolInfo, walletTotalLpBalanceBN = null) {
 
         const poolContract = new web3.eth.Contract(ABIs.lp, poolInfo.pair);
@@ -251,9 +265,7 @@ class PositionWorth {
                 token0Info
             );
 
-            const routerContract = new web3.eth.Contract(ABIs.router, ROUTER_ADDRESS);
-
-            const singleTokenWorthInUSD = await routerContract.methods.getAmountsOut(
+            const singleTokenWorthInUSD = await this.routerContract.methods.getAmountsOut(
                 (new BN("10").pow(token0Info.decimals)), // single whole unit
                 [token0Info.address, WMATIC_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS]
             ).call();
@@ -321,7 +333,8 @@ class PositionWorth {
     /**
      *
      * @param poolContract
-     * @returns {Promise<{token0: *, token1: *}>}
+     * @param token0Info
+     * @returns {Promise<*>}
      * @private
      */
     async _getToken0Reserve(poolContract, token0Info) {
@@ -329,9 +342,7 @@ class PositionWorth {
         const reserves = await poolContract.methods.getReserves().call();
         const token0Address = await poolContract.methods.token0().call();
 
-
         return token0Address === token0Info.address ? reserves._reserve0 : reserves._reserve1;
-
 
     }
 

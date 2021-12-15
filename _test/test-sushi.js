@@ -1,98 +1,76 @@
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3));
 
-async function testSushiPendingRewards() {
-  const PendingRewards = require('../sushi/pending-reward');
-  const pendingRewards = new PendingRewards();
+async function testSushiPendingRewards(address, minimum) {
 
-  // simulate init event
-  await pendingRewards.onInit({
-    web3
-  });
+    const PendingRewards = require('../sushi/pending-reward');
+    const pendingRewards = new PendingRewards();
 
-  // simulate subscribe form event
-  const form = await pendingRewards.onSubscribeForm({
-    web3,
-    address: '0xC81bD599a66dA6dcc3A64399f8025C19fFC42888'
-  });
+    // simulate init event
+    await pendingRewards.onInit({
+        web3
+    });
 
-  // simulate user filling in the subscription form in the app
-  const subscription = {
-    pair: form.find(o => o.id === 'pair').values[0].value,
-    minimum: form.find(o => o.id === 'minimum').default
-  };
+    // simulate subscribe form event
+    const form = await pendingRewards.onSubscribeForm({
+        web3,
+        address: address
+    });
 
-  // simulate on blocks event
-  return pendingRewards.onBlocks({
-    web3,
-    address: '0xC81bD599a66dA6dcc3A64399f8025C19fFC42888',
-    subscription
-  });
+    console.log(form);
+
+    // simulate user filling in the subscription form in the app
+    const subscription = {
+        pair: form.find(o => o.id === 'pair').values[0].value,
+        minimum: minimum
+    };
+
+    // simulate on blocks event
+    return pendingRewards.onBlocks({
+        web3,
+        address: address,
+        subscription
+    });
 }
 
-async function testSushiPositionWorth() {
-  const PositionWorth = require('../sushi/position-worth');
-  const positionWorth = new PositionWorth();
+async function testSushiPositionWorth(address, threshold) {
 
-  // simulate init event
-  await positionWorth.onInit({
-    web3
-  });
+    const PositionWorth = require('../sushi/position-worth');
+    const positionWorth = new PositionWorth();
 
-  // simulate subscribe form event
-  const form = await positionWorth.onSubscribeForm({
-    web3,
-    address: '0xC81bD599a66dA6dcc3A64399f8025C19fFC42888'
-  });
+    // simulate init event
+    await positionWorth.onInit({
+        web3
+    });
 
-  // simulate user filling in the subscription form in the app
-  const subscription = {
-    pair: form.find(o => o.id === 'pair').values[0].value,
-    drop: form.find(o => o.id === 'drop').default
-  };
-  
-  // simulate on blocks event
-  return positionWorth.onBlocks({
-    web3, 
-    address: '0xC81bD599a66dA6dcc3A64399f8025C19fFC42888',
-    subscription
-  });
-}
+    // simulate subscribe form event
+    const form = await positionWorth.onSubscribeForm({
+        web3,
+        address: address
+    });
 
-async function testSushiTokenAmount() {
-  const TokenAmount = require('../sushi/token-amount');
-  const tokenAmount = new TokenAmount();
+    console.log(form);
 
-  // simulate init event
-  await tokenAmount.onInit({
-    web3
-  });
+    // simulate user filling in the subscription form in the app
+    const subscription = {
+        pair: form.find(o => o.id === 'pair').values[0].value,
+        threshold: threshold
+    };
 
-  // simulate subscribe form event
-  const form = await tokenAmount.onSubscribeForm({
-    web3,
-    address: '0xC81bD599a66dA6dcc3A64399f8025C19fFC42888'
-  });
-
-  // simulate user filling in the subscription form in the app
-  const subscription = {
-    pair: form.find(o => o.id === 'pair').values[0].value,
-    drop: form.find(o => o.id === 'drop').default
-  };
-
-  // simulate on blocks event
-  return tokenAmount.onBlocks({
-    web3,
-    address: '0xC81bD599a66dA6dcc3A64399f8025C19fFC42888',
-    subscription
-  });
+    // simulate on blocks event
+    return positionWorth.onBlocks({
+        web3,
+        address: address,
+        subscription
+    });
 }
 
 async function main() {
-  console.log('Running manual test:');
-  console.log(await testSushiPendingRewards());
-  console.log(await testSushiPositionWorth());
-  console.log(await testSushiTokenAmount());
+
+    console.log('Running manual test:');
+
+    console.log(await testSushiPendingRewards('0x3dacC571356e7D5dFB3b475d6922442Ec06B9005', '0.0000000001'));
+    console.log(await testSushiPositionWorth('0x3dacC571356e7D5dFB3b475d6922442Ec06B9005', '30'));
 }
 
 main();
