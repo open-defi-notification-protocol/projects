@@ -120,10 +120,18 @@ class PendingReward {
 
                 const pid = result.originalContractCallContext.context.pid;
 
-                pairs.push({
-                    value: pid,
-                    label: await this._getPairLabel(args, pid)
-                });
+                try {
+
+                    pairs.push({
+                        value: pid,
+                        label: await this._getPairLabel(args, pid)
+                    });
+
+                } catch (ignore) {
+
+                    // unsupported farm
+
+                }
 
             }
 

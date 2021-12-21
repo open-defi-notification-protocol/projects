@@ -86,7 +86,7 @@ async function main() {
     console.log('Running manual test:');
 
     // console.log(await testGetSharesUSDValue(address, vaultAddress));
-    console.log(await testGetAllUserVaults(address));
+    console.log(await testGetAllUserVaults('0x16c686a511BdbC697860a4A3284fED9612D21c27'));
     // console.log(await testGetVaultLabel(vaultaddress));
     console.log(await testOnBlocks(address, "86"));
 }
