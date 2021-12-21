@@ -133,14 +133,22 @@ class PositionWorth {
                     sharesValueBN
                 );
 
-                vaults.push({
-                    value: vaultAddress,
-                    label: await this._getVaultLabel(
-                        args,
-                        vaultAddress,
-                        sharesValueUsdBN
-                    )
-                });
+                try {
+
+                    vaults.push({
+                        value: vaultAddress,
+                        label: await this._getVaultLabel(
+                            args,
+                            vaultAddress,
+                            sharesValueUsdBN
+                        )
+                    });
+
+                } catch (ignore) {
+
+                    // unsupported farm
+
+                }
 
             }
 
