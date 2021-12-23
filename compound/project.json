@@ -5,5 +5,6 @@
   "logo": "logo.png",
   "background": "#070a0e",
   "foreground": "#ffffff",
+  "dev": true,
   "network": "ethereum"
 }
