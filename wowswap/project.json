@@ -3,8 +3,8 @@
   "category": "farm",
   "website": "https://wowswap.io/swap",
   "logo": "logo.png",
-  "background": "#fdf4e1",
-  "foreground": "#000000",
+  "background": "#000000",
+  "foreground": "#fdf4e1",
   "dev": true,
   "network": "ethereum"
 }
