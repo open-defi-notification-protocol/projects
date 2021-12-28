@@ -67,9 +67,11 @@ class PendingReward {
 
             const uniqueId = pid + "-" + threshold;
 
+            const formatter = Intl.NumberFormat('en', {notation: 'compact'});
+
             return {
                 uniqueId: uniqueId,
-                notification: `Your pending REVA amount ${normalizedPendingRewards} surpassed the threshold ${threshold}.  Note: ${userIsCompounding===true? 'Entered autoCompounding.':''} Go to app.revault.network to claim it`,
+                notification: `Your pending REVA amount ${formatter.format(normalizedPendingRewards)} surpassed the threshold ${threshold}.  Note: ${userIsCompounding===true? 'Entered autoCompounding.':''} Go to app.revault.network to claim it`,
             };
 
         }
