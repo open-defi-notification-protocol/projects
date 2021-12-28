@@ -87,15 +87,9 @@ async function GetAllUserPools(web3, revaStakingPoolContract, userAddress) {
             const vRevaMultiplier = new BigNumber(poolInfo.returnValues[2].hex).toNumber();
             const timeLocked = new BigNumber(poolInfo.returnValues[3].hex).toNumber();
 
-            let userIsCompounding = false;
-
-            if (results.originalContractCallContext.context[pid]) {
-                userIsCompounding = results.originalContractCallContext.context[pid]['userIsCompounding'];
-            }
-
             pools.push({
                 value: "" + pid,
-                label: `X${vRevaMultiplier} ${timeLocked / 24 / 60 / 60} Days Lock. ${userIsCompounding === true ? 'Entered autoCompounding.' : ''}`,
+                label: `X${vRevaMultiplier} ${timeLocked / 24 / 60 / 60} Days Lock`,
             });
 
         });
