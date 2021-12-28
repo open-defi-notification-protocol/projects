@@ -78,7 +78,7 @@ async function GetAllUserPools(web3, revaStakingPoolContract, userAddress) {
 
     const contractCallResults = await multicall.call(contractCallContext);
 
-    if (contractCallResults.results.length > 0) {
+    if (Object.keys(contractCallResults.results).length > 0) {
 
         results = contractCallResults.results['user-pools-poolInfo'];
 
