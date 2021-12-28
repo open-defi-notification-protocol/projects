@@ -21,7 +21,11 @@ class PendingReward {
     // runs right before user subscribes to new notifications and populates subscription form
     async onSubscribeForm(args) {
 
-        const pools = await GetAllUserPools(args.web3, this.revaStakingPoolContract, args.address);
+        const pools = await GetAllUserPools(
+            args.web3,
+            this.revaStakingPoolContract,
+            args.address
+        );
 
         return [
             {
@@ -34,7 +38,7 @@ class PendingReward {
                 type: "input-number",
                 id: "threshold",
                 label: "Threshold amount",
-                default: 0,
+                default: "0",
                 description: "Notify me when the amount of REVA exceeds this value"
             }
         ];

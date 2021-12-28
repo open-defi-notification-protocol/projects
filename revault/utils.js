@@ -94,7 +94,7 @@ async function GetAllUserPools(web3, revaStakingPoolContract, userAddress) {
             }
 
             pools.push({
-                value: pid,
+                value: "" + pid,
                 label: `X${vRevaMultiplier} ${timeLocked / 24 / 60 / 60} Days Lock. ${userIsCompounding === true ? 'Entered autoCompounding.' : ''}`,
             });
 
