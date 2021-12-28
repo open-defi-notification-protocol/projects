@@ -107,16 +107,16 @@ async function main() {
     console.log(await testRevaultPendingRewards(
         {
             address:'0x825c9b788f475F17E2Cbfcc200de8dBd0ea3D68D',
-            pid:0,
-            threshold: 627,
+            pid:"0",
+            threshold: "627",
         }
     ));
 
     console.log(await testRevaultPendingRewards(
         {
             address:'0xc38F405bF48a6eEA9cCE578235A6D8c4DE0Ef60f',
-            pid:3,
-            threshold: 1909,
+            pid:"3",
+            threshold: "1909",
         }
     ));
 
@@ -124,14 +124,14 @@ async function main() {
     console.log(await testRevaultStakingUnlock(
         {
             address:'0xc38F405bF48a6eEA9cCE578235A6D8c4DE0Ef60f',
-            pid:3,
+            pid:"3",
         }
     ));
 
     console.log(await testRevaultStakingUnlock(
         {
             address:'0xc38F405bF48a6eEA9cCE578235A6D8c4DE0Ef60f',
-            pid:0,
+            pid:"0",
         }
     ));
 
