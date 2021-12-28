@@ -49,7 +49,7 @@ async function GetAllUserPools(web3, revaStakingPoolContract, userAddress) {
     results.callsReturnContext.map(info => {
 
         const userIsCompounding = info.returnValues[0];
-        const userStakingAmount = info.returnValues[0].hex? new BigNumber(info.returnValues[0].hex).toNumber(): 0;
+        const userStakingAmount = info.returnValues[0].hex ? new BigNumber(info.returnValues[0].hex).toNumber() : 0;
         const pid = info.methodParameters[0];
 
         if (userIsCompounding === true || userStakingAmount > 0) {
@@ -76,30 +76,35 @@ async function GetAllUserPools(web3, revaStakingPoolContract, userAddress) {
         context: extraContext,
     });
 
-    results = (await multicall.call(contractCallContext)).results['user-pools-poolInfo'];
+    const contractCallResults = await multicall.call(contractCallContext);
 
-    results.callsReturnContext.map(poolInfo => {
-        const pid = poolInfo.methodParameters[0];
-        const vRevaMultiplier = new BigNumber(poolInfo.returnValues[2].hex).toNumber();
-        const timeLocked = new BigNumber(poolInfo.returnValues[3].hex).toNumber();
+    if (contractCallResults.results.length > 0) {
 
-        let userIsCompounding = false;
+        results = contractCallResults.results['user-pools-poolInfo'];
 
-        if (results.originalContractCallContext.context[pid]) {
-            userIsCompounding = results.originalContractCallContext.context[pid]['userIsCompounding'];
-        }
+        results.callsReturnContext.map(poolInfo => {
+            const pid = poolInfo.methodParameters[0];
+            const vRevaMultiplier = new BigNumber(poolInfo.returnValues[2].hex).toNumber();
+            const timeLocked = new BigNumber(poolInfo.returnValues[3].hex).toNumber();
 
-        pools.push({
-            value: pid,
-            label: `X${vRevaMultiplier} ${timeLocked / 24 / 60 / 60} Days Lock. ${userIsCompounding===true? 'Entered autoCompounding.':''}`,
+            let userIsCompounding = false;
+
+            if (results.originalContractCallContext.context[pid]) {
+                userIsCompounding = results.originalContractCallContext.context[pid]['userIsCompounding'];
+            }
+
+            pools.push({
+                value: pid,
+                label: `X${vRevaMultiplier} ${timeLocked / 24 / 60 / 60} Days Lock. ${userIsCompounding === true ? 'Entered autoCompounding.' : ''}`,
+            });
+
         });
 
-    });
+    }
 
     return pools;
 
 }
-
 
 
 module.exports = GetAllUserPools

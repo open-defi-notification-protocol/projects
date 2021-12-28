@@ -10,6 +10,14 @@ async function testRevaultPendingRewards(args) {
         web3
     });
 
+    // simulate subscribe form event
+    const form = await pendingReward.onSubscribeForm({
+        web3,
+        address: args.address
+    });
+
+    console.log(form);
+
     // simulate user filling in the subscription form in the app
     const subscription = {
         pool: args.pid,
