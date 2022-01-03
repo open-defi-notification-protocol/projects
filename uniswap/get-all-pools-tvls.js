@@ -1,6 +1,6 @@
 const Web3 = require('web3');
 const BN = require("bignumber.js");
-const web3 = new Web3(new Web3.providers.HttpProvider(require('../_test/dev-keys.json').web3));
+// const web3 = new Web3(new Web3.providers.HttpProvider(require('../_test/dev-keys.json').web3));
 const EthereumMulticall = require('ethereum-multicall');
 const fetch = require("node-fetch");
 const ABIs = require("../uniswap/abis.json");
