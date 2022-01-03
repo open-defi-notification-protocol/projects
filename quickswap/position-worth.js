@@ -78,7 +78,7 @@ class PositionWorth {
         const selectedPairAddress = args.subscription['pair'];
         const threshold = args.subscription['threshold'];
 
-        const poolInfo = this.poolsInfo.find(_poolInfo => !_poolInfo.ended && _poolInfo.pair === selectedPairAddress)
+        const poolInfo = this.poolsInfo.find(_poolInfo => !_poolInfo.ended && _poolInfo.pair === selectedPairAddress);
 
         const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
             args.web3,
@@ -87,7 +87,6 @@ class PositionWorth {
         );
 
         const uniqueId = poolInfo.pair + "-" + threshold;
-
 
         if (new BN(threshold).minus(new BN(positionWorthInUsdBN)).isGreaterThan(0)) {
 
