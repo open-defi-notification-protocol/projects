@@ -21,7 +21,7 @@ class PositionWorth {
      */
     async onInit(args) {
 
-        const response = await fetch('https://api.dot.finance/farms');
+        const response = await fetch('https://api.dot.finance/56/farms');
 
         this.vaultsInfo = await response.json();
 
