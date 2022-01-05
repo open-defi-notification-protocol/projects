@@ -75,7 +75,7 @@ class PendingReward {
 
             return {
                 uniqueId: uniqueId,
-                notification: `Your pending REVA amount ${formatter.format(normalizedPendingRewards)} surpassed the threshold ${threshold}.  Note: ${userIsCompounding===true? 'Entered autoCompounding.':''} Go to app.revault.network to claim it`,
+                notification: `Your pending REVA amount ${formatter.format(normalizedPendingRewards)} surpassed the threshold ${formatter.format(threshold)}.  Note: ${userIsCompounding===true? 'Entered autoCompounding.':''} Go to app.revault.network to claim it`,
             };
 
         }

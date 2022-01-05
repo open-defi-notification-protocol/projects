@@ -2,7 +2,10 @@ const BN = require("bignumber.js");
 const ABIs = require('./abis.json');
 const EthereumMulticall = require('ethereum-multicall');
 
-const MASTERCHEF_TOKEN_ADDRESS = "0xc2EdaD668740f1aA35E4D8f227fB8E17dcA888Cd";
+const MASTERCHEF_ADDRESS = "0xc2EdaD668740f1aA35E4D8f227fB8E17dcA888Cd";
+const SUSHI_TOKEN_ADDRESS = "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2";
+
+const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
 class PendingReward {
 
@@ -19,8 +22,15 @@ class PendingReward {
 
         this.masterchefContract = new args.web3.eth.Contract(
             ABIs.masterchef,
-            MASTERCHEF_TOKEN_ADDRESS
+            MASTERCHEF_ADDRESS
         );
+
+        const sushiContract = new args.web3.eth.Contract(
+            ABIs.erc20,
+            SUSHI_TOKEN_ADDRESS
+        );
+
+        this.sushiDecimals = await sushiContract.methods.decimals().call();
 
     }
 
@@ -59,9 +69,11 @@ class PendingReward {
 
         const pendingReward = await this.masterchefContract.methods.pendingSushi(args.subscription["pair"], args.address).call();
 
-        if (new BN(pendingReward).dividedBy("1e18").toNumber() > parseFloat(args.subscription["minimum"])) return {
+        const pendingRewardBN = new BN(pendingReward).dividedBy('1e' + this.sushiDecimals);
 
-            notification: "You have lots of SUSHI ready to claim"
+        if (pendingRewardBN.isGreaterThanOrEqualTo(args.subscription["minimum"])) return {
+
+            notification: `You have ${amountFormatter.format(pendingRewardBN)} SUSHI ready to claim`
 
         };
         return [];
@@ -88,7 +100,7 @@ class PendingReward {
 
             contractCallContext.push({
                 reference: 'masterchef-poolId-' + poolId,
-                contractAddress: MASTERCHEF_TOKEN_ADDRESS,
+                contractAddress: MASTERCHEF_ADDRESS,
                 abi: ABIs.masterchef,
                 calls: [{reference: 'userInfoCall', methodName: 'userInfo', methodParameters: [poolId, args.address]}],
                 context: {

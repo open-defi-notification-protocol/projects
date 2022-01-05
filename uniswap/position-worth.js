@@ -7,6 +7,8 @@ const ROUTER_ADDRESS = '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D';
 const WETH_TOKEN_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
 const USDC_TOKEN_ADDRESS = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
 
+const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
+
 class PositionWorth {
 
     static displayName = "Position Worth";
@@ -85,7 +87,7 @@ class PositionWorth {
 
             return {
                 uniqueId: uniqueId,
-                notification: `Your shares holdings in ${poolLabel} has dropped below ${threshold} USD`
+                notification: `Your shares holdings in ${poolLabel} has dropped below ${amountFormatter.format(threshold)} USD`
             };
 
         } else {
@@ -105,9 +107,7 @@ class PositionWorth {
      */
     _getPoolLabel(poolInfo, positionWorthInUSDBN) {
 
-        const formatter = Intl.NumberFormat('en', {notation: 'compact'});
-
-        return `${poolInfo.symbol} (${formatter.format(positionWorthInUSDBN)} USD)`;
+        return `${poolInfo.symbol} (${amountFormatter.format(positionWorthInUSDBN)} USD)`;
 
     }
 

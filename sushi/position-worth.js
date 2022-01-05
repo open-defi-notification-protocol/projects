@@ -7,6 +7,8 @@ const ROUTER_ADDRESS = "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F";
 const USDC_TOKEN_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 const WETH_TOKEN_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 
+const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
+
 class PositionWorth {
 
     static displayName = "Position Worth";
@@ -109,7 +111,7 @@ class PositionWorth {
 
             return {
                 uniqueId: uniqueId,
-                notification: `Your shares holdings in ${poolLabel} has dropped below ${threshold} USD`
+                notification: `Your shares holdings in ${poolLabel} has dropped below ${amountFormatter.format(threshold)} USD`
             };
 
         } else {
@@ -220,9 +222,7 @@ class PositionWorth {
         const token0Symbol = await token0Contract.methods.symbol().call();
         const token1Symbol = await token1Contract.methods.symbol().call();
 
-        const formatter = Intl.NumberFormat('en', {notation: 'compact'});
-
-        return `${token0Symbol} - ${token1Symbol} (${formatter.format(positionWorthInUSDBN)} USD)`;
+        return `${token0Symbol} - ${token1Symbol} (${amountFormatter.format(positionWorthInUSDBN)} USD)`;
 
     }
 
