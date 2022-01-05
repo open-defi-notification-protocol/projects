@@ -7,6 +7,8 @@ const ROUTER_ADDRESS = '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff';
 const USDC_TOKEN_ADDRESS = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
 const WMATIC_TOKEN_ADDRESS = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270';
 
+const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
+
 /**
  * Get notified when the USD worth of your position drops below a certain threshold *
  */
@@ -83,7 +85,7 @@ class PositionWorth {
 
             return {
                 uniqueId: uniqueId,
-                notification: `Your shares holdings in ${vaultLabel} has dropped below ${threshold} USD`
+                notification: `Your shares holdings in ${vaultLabel} has dropped below ${amountFormatter.format(threshold)} USD`
             };
 
         }
@@ -243,9 +245,7 @@ class PositionWorth {
         const token0Symbol = await token0Contract.methods.symbol().call();
         const token1Symbol = await token1Contract.methods.symbol().call();
 
-        const formatter = Intl.NumberFormat('en', {notation: 'compact'});
-
-        return `${token0Symbol} - ${token1Symbol} (${formatter.format(sharesValueUsdBN)} USD)`;
+        return `${token0Symbol} - ${token1Symbol} (${amountFormatter.format(sharesValueUsdBN)} USD)`;
 
     }
 }

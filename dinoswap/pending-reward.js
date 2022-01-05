@@ -4,6 +4,8 @@ const EthereumMulticall = require('ethereum-multicall');
 
 const ROUTER_ADDRESS = "0x1948abc5400aa1d72223882958da3bec643fb4e5";
 
+const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
+
 /**
  *
  */
@@ -64,11 +66,13 @@ class PendingReward {
 
         const pendingReward = await this.contract.methods.pendingDino(args.subscription["pair"], args.address).call();
 
-        if (new BN(pendingReward).dividedBy("1e18").isGreaterThanOrEqualTo(args.subscription["minimum"])) {
+        const pendingRewardBN = new BN(pendingReward).dividedBy("1e18");
+
+        if (pendingRewardBN.isGreaterThanOrEqualTo(args.subscription["minimum"])) {
 
             return {
 
-                notification: "You have lots of DINO ready to be claimed"
+                notification: `You have ${amountFormatter.format(pendingRewardBN)} DINO ready to be claimed`
 
             };
 

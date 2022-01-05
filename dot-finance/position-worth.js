@@ -5,6 +5,8 @@ const EthereumMulticall = require('ethereum-multicall');
 
 const CALCULATOR_ADDRESS = "0xba2dda52741b2ea5b57a118f43cf6ff02d932531";
 
+const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
+
 /**
  * Get notified when the USD worth of your position drops below a certain threshold *
  */
@@ -75,7 +77,7 @@ class PositionWorth {
 
             return {
                 uniqueId: uniqueId,
-                notification: `Your shares holdings in ${vaultLabel} has dropped below ${threshold} USD`
+                notification: `Your shares holdings in ${vaultLabel} has dropped below ${amountFormatter.format(threshold)} USD`
             };
 
         }
@@ -223,9 +225,7 @@ class PositionWorth {
         const token0Symbol = await token0Contract.methods.symbol().call();
         const token1Symbol = await token1Contract.methods.symbol().call();
 
-        const formatter = Intl.NumberFormat('en', {notation: 'compact'});
-
-        return `${token0Symbol} - ${token1Symbol} (${formatter.format(sharesValueUsdBN)} USD)`;
+        return `${token0Symbol} - ${token1Symbol} (${amountFormatter.format(sharesValueUsdBN)} USD)`;
 
     }
 }

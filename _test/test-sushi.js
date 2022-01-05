@@ -69,8 +69,8 @@ async function main() {
 
     console.log('Running manual test:');
 
-    console.log(await testSushiPendingRewards('0x3dacC571356e7D5dFB3b475d6922442Ec06B9005', '0.0000000001'));
-    console.log(await testSushiPositionWorth('0x3dacC571356e7D5dFB3b475d6922442Ec06B9005', '30'));
+    console.log(await testSushiPendingRewards('0x3dacC571356e7D5dFB3b475d6922442Ec06B9005', '0.01'));
+    console.log(await testSushiPositionWorth('0x3dacC571356e7D5dFB3b475d6922442Ec06B9005', '10000'));
 }
 
 main();

@@ -5,6 +5,8 @@ const EthereumMulticall = require('ethereum-multicall');
 
 const REWARD_TOKEN_ADDRESS = "0xf28164A485B0B2C90639E47b0f377b4a438a16B1";
 
+const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
+
 /**
  *
  */
@@ -76,9 +78,9 @@ class PendingReward {
 
         const pendingReward = userPendingRewards.dividedBy("1e" + rewardTokenDecimals);
 
-        if (pendingReward.isGreaterThan(minimumTokens)) {
+        if (pendingReward.isGreaterThanOrEqualTo(minimumTokens)) {
 
-            return {notification: `You have lots of dQUICK ready to claim`};
+            return {notification: `You have ${amountFormatter.format(pendingReward)} dQUICK ready to claim`};
 
         } else {
 
