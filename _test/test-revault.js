@@ -108,7 +108,7 @@ async function main() {
         {
             address:'0x825c9b788f475F17E2Cbfcc200de8dBd0ea3D68D',
             pid:"0",
-            threshold: "627",
+            threshold: "807",
         }
     ));
 
@@ -119,7 +119,6 @@ async function main() {
             threshold: "1909",
         }
     ));
-
 
     console.log(await testRevaultStakingUnlock(
         {
@@ -134,9 +133,6 @@ async function main() {
             pid:"0",
         }
     ));
-
-
-    //console.log(await testRevaultChangeStrategy());
 
 }
 
