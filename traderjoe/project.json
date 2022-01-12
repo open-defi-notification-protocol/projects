@@ -1,0 +1,9 @@
+{
+  "name": "Trader Joe",
+  "category": "lending",
+  "website": "https://traderjoexyz.com",
+  "logo": "logo.png",
+  "background": "#a1a5fc",
+  "foreground": "#ffffff",
+  "network": "avalanche"
+}
