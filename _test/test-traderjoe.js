@@ -2,10 +2,13 @@ const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').avalanche));
 
 async function testTraderJoeLending(args) {
-    const {AccountHealth, fetchAccountLendingInfo, calcBorrowLimit} = require('../traderjoe/account-health');
+    const AccountHealth = require('../traderjoe/account-health');
     const accountHealth = new AccountHealth();
-    const accountInfo = await fetchAccountLendingInfo(args.address);
-    accountInfo.borrowLimit = calcBorrowLimit(accountInfo.health);
+
+    const accountInfo = await accountHealth.fetchAccountLendingInfo(args.address);
+
+    accountInfo.borrowLimit = accountHealth.calcBorrowLimit(accountInfo.health);
+
     console.log("\n\n########  testTraderJoeLending #######");
     console.log("args: \n", args, "\n");
     console.log("Account info:\n", accountInfo, "\n");
