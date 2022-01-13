@@ -17,6 +17,7 @@ class AccountHealth {
 
     // runs right before user subscribes to new notifications and populates subscription form
     async onSubscribeForm(args) {
+
         const accountInfo = await fetchAccountLendingInfo(args.address);
 
         if (accountInfo) {
@@ -48,14 +49,14 @@ class AccountHealth {
         if (!args.subscription) return;
         if (accountInfo) {
             const currentBorrowLimit = calcBorrowLimit(accountInfo.health);
-            const threshold = args.subscription["threshold"];
-            if (currentBorrowLimit > threshold) {
-                const uniqueId = threshold.toString();
+            const borrowLimit = args.subscription["borrow-limit"];
+            if (currentBorrowLimit > borrowLimit) {
+                const uniqueId = borrowLimit.toString();
                 let notification;
                 if (currentBorrowLimit > this.BORROW_LIMIT_ACT_NOW_THRESHOLD) {
                     notification = `Act now! You are under-collateralized and about to be liquidated. Current Borrow Limit (~${currentBorrowLimit.toFixed(2)}%).`
                 } else {
-                    notification = `Your Borrow Limit (~${currentBorrowLimit.toFixed(2)}%) surpassed the safety threshold (${threshold.toFixed(2)}%).`;
+                    notification = `Your Borrow Limit (~${currentBorrowLimit.toFixed(2)}%) surpassed the safety threshold (${borrowLimit.toFixed(2)}%).`;
                 }
 
                 return {
