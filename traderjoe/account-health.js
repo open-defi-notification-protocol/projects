@@ -4,7 +4,7 @@ const fetch = require("node-fetch");
 class AccountHealth {
 
     static displayName = "Borrow Limit - Account Health";
-    static description = "Get notified when the account under-collateralized borrowing relative to collateral ($) surpass borrow limit threshold ( (low health factor)";
+    static description = "Get notified when the account under-collateralized borrowing relative to collateral ($) surpass borrow limit threshold (low health factor)";
 
     DEFAULT_BORROW_LIMIT = 66.7;
     BORROW_LIMIT_ACT_NOW_THRESHOLD = 95;
@@ -36,12 +36,15 @@ class AccountHealth {
                     id: "borrow-limit",
                     label: "Borrow Limit",
                     default: defaultLimit,
-                    description: description,
+                    description: description
                 }
             ];
-        }
-    }
 
+        } else {
+            return [];
+        }
+
+    }
 
     // runs when endpoint's chain is extended - notification scanning happens here
     async onBlocks(args) {
