@@ -18,15 +18,15 @@ class AccountHealth {
     // runs right before user subscribes to new notifications and populates subscription form
     async onSubscribeForm(args) {
 
-        const accountInfo = await fetchAccountLendingInfo(args.address);
+        const accountInfo = await this.fetchAccountLendingInfo(args.address);
 
         if (accountInfo) {
-            const currentBorrowLimit = calcBorrowLimit(accountInfo.health);
+            const currentBorrowLimit = this.calcBorrowLimit(accountInfo.health);
             let description = "Notify me when borrow limit exceeds this value.";
             if (currentBorrowLimit > this.BORROW_LIMIT_ACT_NOW_THRESHOLD) {
                 description = "CAUTION: you are currently in risk of liquidation! ";
             }
-            description += `Current Borrow Limit (~${currentBorrowLimit? currentBorrowLimit.toFixed(2): 0}%)`;
+            description += `Current Borrow Limit (~${currentBorrowLimit ? currentBorrowLimit.toFixed(2) : 0}%)`;
             const defaultLimit = Math.min(1.05 * Math.max(currentBorrowLimit, this.DEFAULT_BORROW_LIMIT),
                 this.BORROW_LIMIT_ACT_NOW_THRESHOLD).toFixed(1);
 
@@ -45,10 +45,10 @@ class AccountHealth {
 
     // runs when endpoint's chain is extended - notification scanning happens here
     async onBlocks(args) {
-        const accountInfo = await fetchAccountLendingInfo(args.address);
+        const accountInfo = await this.fetchAccountLendingInfo(args.address);
         if (!args.subscription) return;
         if (accountInfo) {
-            const currentBorrowLimit = calcBorrowLimit(accountInfo.health);
+            const currentBorrowLimit = this.calcBorrowLimit(accountInfo.health);
             const borrowLimit = args.subscription["borrow-limit"];
             if (currentBorrowLimit > borrowLimit) {
                 const uniqueId = borrowLimit.toString();
@@ -68,13 +68,11 @@ class AccountHealth {
         return [];
     }
 
+    async fetchAccountLendingInfo(address) {
 
-}
+        const SUBGRAPH_URL = "https://api.thegraph.com/subgraphs/name/traderjoe-xyz/lending";
 
-
-async function fetchAccountLendingInfo(address) {
-    const SUBGRAPH_URL = "https://api.thegraph.com/subgraphs/name/traderjoe-xyz/lending";
-    const query = `
+        const query = `
             {
                 accounts(where: { id:"${address}"}) {
                   id
@@ -89,29 +87,28 @@ async function fetchAccountLendingInfo(address) {
             }
         `;
 
-    const response = await fetch(SUBGRAPH_URL, {
-        method: "POST",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({query})
-    });
-    const accountInfo = (await response.json()).data.accounts[0];
-    // console.log("Account info:\n", accountInfo);
-    return accountInfo;
-}
-
-function calcBorrowLimit(health) {
-    let borrowLimit = 0;
-    if (health > 0.001) {
-        borrowLimit = (1 / health) * 100;
+        const response = await fetch(SUBGRAPH_URL, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({query})
+        });
+        const accountInfo = (await response.json()).data.accounts[0];
+        // console.log("Account info:\n", accountInfo);
+        return accountInfo;
     }
-    return borrowLimit;
+
+    calcBorrowLimit(health) {
+        let borrowLimit = 0;
+        if (health > 0.001) {
+            borrowLimit = (1 / health) * 100;
+        }
+        return borrowLimit;
+    }
+
 }
 
-module.exports = {
-    AccountHealth,
-    fetchAccountLendingInfo,
-    calcBorrowLimit
-};
+
+module.exports = AccountHealth
