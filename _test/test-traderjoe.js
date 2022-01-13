@@ -39,7 +39,7 @@ async function main() {
     console.log("Notification: ", await testTraderJoeLending(
         {
             address: '0x0181c4c3514210d8f33fec7934a888b9574fbb74',//0x343ba440db35997170cc6402692a0803c360c48c',//0xd253c7cc525345922cb1de7824a753d21083dede',
-            threshold: 70,
+            'borrow-limit': 70,
         }
     ));
 
@@ -47,7 +47,7 @@ async function main() {
     console.log("Notification: ", await testTraderJoeLending(
         {
             address: '0x0181c4c3514210d8f33fec7934a888b9574fbb74',
-            threshold: 80,
+            'borrow-limit': 80,
         }
     ));
 
@@ -62,7 +62,7 @@ async function main() {
     console.log("Notification: ", await testTraderJoeLending(
         {
             address: '0x0153767a621aae02061380ec465ff91d8d517094',
-            threshold: 99.9
+            'borrow-limit': 99.9
         }
     ));
 
