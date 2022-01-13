@@ -48,18 +48,33 @@ class AccountHealth {
 
     // runs when endpoint's chain is extended - notification scanning happens here
     async onBlocks(args) {
+
         const accountInfo = await this.fetchAccountLendingInfo(args.address);
-        if (!args.subscription) return;
+
+        if (!args.subscription) {
+            return;
+        }
+
         if (accountInfo) {
+
             const currentBorrowLimit = this.calcBorrowLimit(accountInfo.health);
-            const borrowLimit = args.subscription["borrow-limit"];
+
+            const borrowLimit = parseFloat(args.subscription["borrow-limit"]);
+
             if (currentBorrowLimit > borrowLimit) {
+
                 const uniqueId = borrowLimit.toString();
+
                 let notification;
+
                 if (currentBorrowLimit > this.BORROW_LIMIT_ACT_NOW_THRESHOLD) {
+
                     notification = `Act now! You are under-collateralized and about to be liquidated. Current Borrow Limit (~${currentBorrowLimit.toFixed(2)}%).`
+
                 } else {
+
                     notification = `Your Borrow Limit (~${currentBorrowLimit.toFixed(2)}%) surpassed the safety threshold (${borrowLimit.toFixed(2)}%).`;
+
                 }
 
                 return {
