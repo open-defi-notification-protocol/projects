@@ -42,7 +42,7 @@ class TokensWorth {
 
         return [
             {
-                type: "input-text",
+                type: "input-address",
                 id: "tokenAddress",
                 label: "Token Address",
                 default: '',
