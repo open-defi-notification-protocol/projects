@@ -4,7 +4,7 @@
   "website": "https://alpacafinance.org",
   "logo": "logo.png",
   "background": ["#e5e7eb"],
-  "foreground": "#ffffff",
+  "foreground": "#2cc37d",
   "network": "bsc",
   "dev": true
 }

@@ -78,7 +78,7 @@ class TokensWorth {
         const tokenAddress = subscription['tokenAddress'];
         const above = subscription["above-below"] === "0";
 
-        const tokenContract = new web3.eth.Contract(ABIs.lp, tokenAddress);
+        const tokenContract = new web3.eth.Contract(ABIs.erc20, tokenAddress);
 
         const walletTokensWorthInUsdBN = await this._getPositionWorthInUsdBN(
             web3,
