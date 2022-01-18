@@ -28,7 +28,11 @@ class APY {
      */
     async onSubscribeForm(args) {
 
-        return [];
+        return [{
+            id: 'allow-subscribe',
+            type: 'hidden',
+            value: true
+        }];
 
     }
 
