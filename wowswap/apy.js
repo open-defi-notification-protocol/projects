@@ -30,6 +30,7 @@ class APY {
 
         return [{
             id: 'allow-subscribe',
+            label:'This input makes sure the Subscribe button will be shown',
             type: 'hidden',
             value: true
         }];
