@@ -19,6 +19,27 @@ class UnlockCooldown {
 
     }
 
+    /**
+     * runs right before user subscribes to new notifications and populates subscription form
+     *
+     * @param args
+     * @returns {Promise<[{values: *[], id: string, label: string, type: string}, {id: string, label: string, type: string, value: string}, {default: number, description: string, id: string, label: string, type: string}]>}
+     */
+    async onSubscribeForm(args) {
+
+        return [{
+            id: 'allow-subscribe',
+            type: 'hidden',
+            value: true
+        }];
+    }
+
+    /**
+     * runs when new blocks are added to the mainnet chain - notification scanning happens here
+     *
+     * @param args
+     * @returns {Promise<{notification: string}|*[]>}
+     */
     async onBlocks(args) {
 
         const position = await this.stakingRewardsContract.methods.getUnstakeStatus(args.address).call();
