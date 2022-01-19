@@ -9,8 +9,8 @@ const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
 class TokensWorth {
 
-    static displayName = "Position Worth";
-    static description = "Track your position's total worth to protect against loss";
+    static displayName = "Tokens Worth";
+    static description = "Track your tokens total value";
 
     /**
      * runs when class is initialized
@@ -46,7 +46,7 @@ class TokensWorth {
                 id: "tokenAddress",
                 label: "Token Address",
                 default: '',
-                description: "The Token contract address"
+                description: "The token contract address"
             },
             {
                 type: "input-select",
@@ -62,7 +62,7 @@ class TokensWorth {
                 id: "threshold",
                 label: "Threshold price",
                 default: 0,
-                description: "Notify me when the price of my tokens goes above/below this value in USD"
+                description: "Notify me when the value of my tokens goes above/below this value in USD"
             }
         ];
 
