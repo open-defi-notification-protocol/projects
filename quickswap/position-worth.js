@@ -274,12 +274,25 @@ class PositionWorth {
                 token0Info
             );
 
-            const singleTokenWorthInUSD = await this.routerContract.methods.getAmountsOut(
+            let amountsOut = await this.routerContract.methods.getAmountsOut(
                 (new BN("10").pow(token0Info.decimals)), // single whole unit
                 [token0Info.address, WMATIC_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS]
-            ).call();
+            ).call()
 
-            const lpWorthInUsdBN = ((new BN(singleTokenWorthInUSD[2]).div(new BN("10").pow(this.usdcDecimals)))
+            let singleTokenWorthInUSD = amountsOut[2]
+
+            if (singleTokenWorthInUSD === "0") {
+
+                amountsOut = await this.routerContract.methods.getAmountsOut(
+                    (new BN("10").pow(token0Info.decimals)), // single whole unit
+                    [token0Info.address, USDC_TOKEN_ADDRESS]
+                ).call()
+
+                singleTokenWorthInUSD = amountsOut[1]
+
+            }
+
+            const lpWorthInUsdBN = ((new BN(singleTokenWorthInUSD).div(new BN("10").pow(this.usdcDecimals)))
                 .multipliedBy(new BN(token0Reserve).div(new BN("10").pow(token0Info.decimals)))).multipliedBy(2);
 
             const sharesBN = await this._getUserSharesBN(
