@@ -142,13 +142,11 @@ class PositionWorth {
 
         for (const poolInfo of this.poolsInfo) {
 
-            const pairAddress = poolInfo.pair;
-
-            if (pairAddress) {
+            if (this._validateAddress(poolInfo.pair) && this._validateAddress(poolInfo.stakingRewardAddress)) {
 
                 contractCallContext.push({
                     reference: JSON.stringify({stakingRewardAddress: poolInfo.stakingRewardAddress, isReward: false}),
-                    contractAddress: pairAddress,
+                    contractAddress: poolInfo.pair,
                     abi: ABIs.lp,
                     calls: [{reference: 'balanceOfCall', methodName: 'balanceOf', methodParameters: [args.address]}],
                     context: {
@@ -223,6 +221,18 @@ class PositionWorth {
         }
 
         return pairs;
+
+    }
+
+    /**
+     *
+     * @param address
+     * @returns {boolean}
+     * @private
+     */
+    _validateAddress(address) {
+
+        return address && address !== "0x0000000000000000000000000000000000000000"
 
     }
 

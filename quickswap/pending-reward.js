@@ -107,7 +107,7 @@ class PendingReward {
 
         for (const poolInfo of this.poolsInfo) {
 
-            if (poolInfo.pair) {
+            if (this._validateAddress(poolInfo.pair) && this._validateAddress(poolInfo.stakingRewardAddress)) {
 
                 contractCallContext.push({
                     reference: 'router-pid-' + poolInfo.stakingRewardAddress,
@@ -145,6 +145,17 @@ class PendingReward {
         return pairs;
     }
 
+    /**
+     *
+     * @param address
+     * @returns {boolean}
+     * @private
+     */
+    _validateAddress(address) {
+
+        return address && address !== "0x0000000000000000000000000000000000000000"
+
+    }
 
     /**
      *
