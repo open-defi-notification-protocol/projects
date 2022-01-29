@@ -80,7 +80,7 @@ class PositionWorth {
         const selectedPairAddress = args.subscription['pair'];
         const threshold = args.subscription['threshold'];
 
-        const poolInfo = this.poolsInfo.find(_poolInfo => !_poolInfo.ended && _poolInfo.pair === selectedPairAddress);
+        const poolInfo = this.poolsInfo.find(_poolInfo => _poolInfo.pair && _poolInfo.pair === selectedPairAddress);
 
         const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
             args.web3,
@@ -179,7 +179,7 @@ class PositionWorth {
             const key = JSON.parse(reference);
 
             // going over active reward contracts and finding their respective pair
-            if (!poolInfo.ended && key.isReward) {
+            if (poolInfo.pair && key.isReward) {
 
                 const pairKey = JSON.parse(reference)
 
