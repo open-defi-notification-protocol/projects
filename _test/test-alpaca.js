@@ -1,67 +1,59 @@
 const Web3 = require('web3');
-const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3));
+const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3bsc));
 
-async function testGetHealthFactor() {
-  const PositionHealth = require('../alpaca/position-health');
-  const positionHealth = new PositionHealth();
+async function testGetAllUserVaults(address) {
+    const PositionHealth = require('../alpaca/position-health');
+    const positionHealth = new PositionHealth();
 
-  return positionHealth._getHealthFactor({
-      web3
-    },
-    '0x08fc9ba2cac74742177e0afc3dc8aed6961c24e7',
-    3000
-  );
+    // simulate init event
+    await positionHealth.onInit({
+        web3
+    });
+
+    return positionHealth._getAllUserVaults({
+        web3,
+        address: address
+    });
 }
 
-async function testGetVaultLabel() {
-  const PositionHealth = require('../alpaca/position-health');
-  const positionHealth = new PositionHealth();
+async function testOnBlocks(address) {
+    const PositionHealth = require('../alpaca/position-health');
+    const positionHealth = new PositionHealth();
 
-  return positionHealth._getVaultLabel({
-      web3
-    },
-    '0x08fc9ba2cac74742177e0afc3dc8aed6961c24e7'
-  );
-}
+    // simulate init event
+    await positionHealth.onInit({
+        web3
+    });
 
-async function testGetAllUserVaults() {
-  const PositionHealth = require('../alpaca/position-health');
-  const positionHealth = new PositionHealth();
+    // simulate subscribe form event
+    const form = await positionHealth.onSubscribeForm({
+        web3,
+        address: address
+    });
 
-  return positionHealth._getAllUserVaults({
-      web3,
-      address: '0xC81bD599a66dA6dcc3A64399f8025C19fFC42888'
-  });
-}
+    // simulate user filling in the subscription form in the app
+    const subscription = {
+        vault: form.find(o => o.id === 'vault').values[0].value,
+        threshold: form.find(o => o.id === 'threshold').default
+    };
 
-async function testOnBlocks() {
-  const PositionHealth = require('../alpaca/position-health');
-  const positionHealth = new PositionHealth();
-  // simulate subscribe form event
-  const form = await positionHealth.onSubscribeForm({
-    web3,
-    address: '0xC81bD599a66dA6dcc3A64399f8025C19fFC42888'
-  });
-
-  // simulate user filling in the subscription form in the app
-  const subscription = {
-    vault: form.find(o => o.id === 'vault').values[0].value,
-    health: form.find(o => o.id === 'health').default
-  };
-
-  return positionHealth.onBlocks({
-      web3,
-      address: '0xC81bD599a66dA6dcc3A64399f8025C19fFC42888',
-      subscription
-  });
+    return positionHealth.onBlocks({
+        web3,
+        address: address,
+        subscription
+    });
 }
 
 async function main() {
-  console.log('Running manual test:');
-  console.log(await testGetHealthFactor());
-  console.log(await testGetAllUserVaults());
-  console.log(await testGetVaultLabel());
-  console.log(await testOnBlocks());
+
+    console.log('Running manual test:');
+
+    const address = '0x98C3fC24A4A1DCB6010685115d6B5F8EF3F0Cc19';
+
+    console.log(await testGetAllUserVaults(address));
+
+    console.log(await testOnBlocks(address));
+
 }
 
 main();
