@@ -18,18 +18,18 @@ class FloorPrice {
 
         return [
             {
-                type: "input-address",
+                type: "input-text",
                 id: "collectionUrl",
-                label: "Threshold Price (ETH)",
+                label: "Collection URL",
                 default: "0",
-                description: "The gas price threshold"
+                description: "Paste the OpenSea collection URL here"
             },
             {
                 type: "input-number",
                 id: "price",
                 label: "Threshold Price (ETH)",
                 default: "0",
-                description: "The gas price threshold"
+                description: "The floor price threshold in ETH"
             },
             {
                 type: "input-select",
