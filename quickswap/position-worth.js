@@ -29,6 +29,7 @@ class PositionWorth {
         // const response = await fetch("http://quickswap.exchange/staking.json");
 
         this.poolsInfo = POOLS_INFO;
+        this.customPoolsInfo = {};
 
         const usdcContract = new args.web3.eth.Contract(ABIs.token, USDC_TOKEN_ADDRESS);
 
@@ -64,6 +65,13 @@ class PositionWorth {
                 label: "Threshold price",
                 default: 0,
                 description: "Notify me when the price of my position goes below this value in USD"
+            },
+            {
+                type: "input-address",
+                id: "customPoolAddress",
+                label: "Pool Address (Advanced/optional)",
+                default: '',
+                description: "If your pool is missing from the list you can set the pool address manually"
             }
         ];
 
@@ -80,10 +88,26 @@ class PositionWorth {
         const selectedPairAddress = args.subscription['pair'];
         const threshold = args.subscription['threshold'];
 
-        const poolInfo = this.poolsInfo.find(_poolInfo => _poolInfo.pair && _poolInfo.pair === selectedPairAddress);
+        const web3 = args.web3;
+
+        let poolInfo;
+
+        if (selectedPairAddress) {
+
+            poolInfo = this.poolsInfo.find(_poolInfo => _poolInfo.pair && _poolInfo.pair === selectedPairAddress);
+
+        } else {
+
+            const customPoolAddress = args.subscription['customPoolAddress'];
+
+            poolInfo = await this._getCustomPoolInfo(
+                web3,
+                customPoolAddress
+            );
+        }
 
         const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
-            args.web3,
+            web3,
             args.address,
             poolInfo
         );
@@ -267,16 +291,20 @@ class PositionWorth {
 
         if (walletTotalLpBalanceBN.isGreaterThan(0)) {
 
-            const token0Info = poolInfo.tokens[0];
+            let tokenInfo = poolInfo.tokens[0];
 
-            const token0Reserve = await this._getToken0Reserve(
+            if (tokenInfo.address.toLowerCase() === WMATIC_TOKEN_ADDRESS.toLowerCase()) {
+                tokenInfo = poolInfo.tokens[1];
+            }
+
+            const tokenReserve = await this._getTokenReserve(
                 poolContract,
-                token0Info
+                tokenInfo
             );
 
             let amountsOut = await this.routerContract.methods.getAmountsOut(
-                (new BN("10").pow(token0Info.decimals)), // single whole unit
-                [token0Info.address, WMATIC_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS]
+                (new BN("10").pow(tokenInfo.decimals)), // single whole unit
+                [tokenInfo.address, WMATIC_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS]
             ).call()
 
             let singleTokenWorthInUSD = amountsOut[2]
@@ -284,8 +312,8 @@ class PositionWorth {
             if (singleTokenWorthInUSD === "0") {
 
                 amountsOut = await this.routerContract.methods.getAmountsOut(
-                    (new BN("10").pow(token0Info.decimals)), // single whole unit
-                    [token0Info.address, USDC_TOKEN_ADDRESS]
+                    (new BN("10").pow(tokenInfo.decimals)), // single whole unit
+                    [tokenInfo.address, USDC_TOKEN_ADDRESS]
                 ).call()
 
                 singleTokenWorthInUSD = amountsOut[1]
@@ -293,7 +321,7 @@ class PositionWorth {
             }
 
             const lpWorthInUsdBN = ((new BN(singleTokenWorthInUSD).div(new BN("10").pow(this.usdcDecimals)))
-                .multipliedBy(new BN(token0Reserve).div(new BN("10").pow(token0Info.decimals)))).multipliedBy(2);
+                .multipliedBy(new BN(tokenReserve).div(new BN("10").pow(tokenInfo.decimals)))).multipliedBy(2);
 
             const sharesBN = await this._getUserSharesBN(
                 walletTotalLpBalanceBN,
@@ -355,18 +383,69 @@ class PositionWorth {
     /**
      *
      * @param poolContract
-     * @param token0Info
+     * @param tokenInfo
      * @returns {Promise<*>}
      * @private
      */
-    async _getToken0Reserve(poolContract, token0Info) {
+    async _getTokenReserve(poolContract, tokenInfo) {
 
         const reserves = await poolContract.methods.getReserves().call();
         const token0Address = await poolContract.methods.token0().call();
 
-        return token0Address === token0Info.address ? reserves._reserve0 : reserves._reserve1;
+        return token0Address.toLowerCase() === tokenInfo.address.toLowerCase() ? reserves._reserve0 : reserves._reserve1;
 
     }
+
+    /**
+     * get pool info for custom pools using cache
+     *
+     * @param web3
+     * @param customPoolAddress
+     * @returns {Promise<{tokens: [{symbol: *, address: *, decimals: *},{symbol: *, address: *, decimals: *}], pair}>}
+     * @private
+     */
+    async _getCustomPoolInfo(web3, customPoolAddress) {
+
+        let poolInfo = this.customPoolsInfo[customPoolAddress];
+
+        // if not in cache then init pool information and save to cache
+        if (!poolInfo) {
+
+            const poolContract = new web3.eth.Contract(ABIs.lp, customPoolAddress);
+
+            const token0Address = await poolContract.methods.token0().call();
+            const token1Address = await poolContract.methods.token1().call();
+
+            const token0Contract = new web3.eth.Contract(ABIs.token, token0Address);
+            const token1Contract = new web3.eth.Contract(ABIs.token, token1Address);
+
+            const token0Symbol = await token0Contract.methods.symbol().call();
+            const token0Decimals = await token0Contract.methods.decimals().call();
+            const token1Symbol = await token1Contract.methods.symbol().call();
+            const token1Decimals = await token1Contract.methods.decimals().call();
+
+            this.customPoolsInfo[customPoolAddress] = poolInfo = {
+                pair: customPoolAddress,
+                tokens: [
+                    {
+                        address: token0Address,
+                        symbol: token0Symbol,
+                        decimals: token0Decimals
+                    },
+                    {
+                        address: token1Address,
+                        symbol: token1Symbol,
+                        decimals: token1Decimals
+                    }
+                ]
+            };
+
+        }
+
+        return poolInfo;
+
+    }
+
 
 }
 
