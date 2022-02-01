@@ -9,6 +9,8 @@ const WMATIC_TOKEN_ADDRESS = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270';
 
 const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
+const customPoolsInfo = {};
+
 /**
  *
  */
@@ -28,8 +30,6 @@ class PositionWorth {
         // cause DDOS response when run on firebase, using cached version for now.
         // const response = await fetch("http://quickswap.exchange/staking.json");
 
-        this.poolsInfo = POOLS_INFO;
-        this.customPoolsInfo = {};
 
         const usdcContract = new args.web3.eth.Contract(ABIs.token, USDC_TOKEN_ADDRESS);
 
@@ -105,7 +105,7 @@ class PositionWorth {
 
             const selectedPairAddress = args.subscription['pair'];
 
-            poolInfo = this.poolsInfo.find(_poolInfo => _poolInfo.pair && _poolInfo.pair === selectedPairAddress);
+            poolInfo = POOLS_INFO.find(_poolInfo => _poolInfo.pair && _poolInfo.pair === selectedPairAddress);
 
         }
 
@@ -167,7 +167,7 @@ class PositionWorth {
 
         const contractCallContext = [];
 
-        for (const poolInfo of this.poolsInfo) {
+        for (const poolInfo of POOLS_INFO) {
 
             if (this._validateAddress(poolInfo.pair) && this._validateAddress(poolInfo.stakingRewardAddress)) {
 
@@ -409,7 +409,7 @@ class PositionWorth {
      */
     async _getCustomPoolInfo(web3, customPoolAddress) {
 
-        let poolInfo = this.customPoolsInfo[customPoolAddress];
+        let poolInfo = customPoolsInfo[customPoolAddress];
 
         // if not in cache then init pool information and save to cache
         if (!poolInfo) {
@@ -427,7 +427,7 @@ class PositionWorth {
             const token1Symbol = await token1Contract.methods.symbol().call();
             const token1Decimals = await token1Contract.methods.decimals().call();
 
-            this.customPoolsInfo[customPoolAddress] = poolInfo = {
+            customPoolsInfo[customPoolAddress] = poolInfo = {
                 pair: customPoolAddress,
                 tokens: [
                     {
