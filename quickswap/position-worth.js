@@ -71,6 +71,7 @@ class PositionWorth {
                 type: "input-address",
                 id: "customPoolAddress",
                 label: "Pool Address (Advanced/optional)",
+                optional: true,
                 default: '',
                 description: "If your pool is missing from the list you can set the pool address manually"
             }
