@@ -52,7 +52,7 @@ async function testQuickPositionWorth(address, threshold, customPoolAddress) {
 
     // simulate user filling in the subscription form in the app
     const subscription = {
-        pair: customPoolAddress ? null : form.find(o => o.id === 'pair').values[0].value,
+        pair: customPoolAddress ? null : form.find(o => o.id === 'pair').values[2].value,
         threshold: threshold,
         customPoolAddress: customPoolAddress
     };

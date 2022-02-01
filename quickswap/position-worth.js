@@ -57,6 +57,7 @@ class PositionWorth {
                 type: "input-select",
                 id: "pair",
                 label: "Pool",
+                description: "* means the rewards for this pool has ended",
                 values: pairs
             },
             {
@@ -85,25 +86,26 @@ class PositionWorth {
      */
     async onBlocks(args) {
 
-        const selectedPairAddress = args.subscription['pair'];
+        const customPoolAddress = args.subscription['customPoolAddress'];
         const threshold = args.subscription['threshold'];
 
         const web3 = args.web3;
 
         let poolInfo;
 
-        if (selectedPairAddress) {
-
-            poolInfo = this.poolsInfo.find(_poolInfo => _poolInfo.pair && _poolInfo.pair === selectedPairAddress);
-
-        } else {
-
-            const customPoolAddress = args.subscription['customPoolAddress'];
+        if (customPoolAddress) {
 
             poolInfo = await this._getCustomPoolInfo(
                 web3,
                 customPoolAddress
             );
+
+        } else {
+
+            const selectedPairAddress = args.subscription['pair'];
+
+            poolInfo = this.poolsInfo.find(_poolInfo => _poolInfo.pair && _poolInfo.pair === selectedPairAddress);
+
         }
 
         const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
@@ -116,7 +118,7 @@ class PositionWorth {
 
         if (new BN(threshold).minus(new BN(positionWorthInUsdBN)).isGreaterThan(0)) {
 
-            const poolLabel = await this._getPoolLabel(poolInfo, positionWorthInUsdBN);
+            const poolLabel = this._getPoolLabel(poolInfo, positionWorthInUsdBN);
 
             return {
                 uniqueId: uniqueId,
@@ -142,7 +144,7 @@ class PositionWorth {
 
         const tokens = poolInfo.tokens;
 
-        return `${tokens[0].symbol} - ${tokens[1].symbol} (${amountFormatter.format(positionWorthInUSDBN)} USD)`;
+        return `${tokens[0].symbol}-${tokens[1].symbol}${poolInfo.ended ? '*' : ''} (${amountFormatter.format(positionWorthInUSDBN)} USD)`;
 
     }
 
@@ -202,7 +204,7 @@ class PositionWorth {
 
             const key = JSON.parse(reference);
 
-            // going over active reward contracts and finding their respective pair
+            // going over reward contracts and finding their respective pair
             if (poolInfo.pair && key.isReward) {
 
                 const pairKey = JSON.parse(reference)
