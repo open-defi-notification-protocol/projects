@@ -1,4 +1,4 @@
-// notify when gas price is below chosen value in Gwei
+// notify when gas price is above/below chosen value in Gwei
 const BN = require("bignumber.js");
 
 class GasPrice {
