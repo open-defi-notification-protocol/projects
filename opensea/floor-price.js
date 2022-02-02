@@ -21,7 +21,7 @@ class FloorPrice {
                 type: "input-text",
                 id: "collectionUrl",
                 label: "Collection URL",
-                default: "0",
+                default: "",
                 description: "Paste the OpenSea collection URL here"
             },
             {

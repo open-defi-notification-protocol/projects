@@ -14,7 +14,7 @@ async function testUnlockedCooldown(address) {
     // simulate on blocks event
     return unlockCooldown.onBlocks({
         web3,
-        address: address
+        address
     });
 }
 

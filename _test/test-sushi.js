@@ -14,7 +14,7 @@ async function testSushiPendingRewards(address, minimum) {
     // simulate subscribe form event
     const form = await pendingRewards.onSubscribeForm({
         web3,
-        address: address
+        address
     });
 
     console.log(form);
@@ -28,7 +28,7 @@ async function testSushiPendingRewards(address, minimum) {
     // simulate on blocks event
     return pendingRewards.onBlocks({
         web3,
-        address: address,
+        address,
         subscription
     });
 }
@@ -46,7 +46,7 @@ async function testSushiPositionWorth(address, threshold) {
     // simulate subscribe form event
     const form = await positionWorth.onSubscribeForm({
         web3,
-        address: address
+        address
     });
 
     console.log(form);
@@ -60,7 +60,7 @@ async function testSushiPositionWorth(address, threshold) {
     // simulate on blocks event
     return positionWorth.onBlocks({
         web3,
-        address: address,
+        address,
         subscription
     });
 }

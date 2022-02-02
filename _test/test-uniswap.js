@@ -14,7 +14,7 @@ async function testUniPositionWorth(address, threshold) {
     // simulate subscribe form event
     const form = await positionWorth.onSubscribeForm({
         web3,
-        address: address
+        address
     });
 
     console.log(form);
@@ -29,7 +29,7 @@ async function testUniPositionWorth(address, threshold) {
     // simulate on blocks event
     return positionWorth.onBlocks({
         web3,
-        address: address,
+        address,
         subscription
     });
 }
