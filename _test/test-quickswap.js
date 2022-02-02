@@ -13,7 +13,7 @@ async function testQuickPendingRewards(address, minimum) {
     // simulate subscribe form event
     const form = await pendingRewards.onSubscribeForm({
         web3,
-        address: address
+        address
     });
 
     console.log(form);
@@ -21,13 +21,13 @@ async function testQuickPendingRewards(address, minimum) {
     // simulate user filling in the subscription form in the app
     const subscription = {
         pair: form.find(o => o.id === 'pair').values[0].value,
-        minimum: minimum
+        minimum
     };
 
     // simulate on blocks event
     return pendingRewards.onBlocks({
         web3,
-        address: address,
+        address,
         subscription
     });
 }
@@ -45,7 +45,7 @@ async function testQuickPositionWorth(address, threshold, customPoolAddress) {
     // simulate subscribe form event
     const form = await positionWorth.onSubscribeForm({
         web3,
-        address: address
+        address
     });
 
     console.log(form);
@@ -60,7 +60,7 @@ async function testQuickPositionWorth(address, threshold, customPoolAddress) {
     // simulate on blocks event
     return positionWorth.onBlocks({
         web3,
-        address: address,
+        address,
         subscription
     });
 }

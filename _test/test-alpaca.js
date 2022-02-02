@@ -12,7 +12,7 @@ async function testGetAllUserVaults(address) {
 
     return positionHealth._getAllUserVaults({
         web3,
-        address: address
+        address
     });
 }
 
@@ -28,7 +28,7 @@ async function testOnBlocks(address) {
     // simulate subscribe form event
     const form = await positionHealth.onSubscribeForm({
         web3,
-        address: address
+        address
     });
 
     // simulate user filling in the subscription form in the app
@@ -39,7 +39,7 @@ async function testOnBlocks(address) {
 
     return positionHealth.onBlocks({
         web3,
-        address: address,
+        address,
         subscription
     });
 }

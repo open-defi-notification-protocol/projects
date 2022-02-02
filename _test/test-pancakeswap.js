@@ -13,7 +13,7 @@ async function testTokensWorth(address, tokenAddress, threshold, above) {
     // simulate subscribe form event
     const form = await positionWorth.onSubscribeForm({
         web3,
-        address: address
+        address
     });
 
     console.log(form);
@@ -28,7 +28,7 @@ async function testTokensWorth(address, tokenAddress, threshold, above) {
     // simulate on blocks event
     return positionWorth.onBlocks({
         web3,
-        address: address,
+        address,
         subscription
     });
 }

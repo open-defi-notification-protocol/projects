@@ -12,7 +12,7 @@ async function testGetSharesUSDValue(address, vault) {
 
     return positionWorth._getSharesUSDValueBN({
             web3,
-            address: address
+            address
         },
         vault
     );
@@ -45,7 +45,7 @@ async function testGetAllUserVaults(address) {
 
     return positionWorth._getAllUserVaults({
         web3,
-        address: address
+        address
     });
 }
 
@@ -61,7 +61,7 @@ async function testOnBlocks(address, threshold) {
     // simulate subscribe form event
     const form = await positionWorth.onSubscribeForm({
         web3,
-        address: address
+        address
     });
 
     // simulate user filling in the subscription form in the app
@@ -72,7 +72,7 @@ async function testOnBlocks(address, threshold) {
 
     return positionWorth.onBlocks({
         web3,
-        address: address,
+        address,
         subscription
     });
 }

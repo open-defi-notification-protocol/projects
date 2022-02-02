@@ -17,7 +17,7 @@ async function testWowswapAPY(address) {
 
     // simulate on blocks event
     return apy.onBlocks({
-        address: address
+        address
     });
 }
 
