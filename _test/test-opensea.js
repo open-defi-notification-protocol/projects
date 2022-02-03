@@ -1,19 +1,12 @@
-const Web3 = require('web3');
-const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3Polygon));
-
 async function testFloorPrice(collectionUrl, price, above) {
     const FloorPrice = require('../opensea/floor-price');
     const floorPrice = new FloorPrice();
 
     // simulate init event
-    await floorPrice.onInit({
-        web3
-    });
+    await floorPrice.onInit({});
 
     // simulate subscribe form event
-    const form = await floorPrice.onSubscribeForm({
-        web3
-    });
+    const form = await floorPrice.onSubscribeForm({});
 
     console.log(form);
 
@@ -26,7 +19,6 @@ async function testFloorPrice(collectionUrl, price, above) {
 
     // simulate on blocks event
     return floorPrice.onBlocks({
-        web3,
         subscription
     });
 }
@@ -36,14 +28,10 @@ async function testActiveBids(address, price) {
     const activeBids = new ActiveBids();
 
     // simulate init event
-    await activeBids.onInit({
-        web3
-    });
+    await activeBids.onInit({});
 
     // simulate subscribe form event
-    const form = await activeBids.onSubscribeForm({
-        web3
-    });
+    const form = await activeBids.onSubscribeForm({});
 
     console.log(form);
 
@@ -54,7 +42,6 @@ async function testActiveBids(address, price) {
 
     // simulate on blocks event
     return activeBids.onBlocks({
-        web3,
         address,
         subscription
     });
@@ -66,8 +53,8 @@ async function main() {
 
     const address = '0x04a7450b1ca006372ebf321e4cd22c362372abe9';
 
-    // console.log(await testFloorPrice("https://opensea.io/collection/boredapeyachtclub", "25", true));
-    console.log(await testActiveBids(address,"0.01"));
+    console.log(await testFloorPrice("https://opensea.io/collection/boredapeyachtclub", "25", true));
+    // console.log(await testActiveBids(address,"0.01"));
 
 }
 
