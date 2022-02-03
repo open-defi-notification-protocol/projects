@@ -14,7 +14,7 @@ class FloorPrice {
     }
 
     // runs right before user subscribes to new notifications and populates subscription form
-    async onSubscribeForm(args) {
+    async onSubscribeForm() {
 
         return [
             {

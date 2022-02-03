@@ -6,5 +6,5 @@
   "background": "#0081e9",
   "foreground": "#ffffff",
   "dev": true,
-  "network": "ethereum"
+  "network": "http"
 }
