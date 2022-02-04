@@ -66,16 +66,14 @@ class PositionWorth {
                 label: "Threshold price",
                 default: 0,
                 description: "Notify me when the price of my position goes below this value in USD"
-            }
-           // removed until new app version is in stores.
-           /*, {
+            }, {
                 type: "input-address",
                 id: "customPoolAddress",
                 label: "Pool Address (Advanced/optional)",
                 optional: true,
                 default: '',
                 description: "If your pool is missing from the list you can set the pool address manually"
-            }*/
+            }
         ];
 
     }
