@@ -24,7 +24,7 @@ async function testFloorPrice(collectionUrl, price, above) {
 }
 
 async function testActiveBids(address, price) {
-    const ActiveBids = require('../opensea/active-bids');
+    const ActiveBids = require('../opensea/new-offers');
     const activeBids = new ActiveBids();
 
     // simulate init event
@@ -51,10 +51,10 @@ async function main() {
 
     console.log('Running manual test:');
 
-    const address = '0x04a7450b1ca006372ebf321e4cd22c362372abe9';
+    const address = '0xbcb6e5e402badcef505baabd9cf9759cf3083636';
 
-    console.log(await testFloorPrice("https://opensea.io/collection/boredapeyachtclub", "25", true));
-    // console.log(await testActiveBids(address,"0.01"));
+    // console.log(await testFloorPrice("https://opensea.io/collection/boredapeyachtclub", "25", true));
+    console.log(await testActiveBids(address,"0.01"));
 
 }
 
