@@ -66,7 +66,7 @@ class PositionHealth {
             const vaultLabel = await this._getVaultLabel(args, vaultAddress, healthFactorNow, positionId);
 
             return {
-                notification: `Your Safety Buffer of the position ${positionId} in ${vaultLabel} is at or below ${args.subscription["threshold"]}%`
+                notification: `The Safety Buffer of your position in ${vaultLabel} is at or below ${args.subscription["threshold"]}%`
             };
 
         } else {
