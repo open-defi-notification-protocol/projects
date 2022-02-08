@@ -30,15 +30,17 @@ class PositionHealth {
             {
                 type: "input-select",
                 id: "vault",
-                label: "Vault ([Current Safety Buffer])",
+                label: "Vault (Current Safety Buffer)",
+                description: "Brackets",
                 values: vaults
             },
             {
                 type: "input-number",
                 id: "threshold",
                 label: "Safety Buffer Threshold",
+                suffix: '%',
                 default: 10,
-                description: "Notify me when the Safety Buffer of my position goes below this threshold"
+                description: "Notify me when the Safety Buffer of my position goes below this threshold."
             }
         ];
     }
@@ -61,10 +63,10 @@ class PositionHealth {
 
         if (new BN(healthFactorNow).isLessThan(threshold)) {
 
-            let vaultLabel = await this._getVaultLabel(args, vaultAddress, healthFactorNow);
+            const vaultLabel = await this._getVaultLabel(args, vaultAddress, healthFactorNow, positionId);
 
             return {
-                notification: `Your Safety Buffer of the position ${positionId} in ${vaultLabel} is below ${args.subscription["threshold"]}`
+                notification: `Your Safety Buffer of the position ${positionId} in ${vaultLabel} is at or below ${args.subscription["threshold"]}%`
             };
 
         } else {
@@ -155,9 +157,11 @@ class PositionHealth {
 
         const vaultContract = new args.web3.eth.Contract(ABIs.vault, vaultAddress);
 
-        const vaultLabel = await vaultContract.methods.name().call();
+        let vaultLabel = await vaultContract.methods.name().call();
 
-        return `${vaultLabel} #${positionId} (${Math.round(healthFactor)})`;
+        vaultLabel = vaultLabel.replace('Interest Bearing', 'LYF')
+
+        return `${vaultLabel} #${positionId} (${Math.round(healthFactor)}%)`;
 
     }
 }

@@ -16,7 +16,7 @@ async function testGetAllUserVaults(address) {
     });
 }
 
-async function testOnBlocks(address) {
+async function testOnBlocks(address, threshold) {
     const PositionHealth = require('../alpaca/position-health');
     const positionHealth = new PositionHealth();
 
@@ -34,7 +34,7 @@ async function testOnBlocks(address) {
     // simulate user filling in the subscription form in the app
     const subscription = {
         vault: form.find(o => o.id === 'vault').values[0].value,
-        threshold: form.find(o => o.id === 'threshold').default
+        threshold: threshold || form.find(o => o.id === 'threshold').default
     };
 
     return positionHealth.onBlocks({
@@ -52,7 +52,7 @@ async function main() {
 
     console.log(await testGetAllUserVaults(address));
 
-    console.log(await testOnBlocks(address));
+    console.log(await testOnBlocks(address, 17));
 
 }
 
