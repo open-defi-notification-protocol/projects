@@ -1,6 +1,5 @@
 const fetch = require("node-fetch");
 
-
 class AccountHealth {
 
     static displayName = "Borrow Limit - Account Health";
@@ -21,12 +20,17 @@ class AccountHealth {
         const accountInfo = await this.fetchAccountLendingInfo(args.address);
 
         if (accountInfo) {
+
             const currentBorrowLimit = this.calcBorrowLimit(accountInfo.health);
+
             let description = "Notify me when borrow limit exceeds this value.";
+
             if (currentBorrowLimit > this.BORROW_LIMIT_ACT_NOW_THRESHOLD) {
                 description = "CAUTION: you are currently in risk of liquidation! ";
             }
+
             description += `Current Borrow Limit (~${currentBorrowLimit ? currentBorrowLimit.toFixed(2) : 0}%)`;
+
             const defaultLimit = Math.min(1.05 * Math.max(currentBorrowLimit, this.DEFAULT_BORROW_LIMIT),
                 this.BORROW_LIMIT_ACT_NOW_THRESHOLD).toFixed(1);
 
