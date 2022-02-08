@@ -92,10 +92,14 @@ class PositionHealth {
             const positionId = position.positionId;
             const healthFactor = await this._getHealthFactor(args, vaultAddress, positionId);
 
-            vaults.push({
-                value: vaultAddress + "*" + positionId,
-                label: await this._getVaultLabel(args, vaultAddress, healthFactor)
-            });
+            if (healthFactor !== null) {
+
+                vaults.push({
+                    value: vaultAddress + "*" + positionId,
+                    label: await this._getVaultLabel(args, vaultAddress, healthFactor, positionId)
+                });
+
+            }
 
         }
 
@@ -132,7 +136,7 @@ class PositionHealth {
 
         } else {
 
-            return 'no-debt';
+            return null;
 
         }
 
@@ -142,16 +146,18 @@ class PositionHealth {
      *
      * @param args
      * @param vaultAddress
-     * @returns {Promise<*>}
+     * @param healthFactor
+     * @param positionId
+     * @returns {Promise<string>}
      * @private
      */
-    async _getVaultLabel(args, vaultAddress, healthFactor) {
+    async _getVaultLabel(args, vaultAddress, healthFactor, positionId) {
 
         const vaultContract = new args.web3.eth.Contract(ABIs.vault, vaultAddress);
 
         const vaultLabel = await vaultContract.methods.name().call();
 
-        return `${vaultLabel} (${healthFactor === 'no-debt' ? healthFactor : Math.round(healthFactor)})`;
+        return `${vaultLabel} #${positionId} (${Math.round(healthFactor)})`;
 
     }
 }

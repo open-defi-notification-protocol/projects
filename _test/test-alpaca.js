@@ -48,7 +48,7 @@ async function main() {
 
     console.log('Running manual test:');
 
-    const address = '0x98C3fC24A4A1DCB6010685115d6B5F8EF3F0Cc19';
+    const address = '0xAD9CADe20100B8b945da48e1bCbd805C38d8bE77';
 
     console.log(await testGetAllUserVaults(address));
 
