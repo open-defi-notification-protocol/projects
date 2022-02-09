@@ -2,6 +2,8 @@
 const BN = require("bignumber.js");
 const fetch = require("node-fetch");
 
+const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
+
 class FloorPrice {
 
     static displayName = "Floor Price";
@@ -68,7 +70,7 @@ class FloorPrice {
 
             return {
                 uniqueId: uniqueId,
-                notification: `Floor price for collection ${collection.name} (${floorPrice} ETH) ${above ? 'is above' : 'dropped below'} ${price} ETH`
+                notification: `Floor price for collection ${collection.name} (${amountFormatter.format(floorPrice)} ETH) ${above ? 'is above' : 'dropped below'} ${price} ETH`
             }
 
         } else {

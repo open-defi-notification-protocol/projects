@@ -2,6 +2,8 @@
 const BN = require("bignumber.js");
 const fetch = require("node-fetch");
 
+const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
+
 const LISTED_AFTER__IN_MINUTES = 30;
 
 class NewOffers {
@@ -67,7 +69,7 @@ class NewOffers {
 
                 notifications.push({
                     uniqueId: uniqueId,
-                    notification: `You have a new offer of ${offerPriceEthBN} ETH for ${asset.name} of collection ${asset.collection.name}`
+                    notification: `You have a new offer of ${amountFormatter.format(offerPriceEthBN)} ETH for ${asset.name} of collection ${asset.collection.name}`
                 });
 
             }
