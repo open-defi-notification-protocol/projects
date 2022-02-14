@@ -1,17 +1,18 @@
 const {RevaStakingPoolInfo} = require("./contracts.js");
 const GetAllUserPools = require("./utils.js");
+const {RevaAutoCompoundPoolInfo} = require("./contracts");
 
 class StakingUnlock {
 
     static displayName = "Staking unlock";
     static description = "Get notified when your staking position unlocked";
 
-
     // runs when class is initialized
     async onInit(args) {
-        this.revaStakingPoolContract = new args.web3.eth.Contract(RevaStakingPoolInfo.abi, RevaStakingPoolInfo.address);
-    }
 
+        this.revaStakingPoolContract = new args.web3.eth.Contract(RevaStakingPoolInfo.abi, RevaStakingPoolInfo.address);
+
+    }
 
     // runs right before user subscribes to new notifications and populates subscription form
     async onSubscribeForm(args) {
@@ -27,6 +28,7 @@ class StakingUnlock {
                 type: "input-select",
                 id: "pool",
                 label: "Pool",
+                description:"* means this is an Auto-compounding pool and will not unlock as the unlock period keep resetting each reentry.",
                 values: pools
             }];
     }
@@ -34,29 +36,32 @@ class StakingUnlock {
 
     async onBlocks(args) {
 
-        const poolInfo = await this.revaStakingPoolContract.methods.poolInfo(args.subscription["pool"]).call();
+        const pid = args.subscription["pool"];
 
-        const userInfo = await this.revaStakingPoolContract.methods.userPoolInfo(args.subscription["pool"], args.address).call();
+        const poolInfo = await this.revaStakingPoolContract.methods.poolInfo(pid).call();
 
-        const unlockWithinDays = Math.max(0, Math.ceil((parseInt(userInfo.timeDeposited) + parseInt(poolInfo.timeLocked) - (new Date().getTime() / 1000)) / 24 / 60 / 60));
+        const userIsCompounding = await this.revaStakingPoolContract.methods.userIsCompounding(pid, args.address).call();
 
-        if (unlockWithinDays > 0) {
+        const notifications = [];
 
-            return [
-                // {
-                //     notification: `Your X${poolInfo.vRevaMultiplier} staking position will be unlock in ${unlockWithinDays} ${unlockWithinDays === 1 ? 'day' : 'days'}`
-                // }
-            ];
+        if (!userIsCompounding) {
 
-        } else {
+            const userInfo = await this.revaStakingPoolContract.methods.userPoolInfo(args.subscription["pool"], args.address).call();
 
-            return [
-                {
+            const unlockWithinDays = Math.max(0, Math.ceil((parseInt(userInfo.timeDeposited) + parseInt(poolInfo.timeLocked) - (new Date().getTime() / 1000)) / 24 / 60 / 60));
+
+            if (unlockWithinDays <= 0) {
+
+                notifications.push({
                     notification: `Your X${poolInfo.vRevaMultiplier} staking position is unlocked, go to app.revault.network to restake`
-                }
-            ];
+                });
+
+            }
 
         }
+
+        return notifications;
+
 
     }
 

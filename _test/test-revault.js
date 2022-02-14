@@ -33,7 +33,6 @@ async function testRevaultPendingRewards(args) {
 }
 
 
-
 async function testRevaultStakingUnlock(args) {
 
     const StakingUnlock = require('../revault/staking-unlock');
