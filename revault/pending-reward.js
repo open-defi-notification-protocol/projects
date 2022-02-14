@@ -7,7 +7,6 @@ class PendingReward {
     static displayName = "Pending Reward";
     static description = "Get notified when your pending REVA rewards surpass a certain threshold";
 
-
     // runs when class is initialized
     async onInit(args) {
 
@@ -15,8 +14,6 @@ class PendingReward {
 
         this.revaAutoCompoundPoolContract = new args.web3.eth.Contract(RevaAutoCompoundPoolInfo.abi, RevaAutoCompoundPoolInfo.address);
     }
-
-
 
     // runs right before user subscribes to new notifications and populates subscription form
     async onSubscribeForm(args) {
@@ -31,6 +28,7 @@ class PendingReward {
             {
                 type: "input-select",
                 id: "pool",
+                description:"* means this is an Auto-compounding pool.",
                 label: "Pool",
                 values: pools
             },
@@ -51,7 +49,7 @@ class PendingReward {
 
         const userIsCompounding = await this.revaStakingPoolContract.methods.userIsCompounding(pid, args.address).call();
 
-        let pendingReward = 0;
+        let pendingReward;
 
         if (userIsCompounding) {
 

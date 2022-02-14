@@ -1,4 +1,4 @@
-const BigNumber = require("bignumber.js");
+const BN = require("bignumber.js");
 const EthereumMulticall = require('ethereum-multicall');
 
 
@@ -29,7 +29,6 @@ async function GetAllUserPools(web3, revaStakingPoolContract, userAddress) {
 
     }
 
-
     contractCallContext.push({
         reference: 'userInfo-pools',
         contractAddress: revaStakingPoolContract.options.address,
@@ -46,27 +45,48 @@ async function GetAllUserPools(web3, revaStakingPoolContract, userAddress) {
 
     const extraContext = [];
 
-    results.callsReturnContext.map(info => {
+    const transformedResults = [];
 
-        const userIsCompounding = info.returnValues[0];
-        const userStakingAmount = info.returnValues[0].hex ? new BigNumber(info.returnValues[0].hex).toNumber() : 0;
-        const pid = info.methodParameters[0];
+    let transformedResult;
 
-        if (userIsCompounding === true || userStakingAmount > 0) {
+    for (let i = 0; i < results.callsReturnContext.length; i++) {
+
+        if (i % 2 === 0) {
+            transformedResult = {};
+            transformedResults.push(transformedResult);
+        } else {
+            transformedResult = transformedResults[transformedResults.length - 1];
+        }
+
+        const info = results.callsReturnContext [i];
+
+        if (info.reference === 'userIsCompoundingCall') {
+            transformedResult.isCompounding = info.returnValues[0];
+        } else {
+            transformedResult.stakingAmountBN = info.returnValues[0].hex ? new BN(info.returnValues[0].hex) : 0;
+        }
+
+        transformedResult.poolId = info.methodParameters[0];
+
+    }
+
+    for (const transformedResult of transformedResults) {
+
+        if (transformedResult.isCompounding || transformedResult.stakingAmountBN.isGreaterThan(0)) {
 
             extraContext.push({
-                userIsCompounding: userIsCompounding
+                userIsCompounding: transformedResult.isCompounding
             });
 
             calls.push({
                 reference: 'poolInfoCall',
                 methodName: 'poolInfo',
-                methodParameters: [pid],
+                methodParameters: [transformedResult.poolId],
             });
 
         }
 
-    });
+    }
 
     contractCallContext.push({
         reference: 'user-pools-poolInfo',
@@ -82,14 +102,18 @@ async function GetAllUserPools(web3, revaStakingPoolContract, userAddress) {
 
         results = contractCallResults.results['user-pools-poolInfo'];
 
-        results.callsReturnContext.map(poolInfo => {
-            const pid = poolInfo.methodParameters[0];
-            const vRevaMultiplier = new BigNumber(poolInfo.returnValues[2].hex).toNumber();
-            const timeLocked = new BigNumber(poolInfo.returnValues[3].hex).toNumber();
+        let i = 0;
 
+        results.callsReturnContext.map(poolInfo => {
+            const context = results.originalContractCallContext.context[i];
+            const pid = poolInfo.methodParameters[0];
+            const vRevaMultiplier = new BN(poolInfo.returnValues[2].hex).toNumber();
+            const timeLocked = new BN(poolInfo.returnValues[3].hex).toNumber();
+
+            i++;
             pools.push({
                 value: "" + pid,
-                label: `X${vRevaMultiplier} ${timeLocked / 24 / 60 / 60} Days Lock`,
+                label: `X${vRevaMultiplier} ${timeLocked / 24 / 60 / 60} Days Lock${context.userIsCompounding ? ' *' : ''}`,
             });
 
         });
