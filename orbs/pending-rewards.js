@@ -21,15 +21,20 @@ class PendingReward {
 
     async onBlocks(args) {
 
+        const minimum = args.subscription["minimum"];
+
         const position = await this.stakingRewardsContract.methods.getStakingRewardsBalance(args.address).call();
 
         const delegatorStakingRewardsBalanceBN = new BN(position.delegatorStakingRewardsBalance);
 
         let pendingRewardBN = delegatorStakingRewardsBalanceBN.dividedBy("1e18");
 
-        if (pendingRewardBN.isGreaterThanOrEqualTo(args.subscription["minimum"])) {
+        if (pendingRewardBN.isGreaterThanOrEqualTo(minimum)) {
+
+            const uniqueId = "orbs-rewards-" + minimum;
 
             return {
+                uniqueId: uniqueId,
                 notification: `You have ${amountFormatter.format(pendingRewardBN)} ORBS ready to claim`
             };
 

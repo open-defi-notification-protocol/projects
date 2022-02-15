@@ -67,16 +67,27 @@ class PendingReward {
      */
     async onBlocks(args) {
 
-        const pendingReward = await this.masterchefContract.methods.pendingSushi(args.subscription["pair"], args.address).call();
+        const pair = args.subscription["pair"];
+        const minimum = args.subscription["minimum"];
+
+        const pendingReward = await this.masterchefContract.methods.pendingSushi(pair, args.address).call();
 
         const pendingRewardBN = new BN(pendingReward).dividedBy('1e' + this.sushiDecimals);
 
-        if (pendingRewardBN.isGreaterThanOrEqualTo(args.subscription["minimum"])) return {
+        if (pendingRewardBN.isGreaterThanOrEqualTo(minimum)) {
 
-            notification: `You have ${amountFormatter.format(pendingRewardBN)} SUSHI ready to claim`
+            const uniqueId = pair + "-" + minimum;
 
-        };
-        return [];
+            return {
+                uniqueId: uniqueId,
+                notification: `You have ${amountFormatter.format(pendingRewardBN)} SUSHI ready to claim`
+            };
+
+        } else {
+
+            return [];
+
+        }
     }
 
     /**

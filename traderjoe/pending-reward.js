@@ -153,18 +153,20 @@ class AccountHealth {
      */
     async onBlocks(args) {
 
-        let pool = args.subscription["pool"];
+        const pool = args.subscription["pool"];
+        const minimum = args.subscription["minimum"];
 
         const pendingReward = await this.masterchefContract.methods.pendingTokens(pool, args.address).call();
 
         const pendingRewardBN = new BN(pendingReward['pendingJoe']).dividedBy('1e' + this.joeDecimals);
 
-        if (pendingRewardBN.isGreaterThanOrEqualTo(args.subscription["minimum"])) {
+        if (pendingRewardBN.isGreaterThanOrEqualTo(minimum)) {
+
+            const uniqueId = pool + "-" + minimum;
 
             return {
-
+                uniqueId: uniqueId,
                 notification: `You have ${amountFormatter.format(pendingRewardBN)} JOE ready to claim`
-
             };
 
         } else {

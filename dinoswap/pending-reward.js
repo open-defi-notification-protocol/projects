@@ -64,16 +64,20 @@ class PendingReward {
      */
     async onBlocks(args) {
 
-        const pendingReward = await this.contract.methods.pendingDino(args.subscription["pair"], args.address).call();
+        const pair = args.subscription["pair"];
+        const minimum = args.subscription["minimum"];
+
+        const pendingReward = await this.contract.methods.pendingDino(pair, args.address).call();
 
         const pendingRewardBN = new BN(pendingReward).dividedBy("1e18");
 
-        if (pendingRewardBN.isGreaterThanOrEqualTo(args.subscription["minimum"])) {
+        if (pendingRewardBN.isGreaterThanOrEqualTo(minimum)) {
+
+            const uniqueId = pair + "-" + minimum;
 
             return {
-
+                uniqueId: uniqueId,
                 notification: `You have ${amountFormatter.format(pendingRewardBN)} DINO ready to be claimed`
-
             };
 
         } else {

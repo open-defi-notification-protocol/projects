@@ -225,7 +225,7 @@ class PositionWorth {
         const token0Symbol = await token0Contract.methods.symbol().call();
         const token1Symbol = await token1Contract.methods.symbol().call();
 
-        return `${token0Symbol} - ${token1Symbol} (${amountFormatter.format(sharesValueUsdBN)} USD)`;
+        return `${token0Symbol}-${token1Symbol} (${amountFormatter.format(sharesValueUsdBN)} USD)`;
 
     }
 }

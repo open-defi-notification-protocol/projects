@@ -2,10 +2,10 @@ const BN = require("bignumber.js");
 const ABIs = require('./abis.json');
 const EthereumMulticall = require('ethereum-multicall');
 
-const MASTERCHEF_TOKEN_ADDRESS = "0xc2EdaD668740f1aA35E4D8f227fB8E17dcA888Cd";
-const ROUTER_ADDRESS = "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F";
-const USDC_TOKEN_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
-const WETH_TOKEN_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
+const MINICHEF_TOKEN_ADDRESS = "0x1f806f7C8dED893fd3caE279191ad7Aa3798E928";
+const ROUTER_ADDRESS = "0xE54Ca86531e17Ef3616d22Ca28b0D458b6C89106";
+const UST_TOKEN_ADDRESS = "0x260Bbf5698121EB85e7a74f2E45E16Ce762EbE11";
+const AVAX_TOKEN_ADDRESS = "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7";
 
 const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
@@ -22,9 +22,9 @@ class PositionWorth {
      */
     async onInit(args) {
 
-        this.masterchefContract = new args.web3.eth.Contract(
-            ABIs.masterchef,
-            MASTERCHEF_TOKEN_ADDRESS
+        this.minichefContract = new args.web3.eth.Contract(
+            ABIs.minichef,
+            MINICHEF_TOKEN_ADDRESS
         );
 
         this.routerContract = new args.web3.eth.Contract(
@@ -32,7 +32,7 @@ class PositionWorth {
             ROUTER_ADDRESS
         );
 
-        const usdcContract = new args.web3.eth.Contract(ABIs.erc20, USDC_TOKEN_ADDRESS);
+        const usdcContract = new args.web3.eth.Contract(ABIs.erc20, UST_TOKEN_ADDRESS);
 
         this.usdcDecimals = await usdcContract.methods.decimals().call();
 
@@ -77,11 +77,11 @@ class PositionWorth {
         const selectedPoolId = args.subscription['pair'];
         const threshold = args.subscription['threshold'];
 
-        const poolInfo = await this.masterchefContract.methods.poolInfo(selectedPoolId).call();
+        const lpToken = await this.minichefContract.methods.lpToken(selectedPoolId).call();
 
         const web3 = args.web3;
 
-        const lpContract = new web3.eth.Contract(ABIs.lp, poolInfo.lpToken);
+        const lpContract = new web3.eth.Contract(ABIs.lp, lpToken);
 
         const token0Address = await lpContract.methods.token0().call();
         const token0Contract = new web3.eth.Contract(ABIs.lp, token0Address);
@@ -95,7 +95,7 @@ class PositionWorth {
             token0Contract
         );
 
-        const uniqueId = poolInfo.lpToken + "-" + threshold;
+        const uniqueId = lpToken + "-" + threshold;
 
         if (new BN(threshold).minus(new BN(positionWorthInUsdBN)).isGreaterThan(0)) {
 
@@ -132,7 +132,7 @@ class PositionWorth {
 
         const pairs = [];
 
-        let walletAddress = args.address;
+        const walletAddress = args.address;
 
         const web3 = args.web3;
 
@@ -140,14 +140,14 @@ class PositionWorth {
 
         const contractCallContext = [];
 
-        const pools = await this.masterchefContract.methods.poolLength().call();
+        const pools = await this.minichefContract.methods.poolLength().call();
 
         for (let poolId = 0; poolId < pools; poolId++) {
 
             contractCallContext.push({
-                reference: 'masterchef-poolId-' + poolId,
-                contractAddress: MASTERCHEF_TOKEN_ADDRESS,
-                abi: ABIs.masterchef,
+                reference: 'minichef-poolId-' + poolId,
+                contractAddress: MINICHEF_TOKEN_ADDRESS,
+                abi: ABIs.minichef,
                 calls: [{reference: 'userInfoCall', methodName: 'userInfo', methodParameters: [poolId, walletAddress]}],
                 context: {
                     poolId: poolId
@@ -166,9 +166,9 @@ class PositionWorth {
 
                 const poolId = result.originalContractCallContext.context.poolId;
 
-                const poolInfo = await this.masterchefContract.methods.poolInfo(poolId).call();
+                const lpToken = await this.minichefContract.methods.lpToken(poolId).call();
 
-                const lpContract = new web3.eth.Contract(ABIs.lp, poolInfo.lpToken);
+                const lpContract = new web3.eth.Contract(ABIs.lp, lpToken);
 
                 const token0Address = await lpContract.methods.token0().call();
                 const token0Contract = new web3.eth.Contract(ABIs.lp, token0Address);
@@ -242,7 +242,7 @@ class PositionWorth {
 
         if (userStakedBalanceBN === null) {
 
-            const userInfo = await this.masterchefContract.methods.userInfo(poolId, walletAddress).call();
+            const userInfo = await this.minichefContract.methods.userInfo(poolId, walletAddress).call();
 
             userStakedBalanceBN = new BN(userInfo.amount);
 
@@ -258,7 +258,7 @@ class PositionWorth {
 
             const singleTokenWorthInUSD = await this.routerContract.methods.getAmountsOut(
                 (new BN("10").pow(token0Decimals)), // single whole unit
-                [token0Address, WETH_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS]
+                [token0Address, AVAX_TOKEN_ADDRESS, UST_TOKEN_ADDRESS]
             ).call();
 
             const lpWorthInUsdBN = ((new BN(singleTokenWorthInUSD[2]).div(new BN("10").pow(this.usdcDecimals)))
