@@ -69,12 +69,15 @@ async function main() {
 
     console.log('Running manual test:');
 
-    console.log(await testPangolinPendingRewards(
+    /*console.log(await testPangolinPendingRewards(
         '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005',
         '0.0001'
-    ));
+    ));*/
 
-    // console.log(await testPangolinPositionWorth('0x3dacC571356e7D5dFB3b475d6922442Ec06B9005', '10000'));
+    console.log(await testPangolinPositionWorth(
+        '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005',
+        '10000'
+    ));
 }
 
 main();

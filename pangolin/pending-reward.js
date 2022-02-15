@@ -67,16 +67,20 @@ class PendingReward {
      */
     async onBlocks(args) {
 
-        const pendingReward = await this.minichefContract.methods.pendingReward(args.subscription["pair"], args.address).call();
+        const pid = args.subscription["pair"];
+        const minimum = args.subscription["minimum"];
+
+        const pendingReward = await this.minichefContract.methods.pendingReward(pid, args.address).call();
 
         const pendingRewardBN = new BN(pendingReward).dividedBy('1e' + this.pangolinDecimals);
 
-        if (pendingRewardBN.isGreaterThanOrEqualTo(args.subscription["minimum"])) {
+        if (pendingRewardBN.isGreaterThanOrEqualTo(minimum)) {
+
+            const uniqueId = pid + "-" + minimum;
 
             return {
-
+                uniqueId: uniqueId,
                 notification: `You have ${amountFormatter.format(pendingRewardBN)} PNG ready to claim`
-
             };
 
         } else {

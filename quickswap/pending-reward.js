@@ -80,7 +80,12 @@ class PendingReward {
 
         if (pendingReward.isGreaterThanOrEqualTo(minimumTokens)) {
 
-            return {notification: `You have ${amountFormatter.format(pendingReward)} dQUICK ready to claim`};
+            const uniqueId = selectedPairAddress + "-" + minimumTokens;
+
+            return {
+                uniqueId: uniqueId,
+                notification: `You have ${amountFormatter.format(pendingReward)} dQUICK ready to claim`
+            };
 
         } else {
 
