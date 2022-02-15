@@ -1,0 +1,10 @@
+{
+  "name": "Pangolin",
+  "category": "amm",
+  "website": "https://pangolin.exchange",
+  "logo": "logo.png",
+  "background": "#ff6b00",
+  "foreground": "#ffffff",
+  "network": "avalanche",
+  "dev": true
+}
