@@ -3,8 +3,9 @@
   "category": "amm",
   "website": "https://pangolin.exchange",
   "logo": "logo.png",
-  "background": "#ff6b00",
-  "foreground": "#ffffff",
+  "background": "#fdfdfd",
+  "foreground": "#e0aa00",
   "network": "avalanche",
   "dev": true
 }
+i
