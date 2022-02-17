@@ -3,7 +3,13 @@
   "category": "farming",
   "website": "https://alpacafinance.org",
   "logo": "logo.png",
-  "background": ["#2cc37d"],
+  "background": [
+    "#2cc37d"
+  ],
   "foreground": "#e5e7eb",
-  "network": "bsc"
+  "network": "bsc",
+  "networks": [
+    "bsc",
+    "fantom"
+  ]
 }
