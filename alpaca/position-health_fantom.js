@@ -1,12 +1,12 @@
 const BN = require("bignumber.js");
 const fetch = require("node-fetch");
-const ABIs = require('./abis.json');
+const ABIs = require('./abis-fantom.json');
 
 class PositionHealth {
 
     static displayName = "Position Health";
     static description = "Get notified when Safety Buffer is getting low";
-    static network = "bsc";
+    static network = "fantom";
 
     /**
      * runs when class is initialized
@@ -85,7 +85,7 @@ class PositionHealth {
 
         const vaults = [];
 
-        const response = await fetch('https://api.alpacafinance.org/v1/positions?owner=' + args.address);
+        const response = await fetch('https://api.alpacafinance.org/ftm/v1/positions?owner=' + args.address);
 
         const json = await response.json();
 
