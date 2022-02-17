@@ -7,9 +7,5 @@
     "#2cc37d"
   ],
   "foreground": "#e5e7eb",
-  "network": "bsc",
-  "networks": [
-    "bsc",
-    "fantom"
-  ]
+  "network": "bsc"
 }

@@ -32,7 +32,6 @@ class PositionHealth {
                 type: "input-select",
                 id: "vault",
                 label: "Vault (Current Safety Buffer)",
-                description: "Brackets",
                 values: vaults
             },
             {
