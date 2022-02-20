@@ -69,9 +69,14 @@ class GasPrice {
 
         const basePricePerGasBN = new BN(this.lastBlock.baseFeePerGas, 16);
 
+        const uniqueId = (above ? 'above' : 'below') + "-" + price;
+
         if ((above && thresholdPriceWeiBN.lt(basePricePerGasBN)) || (!above && thresholdPriceWeiBN.gt(basePricePerGasBN))) {
 
-            return {notification: `Ethereum base price per gas (${this._formatGasPrice(args.web3, basePricePerGasBN)}) is ${above ? 'above' : 'below'} ${price} Gwei`}
+            return {
+                uniqueId: uniqueId,
+                notification: `Ethereum base price per gas (${this._formatGasPrice(args.web3, basePricePerGasBN)}) is ${above ? 'above' : 'below'} ${price} Gwei`
+            }
 
         } else {
 
