@@ -3,7 +3,7 @@
   "category": "farm",
   "website": "https://dinoswap.exchange",
   "logo": "logo.png",
-  "background": "#e8f2e8",
-  "foreground": "#84b378",
+  "background": "#84b378",
+  "foreground": "#e8f2e8",
   "network": "polygon"
 }
