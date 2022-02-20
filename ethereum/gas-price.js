@@ -26,7 +26,7 @@ class GasPrice {
                 id: "price",
                 label: "Gas Price (Gwei)",
                 default: "0",
-                description: `The gas price threshold (current is ${Math.round(args.web3.utils.fromWei(basePricePerGasBN.toString(), 'Gwei'))} Gwei)`
+                description: `The gas price threshold (current is ${this._formatGasPrice(args.web3, basePricePerGasBN)} Gwei)`
             },
             {
                 type: "input-select",
@@ -38,6 +38,19 @@ class GasPrice {
                 ]
             }
         ];
+    }
+
+    /**
+     *
+     * @param web3
+     * @param priceBN
+     * @returns {number}
+     * @private
+     */
+    _formatGasPrice(web3, priceBN) {
+
+        return Math.round(web3.utils.fromWei(priceBN.toString(), 'Gwei'))
+
     }
 
     // runs when new blocks are added to the mainnet chain - notification scanning happens here
@@ -58,7 +71,7 @@ class GasPrice {
 
         if ((above && thresholdPriceWeiBN.lt(basePricePerGasBN)) || (!above && thresholdPriceWeiBN.gt(basePricePerGasBN))) {
 
-            return {notification: `Ethereum base price per gas is ${above ? 'above' : 'below'} ${price} Gwei`}
+            return {notification: `Ethereum base price per gas (${this._formatGasPrice(args.web3, basePricePerGasBN)}) is ${above ? 'above' : 'below'} ${price} Gwei`}
 
         } else {
 
