@@ -5,6 +5,5 @@
   "logo": "logo.png",
   "background": "#1a1a1a",
   "foreground": "#fdfdfd",
-  "network": "avalanche",
-  "dev": true
+  "network": "avalanche"
 }
