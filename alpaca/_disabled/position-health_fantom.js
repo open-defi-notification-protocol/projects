@@ -1,6 +1,6 @@
 const BN = require("bignumber.js");
 const fetch = require("node-fetch");
-const ABIs = require('./abis-fantom.json');
+const ABIs = require('../abis-fantom.json');
 
 class PositionHealth {
 
