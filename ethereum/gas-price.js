@@ -17,13 +17,16 @@ class GasPrice {
     // runs right before user subscribes to new notifications and populates subscription form
     async onSubscribeForm(args) {
 
+        this.lastBlock = await args.web3.eth.getBlock('latest');
+        const basePricePerGasBN = new BN(this.lastBlock.baseFeePerGas, 16);
+
         return [
             {
                 type: "input-number",
                 id: "price",
                 label: "Gas Price (Gwei)",
                 default: "0",
-                description: "The gas price threshold"
+                description: `The gas price threshold (current is ${Math.round(args.web3.utils.fromWei(basePricePerGasBN.toString(), 'Gwei'))} Gwei)`
             },
             {
                 type: "input-select",

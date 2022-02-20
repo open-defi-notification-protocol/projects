@@ -33,10 +33,12 @@ async function testGasPriceAboveBelow(address, price, above) {
     const gasPrice = new GasPrice();
 
     // simulate subscribe form event
-    await gasPrice.onSubscribeForm({
+    let form = await gasPrice.onSubscribeForm({
         web3,
         address
     });
+
+    console.log(form)
 
     // simulate user filling in the subscription form in the app
     const subscription = {
