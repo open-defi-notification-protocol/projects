@@ -65,6 +65,39 @@ async function testPancakeswapPendingRewards(address, minimum) {
     });
 }
 
+async function testPancakeswapPositionWorth(address, threshold) {
+
+    const PositionWorth = require('../pancakeswap/position-worth');
+    const positionWorth = new PositionWorth();
+
+    // simulate init event
+    await positionWorth.onInit({
+        web3
+    });
+
+    // simulate subscribe form event
+    const form = await positionWorth.onSubscribeForm({
+        web3,
+        address
+    });
+
+    console.log(form);
+
+    // simulate user filling in the subscription form in the app
+    const subscription = {
+        pair: form.find(o => o.id === 'pair').values[0].value,
+        threshold: threshold
+    };
+
+    // simulate on blocks event
+    return positionWorth.onBlocks({
+        web3,
+        address,
+        subscription
+    });
+}
+
+
 async function main() {
 
     console.log('Running manual test:');
@@ -72,17 +105,22 @@ async function main() {
     const address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
     const tokenAddress = '0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82';
 
- /*   console.log(await testTokensWorth(
-        address,
-        tokenAddress,
-        "20500",
-        false
-    ));
-*/
+    /*   console.log(await testTokensWorth(
+           address,
+           tokenAddress,
+           "20500",
+           false
+       ));
 
     console.log(await testPancakeswapPendingRewards(
         address,
         '0.000001'
+    ));
+   */
+
+    console.log(await testPancakeswapPositionWorth(
+        address,
+        '10000'
     ));
 
 }
