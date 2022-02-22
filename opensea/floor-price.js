@@ -1,6 +1,7 @@
 // notify when floor price is above/below chosen value in USD
 const BN = require("bignumber.js");
 const fetch = require("node-fetch");
+const Common = require("./common");
 
 const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
@@ -16,15 +17,14 @@ class FloorPrice {
     }
 
     // runs right before user subscribes to new notifications and populates subscription form
-    async onSubscribeForm() {
+    async onSubscribeForm(args) {
 
         return [
             {
-                type: "input-text",
-                id: "collectionUrl",
-                label: "Collection URL",
-                default: "",
-                description: "Paste the OpenSea collection URL here"
+                type: "input-select",
+                id: "collection",
+                label: "Collection",
+                values: await Common.getWalletCollections(args)
             },
             {
                 type: "input-number",
@@ -41,6 +41,14 @@ class FloorPrice {
                     {value: "0", label: "Above"},
                     {value: "1", label: "Below"}
                 ]
+            },
+            {
+                type: "input-text",
+                id: "collectionUrl",
+                label: "Collection URL",
+                optional: true,
+                default: "",
+                description: "If this collection is missing from the list you can paste the OpenSea collection URL here instead"
             }
         ];
     }
@@ -50,13 +58,13 @@ class FloorPrice {
 
         const subscription = args.subscription;
 
-        let collectionUrl = subscription["collectionUrl"];
+        let collectionSlug = subscription["collectionUrl"] || subscription["collection"];
+        collectionSlug = collectionSlug.indexOf('collection/') >= 0 ? collectionSlug.split('collection/')[1] : collectionSlug;
+
         const price = subscription["price"];
         const above = subscription["above-below"] === "0";
 
-        collectionUrl = collectionUrl.indexOf('collection/') >= 0 ? collectionUrl.split('collection/')[1] : collectionUrl;
-
-        const result = await (await fetch(`https://api.opensea.io/api/v1/collection/${collectionUrl}`)).json();
+        const result = await (await fetch(`https://api.opensea.io/api/v1/collection/${collectionSlug}`)).json();
 
         const collection = result.collection;
 
@@ -64,7 +72,7 @@ class FloorPrice {
 
         const floorPrice = collection.stats.floor_price;
 
-        const uniqueId = collectionUrl + "-" + above + "-" + price;
+        const uniqueId = collectionSlug + "-" + above + "-" + price;
 
         if ((above && thresholdPriceBN.lt(floorPrice)) || (!above && thresholdPriceBN.gt(floorPrice))) {
 
@@ -78,6 +86,7 @@ class FloorPrice {
             return [];
         }
     }
+
 
 }
 

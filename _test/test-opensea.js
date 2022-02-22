@@ -1,4 +1,6 @@
-async function testFloorPrice(collectionUrl, price, above) {
+process.env.OPENSEA_API_KEY = require('./dev-keys.json').openSeaApiKey;
+
+async function testFloorPrice(address, collectionUrl, price, above) {
     const FloorPrice = require('../opensea/floor-price');
     const floorPrice = new FloorPrice();
 
@@ -6,12 +8,13 @@ async function testFloorPrice(collectionUrl, price, above) {
     await floorPrice.onInit({});
 
     // simulate subscribe form event
-    const form = await floorPrice.onSubscribeForm({});
+    const form = await floorPrice.onSubscribeForm({address});
 
     console.log(form);
 
     // simulate user filling in the subscription form in the app
     const subscription = {
+        collection: form.find(o => o.id === 'collection').values[12].value,
         collectionUrl: collectionUrl,
         price: price,
         "above-below": above ? "0" : "1"
@@ -23,15 +26,41 @@ async function testFloorPrice(collectionUrl, price, above) {
     });
 }
 
-async function testActiveBids(address, price) {
-    const ActiveBids = require('../opensea/new-offers');
-    const activeBids = new ActiveBids();
+async function testNewOffers(address, price) {
+    const NewOffers = require('../opensea/new-offers');
+    const newOffers = new NewOffers();
+
+    // simulate init event
+    await newOffers.onInit({});
+
+    // simulate subscribe form event
+    const form = await newOffers.onSubscribeForm({address});
+
+    console.log(form);
+
+    // simulate user filling in the subscription form in the app
+    const subscription = {
+        price: price,
+        // collectionUrl: "https://opensea.io/collection/punklaus",
+        collection: form.find(o => o.id === 'collection').values[12].value
+    };
+
+    // simulate on blocks event
+    return newOffers.onBlocks({
+        address,
+        subscription
+    });
+}
+
+async function testNewOffersByFloor(address, price) {
+    const NewOffersByFloor = require('../opensea/new-offers-by-floor');
+    const activeBids = new NewOffersByFloor();
 
     // simulate init event
     await activeBids.onInit({});
 
     // simulate subscribe form event
-    const form = await activeBids.onSubscribeForm({});
+    const form = await activeBids.onSubscribeForm({address});
 
     console.log(form);
 
@@ -53,8 +82,10 @@ async function main() {
 
     const address = '0xbcb6e5e402badcef505baabd9cf9759cf3083636';
 
+
     // console.log(await testFloorPrice("https://opensea.io/collection/boredapeyachtclub", "25", true));
-    console.log(await testActiveBids(address,"0.01"));
+    console.log(await testNewOffers(address, "0.01"));
+    // console.log(await testNewOffersByFloor(address, "0.01"));
 
 }
 

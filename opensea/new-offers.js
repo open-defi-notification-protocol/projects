@@ -1,6 +1,7 @@
 // notify when floor price is above/below chosen value in USD
 const BN = require("bignumber.js");
 const fetch = require("node-fetch");
+const Common = require("./common");
 
 const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
@@ -22,13 +23,28 @@ class NewOffers {
 
         return [
             {
+                type: "input-select",
+                id: "collection",
+                label: "Collection",
+                values: await Common.getWalletCollections(args)
+            },
+            {
                 type: "input-number",
                 id: "price",
                 label: "Threshold Price (ETH)",
                 default: "0",
                 description: "Set an offer price threshold in ETH"
+            },
+            {
+                type: "input-text",
+                id: "collectionUrl",
+                label: "Collection URL",
+                optional: true,
+                default: "",
+                description: "If this collection is missing from the list you can paste the OpenSea collection URL here instead"
             }
         ];
+
     }
 
     // runs when new blocks are added to the mainnet chain - notification scanning happens here
@@ -37,6 +53,9 @@ class NewOffers {
         const subscription = args.subscription;
 
         const price = subscription["price"];
+
+        let collectionSlug = subscription["collectionUrl"] || subscription["collection"];
+        collectionSlug = collectionSlug.indexOf('collection/') >= 0 ? collectionSlug.split('collection/')[1] : collectionSlug;
 
         const params = {
             limit: 50,
@@ -59,18 +78,22 @@ class NewOffers {
 
         for (const order of orders) {
 
-            const offerPriceEthBN = new BN(order.base_price).dividedBy('1e18');
+            if (collectionSlug === order.asset.collection.slug) {
 
-            if (offerPriceEthBN.gt(thresholdPriceEthBN)) {
+                const offerPriceEthBN = new BN(order.base_price).dividedBy('1e18');
 
-                const asset = order.asset;
+                if (offerPriceEthBN.gt(thresholdPriceEthBN)) {
 
-                const uniqueId = asset.id + "-" + order.id;
+                    const asset = order.asset;
 
-                notifications.push({
-                    uniqueId: uniqueId,
-                    notification: `You have a new offer of ${amountFormatter.format(offerPriceEthBN)} ETH for ${asset.name} of collection ${asset.collection.name}`
-                });
+                    const uniqueId = asset.id + "-" + order.id;
+
+                    notifications.push({
+                        uniqueId: uniqueId,
+                        notification: `You have a new offer of ${amountFormatter.format(offerPriceEthBN)} ETH for ${asset.name} of collection ${asset.collection.name}`
+                    });
+
+                }
 
             }
 
