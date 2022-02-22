@@ -5,7 +5,7 @@ module.exports = {
 
         const result = await (await fetch(`https://api.opensea.io/api/v1/collections?offset=0&limit=300&asset_owner=${args.address}`, {
                 method: 'GET',
-                headers: {'X-API-KEY': process.env.OPENSEA_API_KEY}
+                headers: {'X-API-KEY': args.platformKeys.opensea}
             })
         ).json();
 
