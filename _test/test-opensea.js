@@ -52,25 +52,25 @@ async function testNewOffers(address, price) {
     });
 }
 
-async function testNewOffersByFloor(address, price) {
+async function testNewOffersByFloor(address, threshold) {
     const NewOffersByFloor = require('../opensea/new-offers-by-floor');
-    const activeBids = new NewOffersByFloor();
+    const newOffersByFloor = new NewOffersByFloor();
 
     // simulate init event
-    await activeBids.onInit({});
+    await newOffersByFloor.onInit({});
 
     // simulate subscribe form event
-    const form = await activeBids.onSubscribeForm({address});
+    const form = await newOffersByFloor.onSubscribeForm({address});
 
     console.log(form);
 
     // simulate user filling in the subscription form in the app
     const subscription = {
-        price: price
+        "floor-threshold": threshold
     };
 
     // simulate on blocks event
-    return activeBids.onBlocks({
+    return newOffersByFloor.onBlocks({
         address,
         subscription
     });
@@ -84,8 +84,8 @@ async function main() {
 
 
     // console.log(await testFloorPrice("https://opensea.io/collection/boredapeyachtclub", "25", true));
-    console.log(await testNewOffers(address, "0.01"));
-    // console.log(await testNewOffersByFloor(address, "0.01"));
+    // console.log(await testNewOffers(address, "0.01"));
+    console.log(await testNewOffersByFloor(address, "60"));
 
 }
 
