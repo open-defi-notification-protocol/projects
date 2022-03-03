@@ -5,6 +5,9 @@ const EthereumMulticall = require('ethereum-multicall');
 const MASTERCHEF_ADDRESS = "0x73feaa1eE314F8c655E354234017bE2193C9E24E";
 const CAKE_TOKEN_ADDRESS = "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82";
 
+const CAKE_POOL_ID = "0";
+const CAKE_SYRUP_LABEL = 'CAKE-SYRUP';
+
 const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
 class PendingReward {
@@ -130,7 +133,7 @@ class PendingReward {
         results['masterchef-poolId-0'] = {
             "originalContractCallContext": {
                 "context": {
-                    "poolId": 0
+                    "poolId": CAKE_POOL_ID
                 }
             },
             "callsReturnContext": [
@@ -154,7 +157,7 @@ class PendingReward {
 
                 const poolId = result.originalContractCallContext.context.poolId;
 
-                const poolLabel = poolId === 0 ? 'CAKE-SYRUP' : await this._getPairLabel(args, poolId);
+                const poolLabel = poolId === CAKE_POOL_ID ? CAKE_SYRUP_LABEL : await this._getPairLabel(args, poolId);
 
                 pairs.push({
                     value: poolId,
