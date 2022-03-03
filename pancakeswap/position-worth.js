@@ -6,13 +6,16 @@ const MASTERCHEF_TOKEN_ADDRESS = "0x73feaa1eE314F8c655E354234017bE2193C9E24E";
 const ROUTER_ADDRESS = "0x10ED43C718714eb63d5aA57B78B54704E256024E";
 const USDC_TOKEN_ADDRESS = "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d";
 const WBNB_TOKEN_ADDRESS = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c';
+const CAKE_TOKEN_ADDRESS = '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82';
+const CAKE_POOL_ID = 0;
+const CAKE_SYRUP_LABEL = 'CAKE-SYRUP';
 
 const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
 class PositionWorth {
 
     static displayName = "Position Worth";
-    static description = "Track your position's total worth to protect against loss";
+    static description = "Track your staked position's total worth to protect against loss";
 
     /**
      * runs when class is initialized
@@ -31,6 +34,13 @@ class PositionWorth {
             ABIs.router,
             ROUTER_ADDRESS
         );
+
+        const cakeContract = new args.web3.eth.Contract(
+            ABIs.erc20,
+            CAKE_TOKEN_ADDRESS
+        );
+
+        this.cakeDecimals = await cakeContract.methods.decimals().call();
 
         const usdcContract = new args.web3.eth.Contract(ABIs.erc20, USDC_TOKEN_ADDRESS);
 
@@ -77,48 +87,76 @@ class PositionWorth {
         const selectedPoolId = args.subscription['pair'];
         const threshold = args.subscription['threshold'];
 
-        const poolInfo = await this.masterchefContract.methods.poolInfo(selectedPoolId).call();
-
+        const uniqueId = selectedPoolId + "-" + threshold;
         const web3 = args.web3;
+        const walletAddress = args.address;
 
-        const lpContract = new web3.eth.Contract(ABIs.lp, poolInfo.lpToken);
+        if (selectedPoolId === CAKE_POOL_ID) {
 
-        const token0Address = await lpContract.methods.token0().call();
-        const token0Contract = new web3.eth.Contract(ABIs.lp, token0Address);
-
-        const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
-            web3,
-            args.address,
-            selectedPoolId,
-            lpContract,
-            token0Address,
-            token0Contract
-        );
-
-        const uniqueId = poolInfo.lpToken + "-" + threshold;
-
-        if (new BN(threshold).minus(new BN(positionWorthInUsdBN)).isGreaterThan(0)) {
-
-            const token1Address = await lpContract.methods.token1().call();
-            const token1Contract = new web3.eth.Contract(ABIs.lp, token1Address);
-
-            const poolLabel =  await this._getPoolLabel(
+            const positionWorthInUsdBN = await this._getPositionWorthForCakeSyrupFarmInUsdBN(
                 web3,
-                token0Contract,
-                token1Contract,
-                positionWorthInUsdBN
+                walletAddress
             );
 
-            return {
-                uniqueId: uniqueId,
-                notification: `Your shares holdings in ${poolLabel} has dropped below ${amountFormatter.format(threshold)} USD`
-            };
+            if (new BN(threshold).minus(new BN(positionWorthInUsdBN)).isGreaterThan(0)) {
+
+                return {
+                    uniqueId: uniqueId,
+                    notification: `Your shares holdings in ${CAKE_SYRUP_LABEL} (${amountFormatter.format(positionWorthInUsdBN)} USD) has dropped below ${amountFormatter.format(threshold)} USD`
+                };
+
+            } else {
+
+                return [];
+
+            }
 
         } else {
 
-            return [];
+            const poolInfo = await this.masterchefContract.methods.poolInfo(selectedPoolId).call();
+
+
+            const lpContract = new web3.eth.Contract(ABIs.lp, poolInfo.lpToken);
+
+            const token0Address = await lpContract.methods.token0().call();
+            const token0Contract = new web3.eth.Contract(ABIs.lp, token0Address);
+
+            const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
+                web3,
+                walletAddress,
+                selectedPoolId,
+                lpContract,
+                token0Address,
+                token0Contract
+            );
+
+            if (new BN(threshold).minus(new BN(positionWorthInUsdBN)).isGreaterThan(0)) {
+
+                const token1Address = await lpContract.methods.token1().call();
+                const token1Contract = new web3.eth.Contract(ABIs.lp, token1Address);
+
+                const poolLabel = await this._getPoolLabel(
+                    web3,
+                    token0Contract,
+                    token1Contract,
+                    positionWorthInUsdBN
+                );
+
+
+                return {
+                    uniqueId: uniqueId,
+                    notification: `Your shares holdings in ${poolLabel} has dropped below ${amountFormatter.format(threshold)} USD`
+                };
+
+            } else {
+
+                return [];
+
+            }
+
 
         }
+
 
     }
 
@@ -142,7 +180,8 @@ class PositionWorth {
 
         const pools = await this.masterchefContract.methods.poolLength().call();
 
-        for (let poolId = 0; poolId < pools; poolId++) {
+        // starting from 1 bcs pool 0 is the cake token and will be called specifically later.
+        for (let poolId = 1; poolId < pools; poolId++) {
 
             contractCallContext.push({
                 reference: 'masterchef-poolId-' + poolId,
@@ -158,6 +197,28 @@ class PositionWorth {
 
         const results = (await multicall.call(contractCallContext)).results;
 
+        // calling userInfo for pool 0 specifically with web3
+        const pool0UserInfo = await this.masterchefContract.methods.userInfo(CAKE_POOL_ID, args.address).call();
+
+        results['masterchef-poolId-0'] = {
+            "originalContractCallContext": {
+                "context": {
+                    "poolId": 0
+                }
+            },
+            "callsReturnContext": [
+                {
+                    "returnValues": [
+                        {
+                            "type": "BigNumber",
+                            "hex": pool0UserInfo[0]
+                        },
+
+                    ],
+                }
+            ]
+        };
+
         for (const result of Object.values(results)) {
 
             const userStakedBalanceBN = new BN(result.callsReturnContext[0].returnValues[0].hex);
@@ -166,37 +227,60 @@ class PositionWorth {
 
                 const poolId = result.originalContractCallContext.context.poolId;
 
-                const poolInfo = await this.masterchefContract.methods.poolInfo(poolId).call();
+                if (poolId === CAKE_POOL_ID) {
 
-                const lpContract = new web3.eth.Contract(ABIs.lp, poolInfo.lpToken);
+                    const positionWorthInUsdBN = await this._getPositionWorthForCakeSyrupFarmInUsdBN(
+                        web3,
+                        walletAddress,
+                        userStakedBalanceBN
+                    );
 
-                const token0Address = await lpContract.methods.token0().call();
-                const token0Contract = new web3.eth.Contract(ABIs.lp, token0Address);
+                    if (positionWorthInUsdBN.isGreaterThan("0")) {
 
-                const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
-                    web3,
-                    walletAddress,
-                    poolId,
-                    lpContract,
-                    token0Address,
-                    token0Contract,
-                    userStakedBalanceBN
-                );
+                        pairs.push({
+                            value: poolId,
+                            label: `${CAKE_SYRUP_LABEL} (${amountFormatter.format(positionWorthInUsdBN)} USD)`
+                        });
 
-                if (positionWorthInUsdBN.isGreaterThan("0")) {
+                    }
 
-                    const token1Address = await lpContract.methods.token1().call();
-                    const token1Contract = new web3.eth.Contract(ABIs.lp, token1Address);
+                } else {
 
-                    pairs.push({
-                        value: poolId,
-                        label: await this._getPoolLabel(
+                    const poolInfo = await this.masterchefContract.methods.poolInfo(poolId).call();
+
+                    const lpContract = new web3.eth.Contract(ABIs.lp, poolInfo.lpToken);
+
+                    const token0Address = await lpContract.methods.token0().call();
+                    const token0Contract = new web3.eth.Contract(ABIs.lp, token0Address);
+
+                    const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
+                        web3,
+                        walletAddress,
+                        poolId,
+                        lpContract,
+                        token0Address,
+                        token0Contract,
+                        userStakedBalanceBN
+                    );
+
+                    if (positionWorthInUsdBN.isGreaterThan("0")) {
+
+                        const token1Address = await lpContract.methods.token1().call();
+                        const token1Contract = new web3.eth.Contract(ABIs.lp, token1Address);
+
+                        const poolLabel = await this._getPoolLabel(
                             web3,
                             token0Contract,
                             token1Contract,
                             positionWorthInUsdBN
-                        )
-                    });
+                        );
+
+                        pairs.push({
+                            value: poolId,
+                            label: poolLabel
+                        });
+
+                    }
 
                 }
 
@@ -223,6 +307,42 @@ class PositionWorth {
         const token1Symbol = await token1Contract.methods.symbol().call();
 
         return `${token0Symbol}-${token1Symbol} (${amountFormatter.format(positionWorthInUSDBN)} USD)`;
+
+    }
+
+    /**
+     *
+     * @param web3
+     * @param walletAddress
+     * @param userStakedBalanceBN
+     * @returns {Promise<BigNumber>}
+     * @private
+     */
+    async _getPositionWorthForCakeSyrupFarmInUsdBN(web3, walletAddress, userStakedBalanceBN = null) {
+
+        if (userStakedBalanceBN === null) {
+
+            const userInfo = await this.masterchefContract.methods.userInfo(CAKE_POOL_ID, walletAddress).call();
+
+            userStakedBalanceBN = new BN(userInfo.amount);
+
+        }
+
+        if (userStakedBalanceBN.isGreaterThan(0)) {
+
+            const singleTokenWorthInUSD = await this.routerContract.methods.getAmountsOut(
+                (new BN("10").pow(this.cakeDecimals)), // single whole unit
+                [CAKE_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS]
+            ).call();
+
+            return new BN(singleTokenWorthInUSD[1]).dividedBy("1e" + this.usdcDecimals)
+                .multipliedBy(userStakedBalanceBN.dividedBy("1e" + this.cakeDecimals));
+
+        } else {
+
+            return new BN(0);
+
+        }
 
     }
 

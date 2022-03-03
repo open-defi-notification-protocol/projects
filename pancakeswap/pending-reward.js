@@ -107,7 +107,8 @@ class PendingReward {
 
         const pools = await this.masterchefContract.methods.poolLength().call();
 
-        for (let poolId = 0; poolId < pools; poolId++) {
+        // starting from 1 bcs pool 0 is the cake token and will be called specifically later.
+        for (let poolId = 1; poolId < pools; poolId++) {
 
             contractCallContext.push({
                 reference: 'masterchef-poolId-' + poolId,
@@ -123,6 +124,28 @@ class PendingReward {
 
         const results = (await multicall.call(contractCallContext)).results;
 
+        // calling userInfo for pool 0 specifically with web3
+        const pool0UserInfo = await this.masterchefContract.methods.userInfo(0, args.address).call();
+
+        results['masterchef-poolId-0'] = {
+            "originalContractCallContext": {
+                "context": {
+                    "poolId": 0
+                }
+            },
+            "callsReturnContext": [
+                {
+                    "returnValues": [
+                        {
+                            "type": "BigNumber",
+                            "hex": pool0UserInfo[0]
+                        },
+
+                    ],
+                }
+            ]
+        };
+
         for (const result of Object.values(results)) {
 
             const userStakedBalanceBN = new BN(result.callsReturnContext[0].returnValues[0].hex);
@@ -131,9 +154,11 @@ class PendingReward {
 
                 const poolId = result.originalContractCallContext.context.poolId;
 
+                const poolLabel = poolId === 0 ? 'CAKE-SYRUP' : await this._getPairLabel(args, poolId);
+
                 pairs.push({
                     value: poolId,
-                    label: await this._getPairLabel(args, poolId)
+                    label: poolLabel
                 });
 
             }
