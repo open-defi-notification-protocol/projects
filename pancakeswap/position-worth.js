@@ -204,7 +204,7 @@ class PositionWorth {
         results['masterchef-poolId-0'] = {
             "originalContractCallContext": {
                 "context": {
-                    "poolId": 0
+                    "poolId": CAKE_POOL_ID
                 }
             },
             "callsReturnContext": [
