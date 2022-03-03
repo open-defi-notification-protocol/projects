@@ -147,7 +147,7 @@ class TokensWorth {
                 [tokenAddress, WBNB_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS]
             ).call();
 
-            return new BN(singleTokenWorthInUSD[2]).div('1e' + this.usdcDecimals)
+            return new BN(singleTokenWorthInUSD[2]).dividedBy('1e' + this.usdcDecimals)
                 .multipliedBy(walletLpBalanceBN).dividedBy('1e' + tokenDecimals)
 
         } else {

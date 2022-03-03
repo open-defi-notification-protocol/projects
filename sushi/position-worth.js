@@ -12,7 +12,7 @@ const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 class PositionWorth {
 
     static displayName = "Position Worth";
-    static description = "Track your position's total worth to protect against loss";
+    static description = "Track your staked position's total worth to protect against loss";
 
     /**
      * runs when class is initialized
