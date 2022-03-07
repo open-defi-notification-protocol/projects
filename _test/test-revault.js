@@ -65,10 +65,7 @@ async function testRevaultStakingUnlock(args) {
     });
 }
 
-
-/*
-
-async function testRevaultChangeStrategy() {
+async function testRevaultChangeStrategy(address) {
     const ChangeStrategy = require('../revault/change-strategy');
     const changeStrategy = new ChangeStrategy();
 
@@ -80,8 +77,10 @@ async function testRevaultChangeStrategy() {
     // simulate subscribe form event
     const form = await changeStrategy.onSubscribeForm({
         web3,
-        address: '0x0672c5B9BDd5b5c4dE0C80a449d2f1b2779455Ce'
+        address: address
     });
+
+    console.log(form);
 
     // simulate user filling in the subscription form in the app
     const subscription = {
@@ -91,19 +90,16 @@ async function testRevaultChangeStrategy() {
     // simulate on blocks event
     return changeStrategy.onBlocks({
         web3,
-        address: '0x0672c5B9BDd5b5c4dE0C80a449d2f1b2779455Ce',
+        address: address,
         subscription
     });
 }
-
-*/
-
 
 async function main() {
 
     console.log('Running manual test:');
 
-    console.log(await testRevaultPendingRewards(
+    /*console.log(await testRevaultPendingRewards(
         {
             address:'0x825c9b788f475F17E2Cbfcc200de8dBd0ea3D68D',
             pid:"0",
@@ -131,23 +127,17 @@ async function main() {
             address:'0xc38F405bF48a6eEA9cCE578235A6D8c4DE0Ef60f',
             pid:"0",
         }
+    ));*/
+
+    console.log(await testRevaultChangeStrategy(
+        '0x0672c5B9BDd5b5c4dE0C80a449d2f1b2779455Ce'
+    ));
+
+    console.log(await testRevaultChangeStrategy(
+        '0x0672c5B9BDd5b5c4dE0C80a449d2f1b2779455Ce'
     ));
 
 }
 
 main();
 
-//
-//
-// (async () => {
-//
-//     // Get user vault id = 2
-//     const userVault = vaults.find(v => parseInt(v.additionalData.vid) === 2);
-//
-//     const promises = vaults.filter(v => v.depositTokenSymbol === userVault.depositTokenSymbol).map(v => getApy(v.additionalData.vid));
-//
-//     const result = await Promise.all(promises);
-//
-//     console.log(result);
-//
-// })();
