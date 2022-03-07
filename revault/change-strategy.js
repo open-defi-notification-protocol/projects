@@ -64,12 +64,14 @@ class ChangeStrategy {
 
         nonSelectedRelevantVaults = nonSelectedRelevantVaults.sort((a, b) => parseFloat(b.apy) - parseFloat(a.apy))
 
-        if (parseFloat(userVault.apy) < parseFloat(nonSelectedRelevantVaults[0].apy)) {
+        let highestApiVault = nonSelectedRelevantVaults[0];
+
+        if (parseFloat(userVault.apy) < parseFloat(highestApiVault.apy)) {
 
             return [
                 {
-                    notification: `Your ${this.capitalWords(vault.depositTokenSymbol, "-")} position is currently making ${userVaultResult.apy}% APY, go to app.revault.network, re-balance your position to ${this.capitalWords(vault.vaultProvider)} and make ${vault.apy}%`,
-                    uniqueId: vault.depositTokenSymbol
+                    notification: `Your ${this.capitalWords(userVault.depositTokenSymbol, "-")} position is currently making ${userVault.apy}% APY, go to app.revault.network, re-balance your position to ${this.capitalWords(highestApiVault.vaultProvider)} and make ${highestApiVault.apy}%`,
+                    uniqueId: selectedVaultKey
                 }
             ];
 

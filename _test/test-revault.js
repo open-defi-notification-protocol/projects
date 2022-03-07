@@ -99,7 +99,7 @@ async function main() {
 
     console.log('Running manual test:');
 
-    /*console.log(await testRevaultPendingRewards(
+    console.log(await testRevaultPendingRewards(
         {
             address:'0x825c9b788f475F17E2Cbfcc200de8dBd0ea3D68D',
             pid:"0",
@@ -127,15 +127,12 @@ async function main() {
             address:'0xc38F405bF48a6eEA9cCE578235A6D8c4DE0Ef60f',
             pid:"0",
         }
-    ));*/
-
-    console.log(await testRevaultChangeStrategy(
-        '0x0672c5B9BDd5b5c4dE0C80a449d2f1b2779455Ce'
     ));
 
     console.log(await testRevaultChangeStrategy(
         '0x0672c5B9BDd5b5c4dE0C80a449d2f1b2779455Ce'
     ));
+
 
 }
 
