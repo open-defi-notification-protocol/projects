@@ -8,6 +8,8 @@ export abstract class Notification {
   static description: string;
   // optional name of a display icon for this notification type
   static displayIcon: DisplayIcon;
+  // optional override project network to support multiple networks for the same project
+  static network: Network;
 
   // runs once when this class is initialized
   abstract onInit(args: OnInitArgs): Promise<void>;
@@ -21,7 +23,7 @@ export abstract class Notification {
 export type DisplayIcon = "hand" | "wallet" | "up-arrow" | "down-arrow"; // TODO: add more
 
 // network the project is running on
-export type Network = "ethereum" | "bsc" | "polygon" | "avalanche"; // TODO: add more
+export type Network = "ethereum" | "bsc" | "polygon" | "avalanche" | "fantom"; // TODO: add more
 
 // arguments for onInit()
 export interface OnInitArgs {
@@ -70,6 +72,8 @@ export interface SubscribeFormField {
   description?: string;
   // optional default value for the field
   default?: any;
+  // optional is this an optional field (default false)
+  optional?: boolean;
   // required for "input-select" fields and contains all the available options for selection
   values?: LabelAndValue[];
   // required for "hidden" and contains the value of the field
@@ -79,7 +83,7 @@ export interface SubscribeFormField {
 }
 
 // the type of the field in the form, eg. "input-number" is a numerical input field
-export type FormFieldType = "input-number" | "input-select" | "hidden";
+export type FormFieldType = "input-number" | "input-text" | "input-select" | "hidden" | "input-address";
 
 // a pair of a value and its label for users for selection options
 export interface LabelAndValue {

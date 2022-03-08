@@ -4,7 +4,7 @@ const {RevaAutoCompoundPoolInfo} = require("./contracts");
 
 class StakingUnlock {
 
-    static displayName = "Staking unlock";
+    static displayName = "Staking Unlocked";
     static description = "Get notified when your staking position unlocked";
 
     // runs when class is initialized
