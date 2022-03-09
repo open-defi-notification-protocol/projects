@@ -5,9 +5,6 @@ const EthereumMulticall = require('ethereum-multicall');
 const MASTERCHEF_ADDRESS = "0x73feaa1eE314F8c655E354234017bE2193C9E24E";
 const CAKE_TOKEN_ADDRESS = "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82";
 
-const CAKE_POOL_ID = "0";
-const CAKE_SYRUP_LABEL = 'CAKE-SYRUP';
-
 const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
 class PendingReward {
@@ -127,28 +124,6 @@ class PendingReward {
 
         const results = (await multicall.call(contractCallContext)).results;
 
-        // calling userInfo for pool 0 specifically with web3
-        const pool0UserInfo = await this.masterchefContract.methods.userInfo(0, args.address).call();
-
-        results['masterchef-poolId-0'] = {
-            "originalContractCallContext": {
-                "context": {
-                    "poolId": CAKE_POOL_ID
-                }
-            },
-            "callsReturnContext": [
-                {
-                    "returnValues": [
-                        {
-                            "type": "BigNumber",
-                            "hex": pool0UserInfo[0]
-                        },
-
-                    ],
-                }
-            ]
-        };
-
         for (const result of Object.values(results)) {
 
             const userStakedBalanceBN = new BN(result.callsReturnContext[0].returnValues[0].hex);
@@ -157,7 +132,7 @@ class PendingReward {
 
                 const poolId = result.originalContractCallContext.context.poolId;
 
-                const poolLabel = poolId === CAKE_POOL_ID ? CAKE_SYRUP_LABEL : await this._getPairLabel(args, poolId);
+                const poolLabel = await this._getPairLabel(args, poolId);
 
                 pairs.push({
                     value: poolId,
