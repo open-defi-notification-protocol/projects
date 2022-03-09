@@ -11,7 +11,7 @@ const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
 class PendingReward {
 
-    static displayName = "Pending Reward (Syrup)";
+    static displayName = "Pending Reward (Syrup Pools)";
     static description = "Get notified when enough reward on the Syrup Pools is ready to claim";
 
     /**
