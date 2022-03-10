@@ -1,5 +1,6 @@
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3bsc));
+const web3Fantom = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3fantom));
 
 async function testRevaultPendingRewards(args) {
     const PendingRewards = require('../revault/pending-reward');
@@ -27,6 +28,37 @@ async function testRevaultPendingRewards(args) {
     // simulate on blocks event
     return pendingReward.onBlocks({
         web3,
+        address: args.address,
+        subscription
+    });
+}
+
+async function testRevaultVaultPendingRewards_fantom(args) {
+    const VaultPendingRewards_fantom = require('../revault/vault-pending-reward_fantom');
+    const vaultPendingRewards_fantom = new VaultPendingRewards_fantom();
+
+    // simulate init event
+    await vaultPendingRewards_fantom.onInit({
+        web3: web3Fantom
+    });
+
+    // simulate subscribe form event
+    const form = await vaultPendingRewards_fantom.onSubscribeForm({
+        web3: web3Fantom,
+        address: args.address
+    });
+
+    console.log(form);
+
+    // simulate user filling in the subscription form in the app
+    const subscription = {
+        "vault-deposit-token": args.depositTokenAddress,
+        minimum: args.minimum,
+    };
+
+    // simulate on blocks event
+    return vaultPendingRewards_fantom.onBlocks({
+        web3: web3Fantom,
         address: args.address,
         subscription
     });
@@ -99,40 +131,47 @@ async function main() {
 
     console.log('Running manual test:');
 
-    console.log(await testRevaultPendingRewards(
+    /* console.log(await testRevaultPendingRewards(
+         {
+             address:'0x825c9b788f475F17E2Cbfcc200de8dBd0ea3D68D',
+             pid:"0",
+             threshold: "807",
+         }
+     ));
+
+     console.log(await testRevaultPendingRewards(
+         {
+             address:'0xc38F405bF48a6eEA9cCE578235A6D8c4DE0Ef60f',
+             pid:"3",
+             threshold: "1909",
+         }
+     ));
+
+     console.log(await testRevaultStakingUnlock(
+         {
+             address:'0xc38F405bF48a6eEA9cCE578235A6D8c4DE0Ef60f',
+             pid:"3",
+         }
+     ));
+
+     console.log(await testRevaultStakingUnlock(
+         {
+             address:'0xc38F405bF48a6eEA9cCE578235A6D8c4DE0Ef60f',
+             pid:"0",
+         }
+     ));
+
+     console.log(await testRevaultChangeStrategy(
+         '0x0672c5B9BDd5b5c4dE0C80a449d2f1b2779455Ce'
+     ));
+ */
+    console.log(await testRevaultVaultPendingRewards_fantom(
         {
-            address:'0x825c9b788f475F17E2Cbfcc200de8dBd0ea3D68D',
-            pid:"0",
-            threshold: "807",
+            address: '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005',
+            depositTokenAddress: "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83",
+            minimum: "0.0001",
         }
     ));
-
-    console.log(await testRevaultPendingRewards(
-        {
-            address:'0xc38F405bF48a6eEA9cCE578235A6D8c4DE0Ef60f',
-            pid:"3",
-            threshold: "1909",
-        }
-    ));
-
-    console.log(await testRevaultStakingUnlock(
-        {
-            address:'0xc38F405bF48a6eEA9cCE578235A6D8c4DE0Ef60f',
-            pid:"3",
-        }
-    ));
-
-    console.log(await testRevaultStakingUnlock(
-        {
-            address:'0xc38F405bF48a6eEA9cCE578235A6D8c4DE0Ef60f',
-            pid:"0",
-        }
-    ));
-
-    console.log(await testRevaultChangeStrategy(
-        '0x0672c5B9BDd5b5c4dE0C80a449d2f1b2779455Ce'
-    ));
-
 
 }
 
