@@ -4,7 +4,7 @@ const GetAllUserPools = require("./utils.js");
 
 class PendingReward {
 
-    static displayName = "Pending Reward";
+    static displayName = "Staking Pending Reward";
     static description = "Get notified when your pending REVA rewards surpass a certain threshold";
 
     // runs when class is initialized
