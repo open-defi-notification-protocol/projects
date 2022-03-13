@@ -69,6 +69,33 @@ async function testTraderJoePendingRewards(address, minimum) {
     });
 }
 
+/**
+ * testing pending rewards notification
+ *
+ */
+async function testRocketJoeNewLaunch() {
+
+    const RocketJoeNewContract = require('../traderjoe/rocket-joe-new-contract');
+    const rocketJoeNewContract = new RocketJoeNewContract();
+
+    // simulate init event
+    await rocketJoeNewContract.onInit({
+        web3
+    });
+
+    // simulate subscribe form event
+    const form = await rocketJoeNewContract.onSubscribeForm({
+        web3
+    });
+
+    console.log(form);
+
+    // simulate on blocks event
+    return rocketJoeNewContract.onBlocks({
+        web3
+    });
+}
+
 async function main() {
 
     console.log('Running manual test:');
@@ -109,13 +136,18 @@ async function main() {
          {
              address: '0xd253c7cc525345922cb1de7824a753d21083dede',
          }
-     ));*/
+     ));
 
     console.log(
         await testTraderJoePendingRewards(
             '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005',
             '0.0001'
         )
+    );
+*/
+
+    console.log(
+        await testRocketJoeNewLaunch()
     );
 
 }
