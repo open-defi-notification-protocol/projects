@@ -76,7 +76,7 @@ class RocketJoeContract {
 
                 const uniqueId = "num-launch-event-" + launchEvent;
 
-                const phase1Date = new Date(event.returnValues.phaseOneStartTime * 1000).toLocaleDateString();
+                const phase1Date = new Date(event.returnValues.phaseOneStartTime * 1000).toLocaleString('en-us', {month: 'short'});
 
                 notifications.push({
                     uniqueId: uniqueId,
