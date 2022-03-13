@@ -1,0 +1,9 @@
+{
+  "name": "Notional",
+  "category": "lending",
+  "website": "https://notional.finance",
+  "logo": "logo.png",
+  "background": "#012E3A",
+  "foreground": "#ffffff",
+  "network": "ethereum"
+}
