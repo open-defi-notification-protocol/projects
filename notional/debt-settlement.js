@@ -176,7 +176,7 @@ class DebtSettlement {
       maturityThreshold
     );
 
-    return this.buildNotification(debtPositions);
+    return this.buildNotification(debtPositions, timeBufferHours);
   }
 };
 
