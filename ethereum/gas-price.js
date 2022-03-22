@@ -67,7 +67,7 @@ class GasPrice {
 
         const thresholdPriceWeiBN = new BN(args.web3.utils.toWei(price, 'Gwei'));
 
-        const basePricePerGasBN = new BN(this.lastBlock.baseFeePerGas, 16);
+        const basePricePerGasBN = new BN(this.lastBlock.baseFeePerGas);
 
         const uniqueId = (above ? 'above' : 'below') + "-" + price;
 
