@@ -56,7 +56,7 @@ async function testGasPriceAboveBelow(address, price, above) {
         web3,
         address: "0xC81bD599a66dA6dcc3A64399f8025C19fFC42888",
         subscription: subscription,
-        toBlock: 13569998
+        toBlock: 14441466
     });
 
 }
