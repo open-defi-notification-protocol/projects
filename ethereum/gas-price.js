@@ -18,7 +18,7 @@ class GasPrice {
     async onSubscribeForm(args) {
 
         this.lastBlock = await args.web3.eth.getBlock('latest');
-        const basePricePerGasBN = new BN(this.lastBlock.baseFeePerGas, 16);
+        const basePricePerGasBN = new BN(this.lastBlock.baseFeePerGas);
 
         return [
             {
