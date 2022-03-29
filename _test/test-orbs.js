@@ -1,9 +1,10 @@
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3));
+const web3Polygon = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3Polygon));
 
-async function testUnlockedCooldown(address) {
+async function testUnlockedCooldown(web3, notificationModule, address) {
 
-    const UnlockCooldown = require('../orbs/unlock-cooldown');
+    const UnlockCooldown = require('../orbs/' + notificationModule);
     const unlockCooldown = new UnlockCooldown();
 
     // simulate init event
@@ -18,9 +19,9 @@ async function testUnlockedCooldown(address) {
     });
 }
 
-async function testPendingReward(address, minimum) {
+async function testPendingReward(web3, notificationModule, address, minimum) {
 
-    const PendingReward = require('../orbs/pending-rewards');
+    const PendingReward = require('../orbs/' + notificationModule);
     const pendingReward = new PendingReward();
 
     // simulate init event
@@ -40,8 +41,11 @@ async function main() {
 
     console.log('Running manual test:');
 
-    console.log(await testUnlockedCooldown('0x3dacC571356e7D5dFB3b475d6922442Ec06B9005'));
-    console.log(await testPendingReward('0x3dacC571356e7D5dFB3b475d6922442Ec06B9005', 4));
+    console.log(await testUnlockedCooldown(web3, 'unlock-cooldown', '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005'));
+    console.log(await testPendingReward(web3, 'pending-rewards', '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005', 4));
+
+    console.log(await testUnlockedCooldown(web3Polygon, 'unlock-cooldown_polygon', '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005'));
+    console.log(await testPendingReward(web3Polygon, 'pending-rewards_polygon', '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005', 0));
 
 }
 
