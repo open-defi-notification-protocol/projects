@@ -32,7 +32,7 @@ class PendingReward {
 
         if (pendingRewardBN.isGreaterThanOrEqualTo(minimum)) {
 
-            const uniqueId = "orbs-rewards-" + minimum;
+            const uniqueId = "orbs-rewards-polygon-" + minimum;
 
             return {
                 uniqueId: uniqueId,

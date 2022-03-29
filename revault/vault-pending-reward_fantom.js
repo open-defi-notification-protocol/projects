@@ -83,7 +83,7 @@ class VaultPendingReward {
 
         if (pendingRewardBN.isGreaterThanOrEqualTo(minimum)) {
 
-            const uniqueId = depositTokenAddress + "-" + minimum;
+            const uniqueId = 'pending-reward-fantom-' + depositTokenAddress + "-" + minimum;
 
             return {
                 uniqueId: uniqueId,
