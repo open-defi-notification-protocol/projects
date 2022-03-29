@@ -54,7 +54,12 @@ class UnlockCooldown {
 
         if (cooldownAmountBN.isGreaterThan("0") && cooldownEndTimeBN.isLessThan(todaySeconds.toFixed())) {
 
-            return {notification: `Your ${amountFormatter.format(cooldownAmountBN)} unstaked tokens are available for withdrawal`};
+            const uniqueId = "orbs-unlock-cooldown-polygon";
+
+            return {
+                uniqueId: uniqueId,
+               notification: `Your ${amountFormatter.format(cooldownAmountBN)} unstaked tokens are available for withdrawal`
+            };
 
         } else {
 
