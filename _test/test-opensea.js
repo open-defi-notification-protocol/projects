@@ -8,13 +8,16 @@ async function testFloorPrice(address, collectionUrl, price, above) {
     await floorPrice.onInit({});
 
     // simulate subscribe form event
-    const form = await floorPrice.onSubscribeForm({address});
+    const form = await floorPrice.onSubscribeForm({
+        platformKeys: {opensea: process.env.OPENSEA_API_KEY},
+        address
+    });
 
     console.log(form);
 
     // simulate user filling in the subscription form in the app
     const subscription = {
-        collection: form.find(o => o.id === 'collection').values[12].value,
+        collection: form.find(o => o.id === 'collection').values[3].value,
         collectionUrl: collectionUrl,
         price: price,
         "above-below": above ? "0" : "1"
@@ -22,6 +25,7 @@ async function testFloorPrice(address, collectionUrl, price, above) {
 
     // simulate on blocks event
     return floorPrice.onBlocks({
+        platformKeys: {opensea: process.env.OPENSEA_API_KEY},
         subscription
     });
 }
@@ -34,7 +38,10 @@ async function testNewOffers(address, price) {
     await newOffers.onInit({});
 
     // simulate subscribe form event
-    const form = await newOffers.onSubscribeForm({address});
+    const form = await newOffers.onSubscribeForm({
+        platformKeys: {opensea: process.env.OPENSEA_API_KEY},
+        address
+    });
 
     console.log(form);
 
@@ -42,7 +49,7 @@ async function testNewOffers(address, price) {
     const subscription = {
         price: price,
         // collectionUrl: "https://opensea.io/collection/punklaus",
-        collection: form.find(o => o.id === 'collection').values[12].value
+        collection: form.find(o => o.id === 'collection').values[3].value
     };
 
     // simulate on blocks event
@@ -80,11 +87,11 @@ async function main() {
 
     console.log('Running manual test:');
 
-    const address = '0xbcb6e5e402badcef505baabd9cf9759cf3083636';
+    const address = '0x1fC4b564c2f0E601198969817ee999cB78517ED5';
 
 
     // console.log(await testFloorPrice("https://opensea.io/collection/boredapeyachtclub", "25", true));
-    // console.log(await testNewOffers(address, "0.01"));
+    // console.log(await testNewOffers(address, "0.0001"));
     console.log(await testNewOffersByFloor(address, "60"));
 
 }

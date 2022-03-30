@@ -90,7 +90,7 @@ class NewOffers {
 
                     notifications.push({
                         uniqueId: uniqueId,
-                        notification: `You have a new offer of ${amountFormatter.format(offerPriceEthBN)} ETH for ${asset.name} of collection ${asset.collection.name}`
+                        notification: `You have a new offer of ${amountFormatter.format(offerPriceEthBN)} ETH for ${asset.name}${order.quantity !== '1' ? ` (quantity:${order.quantity})` : ''} of collection ${asset.collection.name}`
                     });
 
                 }
