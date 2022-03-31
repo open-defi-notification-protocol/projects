@@ -2,7 +2,7 @@ const ABIs = require('./abis.json');
 const BN = require("bignumber.js");
 
 const ROUTER_ADDRESS = '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D';
-const WBNB_TOKEN_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
+const WETH_TOKEN_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
 const USDC_TOKEN_ADDRESS = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
 
 const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
@@ -144,10 +144,10 @@ class TokensWorth {
 
             const singleTokenWorthInUSD = await this.routerContract.methods.getAmountsOut(
                 (new BN("10").pow(tokenDecimals)), // single whole unit
-                [tokenAddress, WBNB_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS]
+                tokenAddress === WETH_TOKEN_ADDRESS ? [WETH_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS] : [tokenAddress, WETH_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS]
             ).call();
 
-            return new BN(singleTokenWorthInUSD[2]).dividedBy('1e' + this.usdcDecimals)
+            return new BN(singleTokenWorthInUSD[tokenAddress === WETH_TOKEN_ADDRESS ? 1 : 2]).dividedBy('1e' + this.usdcDecimals)
                 .multipliedBy(walletLpBalanceBN).dividedBy('1e' + tokenDecimals)
 
         } else {

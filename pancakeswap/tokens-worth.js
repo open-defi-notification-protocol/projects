@@ -144,10 +144,10 @@ class TokensWorth {
 
             const singleTokenWorthInUSD = await this.routerContract.methods.getAmountsOut(
                 (new BN("10").pow(tokenDecimals)), // single whole unit
-                [tokenAddress, WBNB_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS]
+                tokenAddress === WBNB_TOKEN_ADDRESS ? [WBNB_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS] : [tokenAddress, WBNB_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS]
             ).call();
 
-            return new BN(singleTokenWorthInUSD[2]).dividedBy('1e' + this.usdcDecimals)
+            return new BN(singleTokenWorthInUSD[[tokenAddress === WBNB_TOKEN_ADDRESS ? 1 : 2]]).dividedBy('1e' + this.usdcDecimals)
                 .multipliedBy(walletLpBalanceBN).dividedBy('1e' + tokenDecimals)
 
         } else {

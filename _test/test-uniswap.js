@@ -70,22 +70,21 @@ async function main() {
 
     console.log('Running manual test:');
 
-    const address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
-/*
+    let address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
 
     console.log(await testUniPositionWorth(
         address,
         '90'
     ));
-*/
 
 
-    const tokenAddress = '0x846C66cf71C43f80403B51fE3906B3599D63336f';
+    const tokenAddress = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
+    address = '0x9257a4bdc6e6de95e1c662bf66583735a779736f';
 
     console.log(await testTokensWorth(
-        '0x98C3fC24A4A1DCB6010685115d6B5F8EF3F0Cc19',
+        address,
         tokenAddress,
-        "20500",
+        "2000000",
         false
     ));
 
