@@ -2,16 +2,16 @@ const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3bsc));
 
 async function testTokensWorth(address, tokenAddress, threshold, above) {
-    const PositionWorth = require('../pancakeswap/tokens-worth');
-    const positionWorth = new PositionWorth();
+    const TokensWorth = require('../pancakeswap/tokens-worth');
+    const worth = new TokensWorth();
 
     // simulate init event
-    await positionWorth.onInit({
+    await worth.onInit({
         web3
     });
 
     // simulate subscribe form event
-    const form = await positionWorth.onSubscribeForm({
+    const form = await worth.onSubscribeForm({
         web3,
         address
     });
@@ -26,7 +26,7 @@ async function testTokensWorth(address, tokenAddress, threshold, above) {
     };
 
     // simulate on blocks event
-    return positionWorth.onBlocks({
+    return worth.onBlocks({
         web3,
         address,
         subscription
@@ -137,30 +137,26 @@ async function main() {
     const address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
     const tokenAddress = '0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82';
 
-    /*
-        console.log(await testTokensWorth(
-            address,
-            tokenAddress,
-            "20500",
-            false
-        ));
+    console.log(await testTokensWorth(
+        address,
+        tokenAddress,
+        "20500",
+        false
+    ));
 
-        console.log(await testPancakeswapPendingRewards(
-            address,
-            '0.000001'
-        ));
-    */
+    console.log(await testPancakeswapPendingRewards(
+        address,
+        '0.000001'
+    ));
 
     console.log(await testPancakeswapSyrupPendingRewards(
         address,
         '0.0000000001'
     ));
-    /*
         console.log(await testPancakeswapPositionWorth(
             address,
             '10000'
         ));
-    */
 }
 
 main();
