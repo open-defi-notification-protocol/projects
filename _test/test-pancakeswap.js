@@ -1,6 +1,14 @@
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3bsc));
 
+/**
+ *
+ * @param address
+ * @param tokenAddress
+ * @param threshold
+ * @param above
+ * @returns {Promise<{notification: string, uniqueId: string}|[]>}
+ */
 async function testTokensWorth(address, tokenAddress, threshold, above) {
     const TokensWorth = require('../pancakeswap/tokens-worth');
     const worth = new TokensWorth();
@@ -33,9 +41,16 @@ async function testTokensWorth(address, tokenAddress, threshold, above) {
     });
 }
 
-async function testPancakeswapPendingRewards(address, minimum) {
+/**
+ *
+ * @param address
+ * @param minimum
+ * @param v2
+ * @returns {Promise<*>}
+ */
+async function testPancakeswapPendingRewards(address, minimum, v2) {
 
-    const PendingRewards = require('../pancakeswap/pending-reward');
+    const PendingRewards = require('../pancakeswap/pending-reward' + (v2 ? '-v2' : ''));
     const pendingRewards = new PendingRewards();
 
     // simulate init event
@@ -65,9 +80,16 @@ async function testPancakeswapPendingRewards(address, minimum) {
     });
 }
 
-async function testPancakeswapSyrupPendingRewards(address, minimum) {
+/**
+ *
+ * @param address
+ * @param minimum
+ * @param v2
+ * @returns {Promise<*>}
+ */
+async function testPancakeswapSyrupPendingRewards(address, minimum, v2) {
 
-    const SyrupPendingRewards = require('../pancakeswap/syrup-pending-reward');
+    const SyrupPendingRewards = require('../pancakeswap/syrup-pending-reward' + (v2 ? '-v2' : ''));
     const syrupPendingRewards = new SyrupPendingRewards();
 
     // simulate init event
@@ -97,9 +119,16 @@ async function testPancakeswapSyrupPendingRewards(address, minimum) {
     });
 }
 
-async function testPancakeswapPositionWorth(address, threshold) {
+/**
+ *
+ * @param address
+ * @param threshold
+ * @param v2
+ * @returns {Promise<*>}
+ */
+async function testPancakeswapPositionWorth(address, threshold, v2) {
 
-    const PositionWorth = require('../pancakeswap/position-worth');
+    const PositionWorth = require('../pancakeswap/position-worth' + (v2 ? '-v2' : ''));
     const positionWorth = new PositionWorth();
 
     // simulate init event
@@ -129,7 +158,10 @@ async function testPancakeswapPositionWorth(address, threshold) {
     });
 }
 
-
+/**
+ *
+ * @returns {Promise<void>}
+ */
 async function main() {
 
     console.log('Running manual test:');
@@ -137,26 +169,50 @@ async function main() {
     const address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
     const tokenAddress = '0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82';
 
-    console.log(await testTokensWorth(
+    /* console.log(await testTokensWorth(
+         address,
+         tokenAddress,
+         "20500",
+         false
+     ));
+
+     */
+
+    /*console.log(await testPancakeswapPendingRewards(
         address,
-        tokenAddress,
-        "20500",
-        false
+        '0.0'
     ));
 
     console.log(await testPancakeswapPendingRewards(
         address,
-        '0.000001'
-    ));
+        '0.0',
+        true
+    ));*/
 
     console.log(await testPancakeswapSyrupPendingRewards(
         address,
         '0.0000000001'
     ));
-        console.log(await testPancakeswapPositionWorth(
-            address,
-            '10000'
-        ));
+
+    console.log(await testPancakeswapSyrupPendingRewards(
+        address,
+        '0.0000000001',
+        true
+    ));
+
+    /*
+      console.log(await testPancakeswapPositionWorth(
+          address,
+          '10000'
+      ));
+
+      console.log(await testPancakeswapPositionWorth(
+          address,
+          '10000',
+          true
+      ));
+
+       */
 }
 
 main();
