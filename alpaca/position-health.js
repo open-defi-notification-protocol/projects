@@ -88,7 +88,7 @@ class PositionHealth {
 
         const json = await response.json();
 
-        for (let vid = 0; vid < json.data.positions.length && vid < 5; vid++) {
+        for (let vid = 0; vid < json.data.positions.length; vid++) {
             const position = json.data.positions[vid];
             const vaultAddress = position.vault;
             const positionId = position.positionId;
