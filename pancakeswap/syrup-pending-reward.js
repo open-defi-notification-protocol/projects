@@ -49,7 +49,7 @@ class PendingReward {
                 id: "minimum",
                 label: "Minimum Reward",
                 default: 0,
-                description: "Minimum amount of claimable CAKE to be notified about"
+                description: "Minimum amount of claimable reward token to be notified about"
             }
         ];
     }
