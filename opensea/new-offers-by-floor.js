@@ -57,18 +57,18 @@ class NewOffersByFloor {
             limit: 50,
             side: 0, // Buy
             owner: args.address,
-            listed_after: Math.floor(Date.now()) - (LISTED_AFTER__IN_MINUTES * 60 * 1000)
+            listed_after: Math.floor(Date.now() / 1000) - (LISTED_AFTER__IN_MINUTES * 60)
         };
 
-        const result = await (await fetch(`https://api.opensea.io/wyvern/v1/orders?limit=${params.limit}&side=${params.side}&owner=${params.owner}&listed_after=${params.listed_after}`, {
+        const notifications = [];
+
+        const result = await (await fetch(`https://api.opensea.io/wyvern/v1/orders?limit=${params.limit}&side=${params.side}&owner=${params.owner}&listed_after=${params.listed_after / 1000}`, {
                 method: 'GET',
-                headers: {'X-API-KEY': process.env.OPENSEA_API_KEY}
+                headers: {'X-API-KEY': args.platformKeys.opensea}
             })
         ).json();
 
         const orders = result.orders;
-
-        const notifications = []
 
         const thresholdPercBN = new BN(thresholdPerc);
 
@@ -92,6 +92,7 @@ class NewOffersByFloor {
             }
 
         }
+
 
         return notifications;
 

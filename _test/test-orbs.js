@@ -41,11 +41,13 @@ async function main() {
 
     console.log('Running manual test:');
 
-    console.log(await testUnlockedCooldown(web3, 'unlock-cooldown', '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005'));
-    console.log(await testPendingReward(web3, 'pending-rewards', '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005', 4));
+    const address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
 
-    console.log(await testUnlockedCooldown(web3Polygon, 'unlock-cooldown_polygon', '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005'));
-    console.log(await testPendingReward(web3Polygon, 'pending-rewards_polygon', '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005', 0));
+    console.log(await testUnlockedCooldown(web3, 'unlock-cooldown', address));
+    console.log(await testPendingReward(web3, 'pending-rewards', address, 4));
+
+    console.log(await testUnlockedCooldown(web3Polygon, 'unlock-cooldown_polygon', address));
+    console.log(await testPendingReward(web3Polygon, 'pending-rewards_polygon', address, 0));
 
 }
 

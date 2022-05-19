@@ -1,3 +1,4 @@
+const fetch = require("node-fetch");
 process.env.OPENSEA_API_KEY = require('./dev-keys.json').openSeaApiKey;
 
 async function testFloorPrice(address, collectionUrl, price, above) {
@@ -10,7 +11,7 @@ async function testFloorPrice(address, collectionUrl, price, above) {
     // simulate subscribe form event
     const form = await floorPrice.onSubscribeForm({
         platformKeys: {opensea: process.env.OPENSEA_API_KEY},
-        address
+        address: address
     });
 
     console.log(form);
@@ -54,6 +55,7 @@ async function testNewOffers(address, price) {
 
     // simulate on blocks event
     return newOffers.onBlocks({
+        platformKeys: {opensea: process.env.OPENSEA_API_KEY},
         address,
         subscription
     });
@@ -67,7 +69,7 @@ async function testNewOffersByFloor(address, threshold) {
     await newOffersByFloor.onInit({});
 
     // simulate subscribe form event
-    const form = await newOffersByFloor.onSubscribeForm({address});
+    const form = await newOffersByFloor.onSubscribeForm();
 
     console.log(form);
 
@@ -79,6 +81,7 @@ async function testNewOffersByFloor(address, threshold) {
     // simulate on blocks event
     return newOffersByFloor.onBlocks({
         address,
+        platformKeys: {opensea: process.env.OPENSEA_API_KEY},
         subscription
     });
 }
@@ -89,10 +92,50 @@ async function main() {
 
     const address = '0x1fC4b564c2f0E601198969817ee999cB78517ED5';
 
+    // console.log(await testFloorPrice(address, "https://opensea.io/collection/boredapeyachtclub", "25", true));
+    // console.log(await testNewOffersByFloor(address, "60"));
+    console.log(await testNewOffers(address, "0.0001"));
 
-    // console.log(await testFloorPrice("https://opensea.io/collection/boredapeyachtclub", "25", true));
-    // console.log(await testNewOffers(address, "0.0001"));
-    console.log(await testNewOffersByFloor(address, "60"));
+    // load testing opensea api
+    /*const p = []
+
+    for (let i = 0; i < 1; i++) {
+
+        p.push((async () => {
+
+            const params = {
+                limit: 50,
+                side: 0, // Buy
+                owner: address,
+                listed_after: Math.floor(Date.now()) - (30 * 60 * 1000)
+            };
+
+            const result = (await fetch(
+                    `https://api.opensea.io/wyvern/v1/orders?limit=${params.limit}&side=${params.side}&owner=${params.owner}&listed_after=${params.listed_after}`, {
+                        method: 'GET',
+                        headers: {'X-API-KEY': process.env.OPENSEA_API_KEY}
+                    })
+            );
+
+            // const result = await (await fetch(`https://api.opensea.io/api/v1/collection/boredapeyachtclub`));
+
+            try {
+
+                // console.log(i + ' ' + JSON.stringify(await result.json()))
+                console.log(i + ' ' + await result.text())
+
+            } catch (e) {
+                console.log(e)
+            }
+
+        })())
+
+    }
+
+        await Promise.all(p)
+
+    */
+
 
 }
 
