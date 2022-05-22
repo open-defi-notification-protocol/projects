@@ -92,8 +92,8 @@ async function main() {
 
     const address = '0x1fC4b564c2f0E601198969817ee999cB78517ED5';
 
-    // console.log(await testFloorPrice(address, "https://opensea.io/collection/boredapeyachtclub", "25", true));
-    // console.log(await testNewOffersByFloor(address, "60"));
+    console.log(await testFloorPrice(address, "https://opensea.io/collection/boredapeyachtclub", "25", true));
+    console.log(await testNewOffersByFloor(address, "60"));
     console.log(await testNewOffers(address, "0.0001"));
 
     // load testing opensea api
