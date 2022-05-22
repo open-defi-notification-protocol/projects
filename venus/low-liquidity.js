@@ -1,6 +1,11 @@
-const BigNumber = require("bignumber.js");
-const contracts = require('./contracts');
+const BN = require("bignumber.js");
 const Contract = require('web3-eth-contract');
+const ABIs = require("./abis.json");
+
+const COMPTROLLER_ADDRESS = '0xfD36E2c2a6789Db23113685031d7F16329158384';
+const BUSD_DECIMALS = 18;
+
+const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
 class LowLiquidity {
 
@@ -10,63 +15,82 @@ class LowLiquidity {
 
     // runs when class is initialized
     async onInit(args) {
-        const abi = contracts.lens.abi
-        const addr = contracts.lens.addr
-        this.contract = _createContract(args.web3, addr, abi)
+
+        this.comptrollerContract = new args.web3.eth.Contract(ABIs.comptroller, COMPTROLLER_ADDRESS);
+
     }
 
+    /**
+     * runs right before user subscribes to new notifications and populates subscription form
+     *
+     * @param args
+     * @returns {Promise<[{default: string, description: string, id: string, label: string, type: string}]>}
+     */
     async onSubscribeForm(args) {
-        const {markets, liquidity, shortfall} = await this.contract.methods.getAccountLimits(contracts.comptroller.addr, args.address).call();
 
-        const roughExcess = new BigNumber(liquidity)
-            .dividedBy(1e18) // full units
-            .dp(2, BigNumber.ROUND_HALF_DOWN)
+        const result = await this.comptrollerContract.methods.getAccountLiquidity(args.address).call();
 
-        const defaultMin = roughExcess
-            .dividedBy(10) // suggest 10% of the current liquidity
-            .dp(2, BigNumber.ROUND_UP)
-            .toString()
-        const comment = markets.length > 0 && parseInt(shortfall) ?
+        let liquidity = new BN(result[1]);
+        const shortfall = parseInt(result[2]);
+
+        liquidity = liquidity.dividedBy('1e' + BUSD_DECIMALS);
+
+        const comment = shortfall ?
             `CAUTION: you are currently in risk of liquidation` :
-            `Your current excess liquidity is ~${roughExcess} BNB`
+            `Your current excess liquidity is ~${amountFormatter.format(liquidity)} USD`;
+
         return [
             {
                 type: "input-number",
                 id: "minLiquidity",
                 label: "Minimum Liquidity",
-                default: defaultMin,
-                description: "The minimum desired liquidity denominated in BNB. " + comment
+                default: 0,
+                description: "The minimum desired liquidity denominated in USD. " + comment
             }
         ];
     }
 
-    // runs when new blocks are added to the mainnet chain - notification scanning happens here
+    /**
+     * runs when new blocks are added to the mainnet chain - notification scanning happens here
+     *
+     * @param args
+     * @returns {Promise<{notification: string}|*[]>}
+     */
     async onBlocks(args) {
-        const minBnB = new BigNumber(args.subscription['minLiquidity']).multipliedBy(1e18)
-        const {markets, liquidity, shortfall} = await this.contract.methods.getAccountLimits(contracts.comptroller.addr, args.address).call();
 
-        console.log(`markets: ${markets}, liquidity: ${liquidity}, shortfall: ${shortfall}`)
+        const minLiquidity = args.subscription['minLiquidity'];
 
-        if (markets.length > 0 && minBnB.isGreaterThanOrEqualTo(new BigNumber(liquidity))) {
-            if (shortfall > 0) {
+        const minBUSD = new BN(minLiquidity).multipliedBy('1e' + BUSD_DECIMALS)
+
+        const result = await this.comptrollerContract.methods.getAccountLiquidity(args.address).call();
+
+        let liquidity = new BN(result[1]);
+
+        const shortfall = parseInt(result[2]);
+
+        if (minBUSD.isGreaterThanOrEqualTo(liquidity)) {
+
+            const uniqueId = "liquidity-" + minBUSD;
+
+            if (shortfall) {
+
                 return {
+                    uniqueId: uniqueId,
                     notification: `Act now! You are under-collateralized and about to be liquidated`
                 }
+
             } else {
+
                 return {
-                    notification: `Excess liquidity dropped below your safe minimum`
+                    uniqueId: uniqueId,
+                    notification: `Excess liquidity dropped below your safe minimum of ${minLiquidity} USD (~${amountFormatter.format(liquidity.dividedBy('1e' + BUSD_DECIMALS))})`
                 }
+
             }
         }
 
         return [];
     }
-}
-
-function _createContract(web3, address, abi) {
-    const contract = new Contract(abi, address)
-    contract.setProvider(web3.currentProvider)
-    return contract
 }
 
 module.exports = LowLiquidity;

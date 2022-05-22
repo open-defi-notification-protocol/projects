@@ -47,7 +47,12 @@ class NewOffers {
 
     }
 
-    // runs when new blocks are added to the mainnet chain - notification scanning happens here
+    /**
+     * runs when new blocks are added to the mainnet chain - notification scanning happens here
+     *
+     * @param args
+     * @returns {Promise<{notification: string}|*[]>}
+     */
     async onBlocks(args) {
 
         const subscription = args.subscription;

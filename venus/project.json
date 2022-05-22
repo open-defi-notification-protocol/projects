@@ -3,8 +3,7 @@
   "category": "lending",
   "website": "https://venus.io",
   "logo": "logo.png",
-  "background": "#ffb625",
+  "background": "#121620",
   "foreground": "#ffffff",
-  "dev": true,
   "network": "bsc"
 }

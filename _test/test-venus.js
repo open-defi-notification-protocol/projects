@@ -1,32 +1,41 @@
 const Web3 = require('web3');
-const web3 = new Web3(new Web3.providers.HttpProvider(require('./api-keys.json').bsc));
+const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3bsc));
 
-async function testVenusLowHealth() {
-  const LowHealth = require('../venus/low-liquidity');
-  const lowHealth = new LowHealth();
+async function testVenusLowHealth(address) {
 
-  // simulate init event
-  await lowHealth.onInit({
-    web3
-  });
+    const LowHealth = require('../venus/low-liquidity');
+    const lowHealth = new LowHealth();
 
-  // simulate on blocks event
-  let toBlock = await web3.eth.getBlockNumber();
-  return lowHealth.onBlocks({
-    web3,
-    toBlock: toBlock,
-    fromBlock: toBlock - 20,
-    subscription: {
-      minLiquidity: '600'
-    },
-    address: '0x66ccdb83c2b1ed8378956cabe668b60c9c05d9f9' // a random guy with balance
-  });
+    // simulate init event
+    await lowHealth.onInit({
+        web3
+    });
+
+    // simulate on blocks event
+    const form = await lowHealth.onSubscribeForm({address});
+
+    console.log(form);
+
+    return lowHealth.onBlocks({
+        web3,
+        subscription: {
+            minLiquidity: '10'
+        },
+        address // a random guy with balance
+    });
 }
 
 
 async function main() {
-  console.log('Running manual test:');
-  console.log(await testVenusLowHealth());
+
+    console.log('Running manual test:');
+
+    const address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005'
+
+    console.log(await testVenusLowHealth(
+        address
+    ));
+
 }
 
 main();
