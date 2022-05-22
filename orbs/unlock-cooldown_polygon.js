@@ -30,7 +30,7 @@ class UnlockCooldown {
 
         return [{
             id: 'allow-subscribe',
-            label:'This input makes sure the Subscribe button will be shown',
+            label: 'This input makes sure the Subscribe button will be shown',
             type: 'hidden',
             value: true
         }];
@@ -54,11 +54,9 @@ class UnlockCooldown {
 
         if (cooldownAmountBN.isGreaterThan("0") && cooldownEndTimeBN.isLessThan(todaySeconds.toFixed())) {
 
-            const uniqueId = "orbs-unlock-cooldown-polygon";
-
             return {
-                uniqueId: uniqueId,
-               notification: `Your ${amountFormatter.format(cooldownAmountBN)} unstaked tokens are available for withdrawal`
+                uniqueId: "orbs-cooldown-polygon",
+                notification: `Your ${amountFormatter.format(cooldownAmountBN)} unstaked tokens are available for withdrawal`
             };
 
         } else {

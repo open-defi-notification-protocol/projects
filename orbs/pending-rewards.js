@@ -31,10 +31,8 @@ class PendingReward {
 
         if (pendingRewardBN.isGreaterThanOrEqualTo(minimum)) {
 
-            const uniqueId = "orbs-rewards-" + minimum;
-
             return {
-                uniqueId: uniqueId,
+                uniqueId: "orbs-rewards-" + minimum,
                 notification: `You have ${amountFormatter.format(pendingRewardBN)} ORBS ready to claim`
             };
 
