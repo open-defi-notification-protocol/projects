@@ -57,7 +57,7 @@ class NewOffersByFloor {
             limit: 50,
             side: 0, // Buy
             owner: args.address,
-            listed_after: Math.floor(Date.now() / 1000) - (LISTED_AFTER__IN_MINUTES * 60)
+            listed_after: Math.floor(Date.now()) - (LISTED_AFTER__IN_MINUTES * 60 * 1000)
         };
 
         const notifications = [];
