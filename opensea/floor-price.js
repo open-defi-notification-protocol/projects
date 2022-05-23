@@ -23,7 +23,9 @@ class FloorPrice {
             {
                 type: "input-select",
                 id: "collection",
-                label: "Collection",
+                optional: true,
+                label: "Owned Collection",
+                description: "Use this for collections that you own, if you want to use other collections, use the \"Collection URL\" field instead",
                 values: await Common.getWalletCollections(args)
             },
             {
@@ -45,7 +47,7 @@ class FloorPrice {
             {
                 type: "input-text",
                 id: "collectionUrl",
-                label: "Collection URL",
+                label: "Collection URL / ID",
                 optional: true,
                 default: "",
                 description: "If this collection is missing from the list you can paste the OpenSea collection URL here instead"
