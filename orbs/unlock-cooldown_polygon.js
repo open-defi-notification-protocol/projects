@@ -7,7 +7,7 @@ const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 class UnlockCooldown {
 
     static displayName = "Unlock Cooldown";
-    static description = "Get notified when the unlock cooldown timer reaches zero";
+    static description = "Get notified when the unlock cooldown period is over";
     static displayIcon = "hand";
     static network = "polygon";
 
@@ -29,10 +29,11 @@ class UnlockCooldown {
     async onSubscribeForm(args) {
 
         return [{
-            id: 'allow-subscribe',
-            label: 'This input makes sure the Subscribe button will be shown',
-            type: 'hidden',
-            value: true
+            type: "input-number",
+            id: "daysBefore",
+            label: "Days before",
+            default: 0,
+            description: "Notify me X days before the unlock cooldown period is over"
         }];
     }
 
@@ -44,6 +45,8 @@ class UnlockCooldown {
      */
     async onBlocks(args) {
 
+        const daysBefore = args.subscription["daysBefore"];
+
         const position = await this.stakingRewardsContract.methods.getUnstakeStatus(args.address).call();
 
         const cooldownEndTimeBN = new BN(position.cooldownEndTime);
@@ -52,11 +55,15 @@ class UnlockCooldown {
 
         const todaySeconds = new Date().getTime() / 1000;
 
-        if (cooldownAmountBN.isGreaterThan("0") && cooldownEndTimeBN.isLessThan(todaySeconds.toFixed())) {
+        if (cooldownAmountBN.isGreaterThan("0") && cooldownEndTimeBN.minus(daysBefore * 60 * 60 * 24).isLessThan(todaySeconds.toFixed())) {
+
+            const daysLeft = cooldownEndTimeBN.minus(todaySeconds).dividedBy(60 * 60 * 24).toNumber();
+
+            const message = daysLeft > 0 ? `Your ${amountFormatter.format(cooldownAmountBN)} unstaked tokens will be available for withdrawal in ${amountFormatter.format(daysLeft)} days` : `Your ${amountFormatter.format(cooldownAmountBN)} unstaked tokens are available for withdrawal`;
 
             return {
                 uniqueId: "orbs-cooldown-polygon",
-                notification: `Your ${amountFormatter.format(cooldownAmountBN)} unstaked tokens are available for withdrawal`
+                notification: message
             };
 
         } else {

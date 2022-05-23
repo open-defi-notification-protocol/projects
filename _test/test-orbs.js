@@ -2,7 +2,7 @@ const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3));
 const web3Polygon = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3Polygon));
 
-async function testUnlockedCooldown(web3, notificationModule, address) {
+async function testUnlockedCooldown(web3, notificationModule, address, daysBefore) {
 
     const UnlockCooldown = require('../orbs/' + notificationModule);
     const unlockCooldown = new UnlockCooldown();
@@ -15,7 +15,8 @@ async function testUnlockedCooldown(web3, notificationModule, address) {
     // simulate on blocks event
     return unlockCooldown.onBlocks({
         web3,
-        address
+        address,
+        subscription: {daysBefore: daysBefore}
     });
 }
 
@@ -43,11 +44,11 @@ async function main() {
 
     const address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
 
-    console.log(await testUnlockedCooldown(web3, 'unlock-cooldown', address));
-    console.log(await testPendingReward(web3, 'pending-rewards', address, 4));
+    console.log(await testUnlockedCooldown(web3, 'unlock-cooldown', address, 14));
+    // console.log(await testPendingReward(web3, 'pending-rewards', address, 4));
 
-    console.log(await testUnlockedCooldown(web3Polygon, 'unlock-cooldown_polygon', address));
-    console.log(await testPendingReward(web3Polygon, 'pending-rewards_polygon', address, 0));
+    console.log(await testUnlockedCooldown(web3Polygon, 'unlock-cooldown_polygon', address, 10));
+    // console.log(await testPendingReward(web3Polygon, 'pending-rewards_polygon', address, 0));
 
 }
 
