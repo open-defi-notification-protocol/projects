@@ -44,7 +44,10 @@ class UnlockCooldown {
      */
     async onBlocks(args) {
 
-        const daysBefore = args.subscription["daysBefore"];
+        let daysBefore = args.subscription["daysBefore"];
+
+        // fallback for older version subscriptions
+        daysBefore = daysBefore || 0;
 
         const position = await this.stakingRewardsContract.methods.getUnstakeStatus(args.address).call();
 
