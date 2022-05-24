@@ -64,10 +64,10 @@ async function main() {
 
     const address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
 
-    // console.log(await testUnlockedCooldown(web3, 'unlock-cooldown', address, 14));
+    console.log(await testUnlockedCooldown(web3, 'unlock-cooldown', address, 14));
     // console.log(await testPendingReward(web3, 'pending-rewards', address, 4));
 
-    // console.log(await testUnlockedCooldown(web3Polygon, 'unlock-cooldown_polygon', address, 10));
+    console.log(await testUnlockedCooldown(web3Polygon, 'unlock-cooldown_polygon', address, 10));
     // console.log(await testPendingReward(web3Polygon, 'pending-rewards_polygon', address, 0));
 
     console.log(await testRewardsClaim(web3Polygon, 'polygon-rewards-claim', "0x216FF847E6e1cf55618FAf443874450f734885e0"))
