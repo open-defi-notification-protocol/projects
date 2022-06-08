@@ -5,7 +5,7 @@ const ABIs = require('./abis.json');
 const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 const autoCompounder = "0x216FF847E6e1cf55618FAf443874450f734885e0";
 
-class PendingReward {
+class AutoCompound {
 
     static displayName = "Polygon auto compound restake";
     static description = "Get notified when your staking rewards tokens have been auto compounded on Polygon";
@@ -67,6 +67,6 @@ class PendingReward {
     }
 }
 
-module.exports = PendingReward;
+module.exports = AutoCompound;
 
 
