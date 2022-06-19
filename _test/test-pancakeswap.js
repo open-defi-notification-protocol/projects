@@ -160,6 +160,47 @@ async function testPancakeswapPositionWorth(address, threshold, v2) {
 
 /**
  *
+ * @param address
+ * @param poolAddress
+ * @param above
+ * @param threshold
+ * @returns {Promise<*>}
+ */
+async function testPancakeswapTVLWorth(address, poolAddress, above, threshold) {
+
+    const TVLWorth = require('../pancakeswap/tvl');
+    const tvlWorth = new TVLWorth();
+
+    // simulate init event
+    await tvlWorth.onInit({
+        web3
+    });
+
+    // simulate subscribe form event
+    const form = await tvlWorth.onSubscribeForm({
+        web3,
+        address
+    });
+
+    console.log(form);
+
+    // simulate user filling in the subscription form in the app
+    const subscription = {
+        poolAddress: poolAddress,
+        'above-below': above ? '0' : '1',
+        threshold: threshold
+    };
+
+    // simulate on blocks event
+    return tvlWorth.onBlocks({
+        web3,
+        address,
+        subscription
+    });
+}
+
+/**
+ *
  * @returns {Promise<void>}
  */
 async function main() {
@@ -187,7 +228,7 @@ async function main() {
         address,
         '0.0',
         true
-    ));*/
+    ));
 
     console.log(await testPancakeswapSyrupPendingRewards(
         address,
@@ -200,7 +241,6 @@ async function main() {
         true
     ));
 
-    /*
       console.log(await testPancakeswapPositionWorth(
           address,
           '10000'
@@ -213,6 +253,14 @@ async function main() {
       ));
 
        */
+
+    console.log(await testPancakeswapTVLWorth(
+        address,
+        '0x58F876857a02D6762E0101bb5C46A8c1ED44Dc16',
+        true,
+        '10000'
+    ));
+
 }
 
 main();
