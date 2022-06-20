@@ -3,6 +3,7 @@ const BN = require("bignumber.js");
 const ABIs = require('./abis.json');
 
 const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
+const StakingRewardsClaimedTopic = "0x5f51e0cd4567b63928e199868f571929625ded3459b724759a0eb8edbf94158b"
 const autoCompounder = "0x216FF847E6e1cf55618FAf443874450f734885e0";
 
 class AutoCompound {
@@ -24,6 +25,7 @@ class AutoCompound {
     async onBlocks(args) {
 
         const events = await this.stakingRewardsContract.getPastEvents('StakingRewardsClaimed', {
+            topics: [StakingRewardsClaimedTopic, '0x000000000000000000000000' + args.address.substring(2).toLowerCase()],
             fromBlock: args.fromBlock,
             toBlock: args.toBlock
         });
