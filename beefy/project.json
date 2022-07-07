@@ -1,0 +1,9 @@
+{
+  "name": "SpiritSwap",
+  "category": "amm",
+  "website": "https://www.spiritswap.finance/",
+  "logo": "logo.png",
+  "background": "#0d0e21",
+  "foreground": "#42d784",
+  "network": "fantom"
+}
