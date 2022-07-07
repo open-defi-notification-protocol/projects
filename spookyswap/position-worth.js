@@ -90,6 +90,7 @@ class PositionWorth {
 
         const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
             web3,
+            args.web3Cache,
             args.address,
             selectedPoolId,
             lpContract,
@@ -106,6 +107,7 @@ class PositionWorth {
 
             const poolLabel = await this._getPoolLabel(
                 web3,
+                args.web3Cache,
                 token0Contract,
                 token1Contract,
                 positionWorthInUsdBN
@@ -179,6 +181,7 @@ class PositionWorth {
 
                 const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
                     web3,
+                    null,
                     walletAddress,
                     poolId,
                     lpContract,
@@ -195,6 +198,7 @@ class PositionWorth {
                         value: poolId,
                         label: await this._getPoolLabel(
                             web3,
+                            null,
                             token0Contract,
                             token1Contract,
                             positionWorthInUsdBN
@@ -214,16 +218,36 @@ class PositionWorth {
     /**
      *
      * @param web3
+     * @param web3Cache
      * @param token0Contract
      * @param token1Contract
      * @param positionWorthInUSDBN
      * @returns {Promise<string>}
      * @private
      */
-    async _getPoolLabel(web3, token0Contract, token1Contract, positionWorthInUSDBN) {
+    async _getPoolLabel(web3, web3Cache, token0Contract, token1Contract, positionWorthInUSDBN) {
 
-        const token0Symbol = await token0Contract.methods.symbol().call();
-        const token1Symbol = await token1Contract.methods.symbol().call();
+        let token0Symbol
+        let token1Symbol
+
+        if (web3Cache) {
+
+            token0Symbol = await web3Cache.get(
+                token0Contract,
+                'symbol'
+            );
+
+            token1Symbol = await web3Cache.get(
+                token1Contract,
+                'symbol'
+            );
+
+        } else {
+
+            token0Symbol = await token0Contract.methods.symbol().call();
+            token1Symbol = await token1Contract.methods.symbol().call();
+
+        }
 
         return `${token0Symbol}-${token1Symbol} (${amountFormatter.format(positionWorthInUSDBN)} USD)`;
 
@@ -232,6 +256,7 @@ class PositionWorth {
     /**
      *
      * @param web3
+     * @param web3Cache
      * @param walletAddress
      * @param poolId
      * @param lpContract
@@ -243,7 +268,7 @@ class PositionWorth {
      * @returns {Promise<BigNumber>}
      * @private
      */
-    async _getPositionWorthInUsdBN(web3, walletAddress, poolId, lpContract, token0Address, token0Contract, token1Address, token1Contract, userStakedBalanceBN = null) {
+    async _getPositionWorthInUsdBN(web3, web3Cache, walletAddress, poolId, lpContract, token0Address, token0Contract, token1Address, token1Contract, userStakedBalanceBN = null) {
 
         if (userStakedBalanceBN === null) {
 
@@ -268,7 +293,18 @@ class PositionWorth {
                 tokenAddress
             );
 
-            const tokenDecimals = await tokenContract.methods.decimals().call();
+            let tokenDecimals
+
+            if (web3Cache) {
+
+                tokenDecimals = await web3Cache.get(
+                    tokenContract,
+                    'decimals'
+                );
+
+            } else {
+                tokenDecimals = await tokenContract.methods.decimals().call();
+            }
 
             const singleTokenWorthInUSD = await this.routerContract.methods.getAmountsOut(
                 (new BN("10").pow(tokenDecimals)), // single whole unit
@@ -323,7 +359,7 @@ class PositionWorth {
     /**
      *
      * @param poolContract
-     * @param tokenInfo
+     * @param tokenAddress
      * @returns {Promise<*>}
      * @private
      */
