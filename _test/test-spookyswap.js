@@ -1,5 +1,6 @@
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3fantom));
+const CacheService = require('./cache-service');
 
 /**
  *
@@ -17,9 +18,12 @@ async function testPendingRewards(address, minimum) {
         web3
     });
 
+    const web3Cache = CacheService.initWeb3Cache();
+
     // simulate subscribe form event
     const form = await pendingRewards.onSubscribeForm({
         web3,
+        web3Cache,
         address
     });
 
@@ -34,6 +38,7 @@ async function testPendingRewards(address, minimum) {
     // simulate on blocks event
     return pendingRewards.onBlocks({
         web3,
+        web3Cache,
         address,
         subscription
     });
@@ -49,9 +54,12 @@ async function testPositionWorth(address, threshold) {
         web3
     });
 
+    const web3Cache = CacheService.initWeb3Cache();
+
     // simulate subscribe form event
     const form = await positionWorth.onSubscribeForm({
         web3,
+        web3Cache,
         address
     });
 
@@ -66,6 +74,7 @@ async function testPositionWorth(address, threshold) {
     // simulate on blocks event
     return positionWorth.onBlocks({
         web3,
+        web3Cache,
         address,
         subscription
     });
@@ -85,9 +94,9 @@ async function main() {
         address,
         '0.0000000001'
     ));
-    
+
     console.log(await testPositionWorth(
-        address ,
+        address,
         '10000'
     ));
 

@@ -119,7 +119,11 @@ class PositionHealth {
     async _getHealthFactor(args, vaultAddress, positionId) {
 
         const vaultContract = new args.web3.eth.Contract(ABIs.vault, vaultAddress);
-        const configAddress = await vaultContract.methods.config().call();
+
+        const configAddress = await args.web3Cache.get(
+            vaultContract,
+            'config'
+        );
 
         const configContract = new args.web3.eth.Contract(ABIs.config, configAddress);
 
@@ -157,7 +161,10 @@ class PositionHealth {
 
         const vaultContract = new args.web3.eth.Contract(ABIs.vault, vaultAddress);
 
-        let vaultLabel = await vaultContract.methods.name().call();
+        let vaultLabel = await args.web3Cache.get(
+            vaultContract,
+            'name'
+        );
 
         vaultLabel = vaultLabel.replace('Interest Bearing', 'LYF')
 
