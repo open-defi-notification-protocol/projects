@@ -83,14 +83,13 @@ class PositionWorth {
 
         const lpContract = new web3.eth.Contract(ABIs.lp, poolInfo.lpToken);
 
-        const token0Address = await args.web3Cache.get(lpContract, 'token0');
-        const token1Address = await args.web3Cache.get(lpContract, 'token1');
+        const token0Address = await lpContract.methods.token0().call();
         const token0Contract = new web3.eth.Contract(ABIs.lp, token0Address);
+        const token1Address = await lpContract.methods.token1().call();
         const token1Contract = new web3.eth.Contract(ABIs.lp, token1Address);
 
         const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
             web3,
-            args.web3Cache,
             args.address,
             selectedPoolId,
             lpContract,
@@ -107,7 +106,6 @@ class PositionWorth {
 
             const poolLabel = await this._getPoolLabel(
                 web3,
-                args.web3Cache,
                 token0Contract,
                 token1Contract,
                 positionWorthInUsdBN
@@ -175,13 +173,12 @@ class PositionWorth {
                 const lpContract = new web3.eth.Contract(ABIs.lp, poolInfo.lpToken);
 
                 const token0Address = await lpContract.methods.token0().call();
-                const token1Address = await lpContract.methods.token1().call();
                 const token0Contract = new web3.eth.Contract(ABIs.lp, token0Address);
+                const token1Address = await lpContract.methods.token1().call();
                 const token1Contract = new web3.eth.Contract(ABIs.lp, token1Address);
 
                 const positionWorthInUsdBN = await this._getPositionWorthInUsdBN(
                     web3,
-                    args.web3Cache,
                     walletAddress,
                     poolId,
                     lpContract,
@@ -198,7 +195,6 @@ class PositionWorth {
                         value: poolId,
                         label: await this._getPoolLabel(
                             web3,
-                            args.web3Cache,
                             token0Contract,
                             token1Contract,
                             positionWorthInUsdBN
@@ -218,24 +214,16 @@ class PositionWorth {
     /**
      *
      * @param web3
-     * @param web3Cache
      * @param token0Contract
      * @param token1Contract
      * @param positionWorthInUSDBN
      * @returns {Promise<string>}
      * @private
      */
-    async _getPoolLabel(web3, web3Cache, token0Contract, token1Contract, positionWorthInUSDBN) {
+    async _getPoolLabel(web3, token0Contract, token1Contract, positionWorthInUSDBN) {
 
-        const token0Symbol = await web3Cache.get(
-            token0Contract,
-            'symbol'
-        );
-
-        const token1Symbol = await web3Cache.get(
-            token1Contract,
-            'symbol'
-        );
+        const token0Symbol = await token0Contract.methods.symbol().call();
+        const token1Symbol = await token1Contract.methods.symbol().call();
 
         return `${token0Symbol}-${token1Symbol} (${amountFormatter.format(positionWorthInUSDBN)} USD)`;
 
@@ -244,7 +232,6 @@ class PositionWorth {
     /**
      *
      * @param web3
-     * @param web3Cache
      * @param walletAddress
      * @param poolId
      * @param lpContract
@@ -256,7 +243,7 @@ class PositionWorth {
      * @returns {Promise<BigNumber>}
      * @private
      */
-    async _getPositionWorthInUsdBN(web3, web3Cache, walletAddress, poolId, lpContract, token0Address, token0Contract, token1Address, token1Contract, userStakedBalanceBN = null) {
+    async _getPositionWorthInUsdBN(web3, walletAddress, poolId, lpContract, token0Address, token0Contract, token1Address, token1Contract, userStakedBalanceBN = null) {
 
         if (userStakedBalanceBN === null) {
 
@@ -277,24 +264,20 @@ class PositionWorth {
             }
 
             const tokenReserve = await this._getTokenReserve(
-                web3Cache,
                 lpContract,
                 tokenAddress
             );
 
-            const tokenDecimals = await web3Cache.get(
-                tokenContract,
-                'decimals'
-            );
+            const tokenDecimals = await tokenContract.methods.decimals().call();
 
-            let singleTokenWorthInUSD = await this.routerContract.methods.getAmountsOut(
+            const singleTokenWorthInUSD = await this.routerContract.methods.getAmountsOut(
                 (new BN("10").pow(tokenDecimals)), // single whole unit
                 [tokenAddress, WFTM_TOKEN_ADDRESS, USDC_TOKEN_ADDRESS]
             ).call();
 
             if (singleTokenWorthInUSD === "0") {
 
-                const amountsOut = await this.routerContract.methods.getAmountsOut(
+                amountsOut = await this.routerContract.methods.getAmountsOut(
                     (new BN("10").pow(tokenDecimals)), // single whole unit
                     [tokenAddress, USDC_TOKEN_ADDRESS]
                 ).call()
@@ -307,7 +290,6 @@ class PositionWorth {
                 .multipliedBy(new BN(tokenReserve).div(new BN("10").pow(tokenDecimals)))).multipliedBy(2);
 
             const sharesBN = await this._getUserSharesBN(
-                web3Cache,
                 userStakedBalanceBN,
                 lpContract,
             );
@@ -325,17 +307,14 @@ class PositionWorth {
 
     /**
      *
-     * @param web3Cache
      * @param totalWalletLpBalanceBN
      * @param poolContract
      * @returns {Promise<BigNumber>}
      * @private
      */
-    async _getUserSharesBN(web3Cache, totalWalletLpBalanceBN, poolContract) {
+    async _getUserSharesBN(totalWalletLpBalanceBN, poolContract) {
 
-        const totalSupply = await web3Cache.get(poolContract, 'totalSupply');
-
-        const poolLpTotalSupplyBN = new BN(totalSupply);
+        const poolLpTotalSupplyBN = new BN(await poolContract.methods.totalSupply().call());
 
         return totalWalletLpBalanceBN.dividedBy(poolLpTotalSupplyBN);
 
@@ -343,16 +322,15 @@ class PositionWorth {
 
     /**
      *
-     * @param web3Cache
      * @param poolContract
-     * @param tokenAddress
+     * @param tokenInfo
      * @returns {Promise<*>}
      * @private
      */
-    async _getTokenReserve(web3Cache, poolContract, tokenAddress) {
+    async _getTokenReserve(poolContract, tokenAddress) {
 
-        const reserves = await web3Cache.get(poolContract, 'getReserves');
-        const token0Address = await web3Cache.get(poolContract, 'token0');
+        const reserves = await poolContract.methods.getReserves().call();
+        const token0Address = await poolContract.methods.token0().call();
 
         return token0Address.toLowerCase() === tokenAddress.toLowerCase() ? reserves._reserve0 : reserves._reserve1;
 
