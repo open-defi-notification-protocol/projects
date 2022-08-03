@@ -44,7 +44,7 @@ async function main() {
     console.log('Running manual test:');
     console.log(await testAavePisitionHealth(
         address,
-        2
+        "10"
     ));
 
 }
