@@ -33,15 +33,24 @@ class PositionHealth {
 
         const healthFactorBN = await this._getPositionHealth(args);
 
-        return [
-            {
-                type: "input-number",
-                id: "threshold",
-                label: `Health Factor Threshold (current is ${amountFormatter.format(healthFactorBN.toString())})`,
-                default: "1.1",
-                description: "Notify me when the Health Factor of my position goes below this threshold."
-            }
-        ];
+
+        if (healthFactorBN !== 'no-position') {
+
+            return [
+                {
+                    type: "input-number",
+                    id: "threshold",
+                    label: `Health Factor Threshold (current is ${amountFormatter.format(healthFactorBN.toString())})`,
+                    default: "1.1",
+                    description: "Notify me when the Health Factor of my position goes below this threshold."
+                }
+            ];
+
+        } else {
+
+            return [];
+
+        }
     }
 
 
@@ -60,7 +69,7 @@ class PositionHealth {
 
         const healthFactorBN = await this._getPositionHealth(args);
 
-        if (healthFactorBN.isLessThan(threshold)) return {
+        if (healthFactorBN !== 'no-position' && healthFactorBN.isLessThan(threshold)) return {
             uniqueId: uniqueId,
             notification: `Current Health Factor (${amountFormatter.format(healthFactorBN.toString())}) is below the threshold of ${threshold}!`
         };
@@ -72,7 +81,7 @@ class PositionHealth {
 
         const position = await this.contract.methods.getUserAccountData(args.address).call();
 
-        return new BN(position.healthFactor).dividedBy("1e18");
+        return new BN(position.totalDebtETH).isGreaterThan(0) ? new BN(position.healthFactor).dividedBy("1e18") : 'no-position';
 
     }
 

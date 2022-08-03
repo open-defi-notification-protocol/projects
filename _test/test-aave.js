@@ -39,7 +39,7 @@ async function testAavePisitionHealth(address, threshold) {
 
 async function main() {
 
-    const address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
+    const address = '0x98C3fC24A4A1DCB6010685115d6B5F8EF3F0Cc19';
 
     console.log('Running manual test:');
     console.log(await testAavePisitionHealth(
