@@ -1,42 +1,50 @@
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3));
 
-async function testAaveLowHealth() {
-  const LowHealth = require('../aave/low-health');
-  const lowHealth = new LowHealth();
+/**
+ *
+ * @param address
+ * @param threshold
+ * @returns {Promise<{notification: string}|[]>}
+ */
+async function testAavePisitionHealth(address, threshold) {
+    const PositionHealth = require('../aave/position-health');
+    const positionHealth = new PositionHealth();
 
-  // simulate init event
-  await lowHealth.onInit({
-    web3
-  });
+    // simulate init event
+    await positionHealth.onInit({
+        web3
+    });
 
-  // simulate on blocks event
-  return lowHealth.onBlocks({
-    web3,
-    address: '0xC81bD599a66dA6dcc3A64399f8025C19fFC42888'
-  });
-}
+    // simulate subscribe form event
+    const form = await positionHealth.onSubscribeForm({
+        web3,
+        address
+    });
 
-async function testAaveSevereLowHealth() {
-  const SevereHealth = require('../aave/severe-health');
-  const severeHealth = new SevereHealth();
+    // simulate user filling in the subscription form in the app
+    const subscription = {
+        threshold: threshold || form.find(o => o.id === 'threshold').default
+    };
 
-  // simulate init event
-  await severeHealth.onInit({
-    web3
-  });
-  
-  // simulate on blocks event
-  return severeHealth.onBlocks({
-    web3, 
-    address: '0xC81bD599a66dA6dcc3A64399f8025C19fFC42888'
-  });
+    return positionHealth.onBlocks({
+        web3,
+        address,
+        subscription
+    });
+
 }
 
 async function main() {
-  console.log('Running manual test:');
-  console.log(await testAaveLowHealth());
-  console.log(await testAaveSevereLowHealth());
+
+    const address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
+
+    console.log('Running manual test:');
+    console.log(await testAavePisitionHealth(
+        address,
+        2
+    ));
+
 }
 
 main();
