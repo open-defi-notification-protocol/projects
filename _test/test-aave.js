@@ -22,6 +22,8 @@ async function testAavePisitionHealth(address, threshold) {
         address
     });
 
+    console.log(form);
+
     // simulate user filling in the subscription form in the app
     const subscription = {
         threshold: threshold || form.find(o => o.id === 'threshold').default

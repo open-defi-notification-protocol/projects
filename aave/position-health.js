@@ -3,6 +3,7 @@ const ABIs = require('./abis.json');
 
 const amountFormatter = Intl.NumberFormat('en');
 
+
 class PositionHealth {
 
     static displayName = "Position Health";
@@ -30,14 +31,16 @@ class PositionHealth {
      */
     async onSubscribeForm(args) {
 
+        const healthFactorBN = await this._getPositionHealth(args);
+
         return [
             {
                 type: "input-number",
                 id: "threshold",
-                label: "Safety Buffer Threshold",
+                label: `Health Factor Threshold (current is ${amountFormatter.format(healthFactorBN)})`,
                 suffix: '%',
                 default: 1.1,
-                description: "Notify me when the Safety Buffer of my position goes below this threshold."
+                description: "Notify me when the Health Factor of my position goes below this threshold."
             }
         ];
     }
@@ -51,13 +54,12 @@ class PositionHealth {
      */
     async onBlocks(args) {
 
-        const position = await this.contract.methods.getUserAccountData(args.address).call();
 
         const threshold = args.subscription["threshold"];
 
         const uniqueId = "aave-health-" + threshold;
 
-        const healthFactorBN = new BN(position.healthFactor).dividedBy("1e18");
+        const healthFactorBN = await this._getPositionHealth(args);
 
         if (healthFactorBN.isLessThan(threshold)) return {
             uniqueId: uniqueId,
@@ -65,6 +67,14 @@ class PositionHealth {
         };
 
         return [];
+    }
+
+    async _getPositionHealth(args) {
+
+        const position = await this.contract.methods.getUserAccountData(args.address).call();
+
+        return new BN(position.healthFactor).dividedBy("1e18");
+
     }
 
 }
