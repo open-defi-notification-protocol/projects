@@ -37,9 +37,8 @@ class PositionHealth {
             {
                 type: "input-number",
                 id: "threshold",
-                label: `Health Factor Threshold (current is ${amountFormatter.format(healthFactorBN)})`,
-                suffix: '%',
-                default: 1.1,
+                label: `Health Factor Threshold (current is ${amountFormatter.format(healthFactorBN.toString())})`,
+                default: "1.1",
                 description: "Notify me when the Health Factor of my position goes below this threshold."
             }
         ];
@@ -63,7 +62,7 @@ class PositionHealth {
 
         if (healthFactorBN.isLessThan(threshold)) return {
             uniqueId: uniqueId,
-            notification: `Current Health Factor (${amountFormatter.format(healthFactorBN)}) is below the threshold of ${threshold}!`
+            notification: `Current Health Factor (${amountFormatter.format(healthFactorBN.toString())}) is below the threshold of ${threshold}!`
         };
 
         return [];
