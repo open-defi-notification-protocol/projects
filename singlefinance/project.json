@@ -5,5 +5,6 @@
   "logo": "logo.png",
   "background": "#6a73fb",
   "foreground": "#ffffff",
-  "network": "cronos"
+  "network": "cronos",
+  "dev": true
 }
