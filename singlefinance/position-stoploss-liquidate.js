@@ -80,7 +80,7 @@ class PositionStoplossLiquidate {
                 if(eventPositionId==positionId)
                 {
                     notifications.push({
-                        notification: `Position #${positionId} is ${eventName} and staked for lending!`
+                        notification: `Position #${positionId} is ${eventName} !!`
                     });
                 }
             }
