@@ -1,0 +1,9 @@
+{
+  "name": "Single Finance",
+  "category": "farm",
+  "website": "https://app.singlefinance.io/",
+  "logo": "logo.png",
+  "background": "#6a73fb",
+  "foreground": "#ffffff",
+  "network": "cronos"
+}
