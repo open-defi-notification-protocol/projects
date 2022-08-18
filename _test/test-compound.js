@@ -11,13 +11,14 @@ async function testVenusLowHealth(address) {
     });
 
     // simulate on blocks event
-    let toBlock = await web3.eth.getBlockNumber();
+    const form = await lowHealth.onSubscribeForm({address});
+
+    console.log(form);
+
     return lowHealth.onBlocks({
         web3,
-        toBlock: toBlock,
-        fromBlock: toBlock - 20,
         subscription: {
-            threshold: "0.5"
+            minLiquidity: '10'
         },
         address: address
     });
