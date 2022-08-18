@@ -1,9 +1,9 @@
-const BigNumber = require("bignumber.js");
-const ABIs = require('./abis.json');
+const BN = require("bignumber.js");
+const ABIs = require("./abis.json");
 
-
-const LENS_ADDRESS = '0xA6c8D1c55951e8AC44a0EaA959Be5Fd21cc07531'
 const COMPTROLLER_ADDRESS = '0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b'
+
+const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
 class LowLiquidity {
 
@@ -19,42 +19,37 @@ class LowLiquidity {
      */
     async onInit(args) {
 
-        this.lensContract = new args.web3.eth.Contract(
-            ABIs.compoundLens,
-            LENS_ADDRESS
-        )
-
+        this.comptrollerContract = new args.web3.eth.Contract(
+            ABIs.comptroller,
+            COMPTROLLER_ADDRESS
+        );
     }
 
     /**
+     * runs right before user subscribes to new notifications and populates subscription form
      *
      * @param args
      * @returns {Promise<[{default: string, description: string, id: string, label: string, type: string}]>}
      */
     async onSubscribeForm(args) {
-        const {
-            markets,
-            liquidity,
-            shortfall
-        } = await this.lensContract.methods.getAccountLimits(COMPTROLLER_ADDRESS, args.address).call();
 
-        const roughExcess = new BigNumber(liquidity)
-            .dividedBy(1e18) // full units
-            .dp(2, BigNumber.ROUND_HALF_DOWN)
+        const result = await this.comptrollerContract.methods.getAccountLiquidity(args.address).call();
 
-        const defaultMin = roughExcess
-            .dividedBy(10) // suggest 10% of the current liquidity
-            .dp(2, BigNumber.ROUND_UP)
-            .toString()
-        const comment = markets.length > 0 && parseInt(shortfall) ?
+        let liquidity = new BN(result[1]);
+        const shortfall = parseInt(result[2]);
+
+        liquidity = liquidity.dividedBy('1e18');
+
+        const comment = shortfall ?
             `CAUTION: you are currently in risk of liquidation` :
-            `Your current excess liquidity is ~${roughExcess} USD`
+            `Your current excess liquidity is ~${amountFormatter.format(liquidity)} USD`;
+
         return [
             {
                 type: "input-number",
                 id: "minLiquidity",
                 label: "Minimum Liquidity",
-                default: defaultMin,
+                default: 0,
                 description: "The minimum desired liquidity denominated in USD. " + comment
             }
         ];
@@ -68,32 +63,35 @@ class LowLiquidity {
      */
     async onBlocks(args) {
 
-        const threshold = new BigNumber(args.subscription['threshold']).multipliedBy(1e18)
+        const minLiquidity = args.subscription['minLiquidity'];
 
-        const {
-            markets,
-            liquidity,
-            shortfall
-        } = await this.lensContract.methods.getAccountLimits(COMPTROLLER_ADDRESS, args.address).call();
+        const thresholdUSD = new BN(minLiquidity).multipliedBy('1e18')
 
-        console.log(`markets: ${markets}, liquidity: ${liquidity}, shortfall: ${shortfall}`)
+        const result = await this.comptrollerContract.methods.getAccountLiquidity(args.address).call();
 
-        if (markets.length > 0 && threshold.isGreaterThanOrEqualTo(new BigNumber(liquidity))) {
+        let liquidity = new BN(result[1]);
 
-            if (shortfall > 0) {
+        const shortfall = parseInt(result[2]);
+
+        if (thresholdUSD.isGreaterThanOrEqualTo(liquidity)) {
+
+            const uniqueId = "liquidity-" + thresholdUSD;
+
+            if (shortfall) {
 
                 return {
+                    uniqueId: uniqueId,
                     notification: `Act now! You are under-collateralized and about to be liquidated`
                 }
 
             } else {
 
                 return {
-                    notification: `Excess liquidity dropped below your safe minimum`
+                    uniqueId: uniqueId,
+                    notification: `Excess liquidity (~${amountFormatter.format(liquidity.dividedBy('1e18'))}) dropped below your safe minimum of ${minLiquidity} USD`
                 }
 
             }
-
         }
 
         return [];
