@@ -18,12 +18,11 @@ class PendingReward {
      */
     async onInit(args) {
 
-        // const response = await fetch("https://raw.githubusercontent.com/kogecoin/vault-contracts/main/vaultaddresses");
         const response = await fetch("https://api-ui.harvest.finance/pools?key=41e90ced-d559-4433-b390-af424fdc76d6");
 
         this.pools = await response.json();
 
-        this.farmDecimals = 18
+        this.farmDecimals = 18;
 
     }
 

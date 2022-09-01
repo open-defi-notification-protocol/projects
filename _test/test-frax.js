@@ -9,7 +9,7 @@ const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json')
  */
 async function testPendingRewards(address, minimum) {
 
-    const PendingRewards = require('../harvest-finance/pending-reward');
+    const PendingRewards = require('../frax/pending-reward');
     const pendingRewards = new PendingRewards();
 
     // simulate init event
@@ -27,7 +27,6 @@ async function testPendingRewards(address, minimum) {
 
     // simulate user filling in the subscription form in the app
     const subscription = {
-        pool: form.find(o => o.id === 'pool').values[1].value,
         minimum: minimum
     };
 
@@ -51,7 +50,7 @@ async function main() {
 
     console.log(await testPendingRewards(
         address,
-        '0.000000001'
+        '0.000001'
     ));
 
 }
