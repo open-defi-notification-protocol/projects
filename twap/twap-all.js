@@ -1,10 +1,6 @@
-const BN = require("bignumber.js");
-const POOLS_INFO = require('./pools-info.json');
 const ABIs = require('./abis.json');
-const EthereumMulticall = require('ethereum-multicall');
 
-const TWAP_ADDRESS = "0xE83df5BfA9F14a84e550c38c4ec505cB22C6A0d7";
-
+const TWAP_ADDRESS = "0x8358686cf6dE08c89EE48016b6A40BBf1b1F9d3D";
 
 class TwapAll {
 

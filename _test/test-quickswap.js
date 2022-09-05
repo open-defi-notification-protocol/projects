@@ -32,35 +32,6 @@ async function testQuickPendingRewards(address, minimum) {
     });
 }
 
-async function testTwap(address, type) {
-
-    const TwapNotification = require('../quickswap/twap-' + type);
-    const twapNotification = new TwapNotification();
-
-    // simulate init event
-    await twapNotification.onInit({
-        web3
-    });
-
-    // simulate subscribe form event
-    const form = await twapNotification.onSubscribeForm({
-        web3,
-        address
-    });
-
-    console.log(form);
-
-    // simulate on blocks event
-    return twapNotification.onBlocks({
-        web3,
-        address,
-        subscription: {},
-        fromBlock: 32492682,
-        toBlock: 32492699
-    });
-
-}
-
 async function testQuickPositionWorth(address, threshold, customPoolAddress) {
 
     const PositionWorth = require('../quickswap/position-worth');
@@ -100,13 +71,11 @@ async function main() {
 
     const address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
 
-    // console.log(await testQuickPendingRewards(address, "0.000001"));
+    console.log(await testQuickPendingRewards(address, "0.000001"));
 
-    // console.log(await testQuickPositionWorth(address, "25000", "0x57fd1e87cc7616f2b086b3912bce3cf9fee36256"));
+    console.log(await testQuickPositionWorth(address, "25000", "0x57fd1e87cc7616f2b086b3912bce3cf9fee36256"));
 
-    // console.log(await testTwap("0x5FaadBBc3bc42E463BDE53dbD45b8a29D3a1C66f", "order-completed"));
-
-    console.log(await testTwap("0x5FaadBBc3bc42E463BDE53dbD45b8a29D3a1C66f", "all"));
+    console.log(await testTwap("0x5FaadBBc3bc42E463BDE53dbD45b8a29D3a1C66f", "order-completed"));
 
 }
 
