@@ -1,0 +1,10 @@
+{
+  "name": "Arrakis",
+  "category": "vault",
+  "website": "https://www.arrakis.finance",
+  "logo": "logo.png",
+  "background": ["#fcfaf6", "#edddc0"],
+  "foreground": "#000000",
+  "network": "polygon",
+  "dev": true
+}
