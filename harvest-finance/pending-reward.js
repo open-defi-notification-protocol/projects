@@ -46,9 +46,9 @@ class PendingReward {
             {
                 type: "input-number",
                 id: "minimum",
-                label: "Minimum BOO",
+                label: "Minimum FARM",
                 default: 0,
-                description: "Minimum amount of claimable BOO to be notified about"
+                description: "Minimum amount of claimable FARM to be notified about"
             }
         ];
     }
