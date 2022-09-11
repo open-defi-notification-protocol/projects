@@ -1,0 +1,10 @@
+{
+  "name": "Balancer",
+  "category": "dex",
+  "website": "https://balancer.fi",
+  "logo": "logo.png",
+  "background": "#ffffff",
+  "foreground": "#000000",
+  "network": "ethereum",
+  "dev": true
+}
