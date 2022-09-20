@@ -3,8 +3,8 @@
   "category": "dex",
   "website": "https://frax.finance",
   "logo": "logo.png",
-  "background": "#28282c",
-  "foreground": "#ededef",
+  "background": "#ededef",
+  "foreground": "#28282c",
   "network": "ethereum",
   "dev": true
 }
