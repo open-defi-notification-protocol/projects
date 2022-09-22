@@ -1,6 +1,6 @@
 const Web3 = require('web3');
 const web3 = new Web3(
-  new Web3.providers.HttpProvider(require('./api-keys.json').avalanche)
+  new Web3.providers.HttpProvider(require('./dev-keys.json').web3avalanche)
 );
 
 /**
