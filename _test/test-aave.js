@@ -7,7 +7,7 @@ const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json')
  * @param threshold
  * @returns {Promise<{notification: string}|[]>}
  */
-async function testAavePisitionHealth(address, threshold) {
+async function testAavePositionHealth(address, threshold) {
     const PositionHealth = require('../aave/position-health');
     const positionHealth = new PositionHealth();
 
@@ -42,7 +42,7 @@ async function main() {
     const address = '0x98C3fC24A4A1DCB6010685115d6B5F8EF3F0Cc19';
 
     console.log('Running manual test:');
-    console.log(await testAavePisitionHealth(
+    console.log(await testAavePositionHealth(
         address,
         "10"
     ));

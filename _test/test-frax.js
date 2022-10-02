@@ -1,4 +1,5 @@
 const Web3 = require('web3');
+const PositionHealth = require("../aave/position-health");
 const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3));
 
 /**
@@ -40,6 +41,45 @@ async function testPendingRewards(address, minimum) {
 
 /**
  *
+ * @param address
+ * @param threshold
+ * @returns {Promise<{notification: string}|[]>}
+ */
+async function testPositionHealth(address, threshold) {
+
+    const PositionHealth = require('../frax/position-health');
+
+    const positionHealth = new PositionHealth();
+
+    // simulate init event
+    await positionHealth.onInit({
+        web3
+    });
+
+    // simulate subscribe form event
+    const form = await positionHealth.onSubscribeForm({
+        web3,
+        address
+    });
+
+    console.log(form);
+
+    // simulate user filling in the subscription form in the app
+    const subscription = {
+        pair: form.find(o => o.id === 'pair').values[0].value,
+        threshold: threshold || form.find(o => o.id === 'threshold').default
+    };
+
+    return positionHealth.onBlocks({
+        web3,
+        address,
+        subscription
+    });
+
+}
+
+/**
+ *
  * @returns {Promise<void>}
  */
 async function main() {
@@ -51,6 +91,11 @@ async function main() {
     console.log(await testPendingRewards(
         address,
         '0.000001'
+    ));
+    
+    console.log(await testPositionHealth(
+        address,
+        '70'
     ));
 
 }
