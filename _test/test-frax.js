@@ -92,7 +92,7 @@ async function main() {
         address,
         '0.000001'
     ));
-    
+
     console.log(await testPositionHealth(
         address,
         '70'

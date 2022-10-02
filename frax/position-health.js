@@ -11,7 +11,6 @@ class PositionHealth {
 
     static displayName = "Position Health";
     static description = "Get notified when the LTV (Loan-To-Value) of your position is above a certain threshold";
-    static network = "bsc";
 
     /**
      * runs when class is initialized
