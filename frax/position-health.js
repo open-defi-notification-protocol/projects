@@ -76,7 +76,7 @@ class PositionHealth {
 
             return {
                 uniqueId: pairAddress + "-" + threshold,
-                notification: `The LTV of your position in ${pairLabel} is above the threshold of ${args.subscription["threshold"]}%`
+                notification: `The LTV of your position in ${pairLabel} is above the threshold of ${args.subscription["threshold"]}`
             };
 
         } else {
