@@ -13,5 +13,11 @@
     "bignumber.js": "^9.0.1",
     "node-fetch": "^2.6.5",
     "web3": "^1.5.2"
+  },
+  "devDependencies": {
+    "prettier": "2.x"
+  },
+  "prettier": {
+    "printWidth": 180
   }
 }
