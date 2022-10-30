@@ -3,7 +3,7 @@ const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json')
 
 async function testTwap(address, type) {
 
-    const TwapNotification = require('../twap/twap-' + type);
+    const TwapNotification = require(`../twap/twap-${type}-ftm`);
     const twapNotification = new TwapNotification();
 
     // simulate init event
@@ -34,11 +34,11 @@ async function main() {
 
     console.log('Running manual test:');
 
-    const address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
+    const address = '';
 
-    console.log(await testTwap("0x5FaadBBc3bc42E463BDE53dbD45b8a29D3a1C66f", "all"));
+    console.log(await testTwap(address, "all"));
 
-    console.log(await testTwap("0x5FaadBBc3bc42E463BDE53dbD45b8a29D3a1C66f", "order-completed"));
+    console.log(await testTwap(address, "order-completed"));
 
 }
 
