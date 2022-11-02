@@ -1,6 +1,6 @@
-const TwapOrderCompleted = require("./twap-order-completed");
+const TwapOrderCompletedBase = require("./twap-order-completed-base");
 
-module.exports = class TwapOrderCompletedFtm extends TwapOrderCompleted {
+module.exports = class TwapOrderCompletedFtm extends TwapOrderCompletedBase {
   static displayName = "TWAP Order Completed";
   static description = "Get notified when your TWAP order is completely filled (Fantom)";
   static network = "fantom";
