@@ -1,9 +1,9 @@
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3Polygon));
 
-async function testTwap(address, type) {
+async function testTwap(address, type, network) {
 
-    const TwapNotification = require(`../twap/twap-${type}-ftm`);
+    const TwapNotification = require(`../twap/twap-${type}-${network}`);
     const twapNotification = new TwapNotification();
 
     // simulate init event
@@ -36,9 +36,11 @@ async function main() {
 
     const address = '';
 
-    console.log(await testTwap(address, "all"));
+    console.log(await testTwap(address, "all", "ftm"));
+    console.log(await testTwap(address, "all", "polygon"));
 
-    console.log(await testTwap(address, "order-completed"));
+    console.log(await testTwap(address, "order-completed", "ftm"));
+    console.log(await testTwap(address, "order-completed", "polygon"));
 
 }
 
