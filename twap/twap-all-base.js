@@ -1,6 +1,6 @@
 const ABIs = require("./abis.json");
 
-module.exports = class TwapAll {
+module.exports = class TwapAllBase {
   constructor(twapAddress) {
     this.twapAddress = twapAddress;
   }
