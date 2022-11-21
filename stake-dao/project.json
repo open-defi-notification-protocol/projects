@@ -1,0 +1,10 @@
+{
+  "name": "Gearbox",
+  "category": "dex",
+  "website": "https://app.gearbox.fi/",
+  "logo": "logo.png",
+  "background": "#000000",
+  "foreground": "#ffffff",
+  "network": "ethereum",
+  "dev": true
+}
