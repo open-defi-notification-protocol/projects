@@ -6,6 +6,6 @@ module.exports = class TwapAllFtm extends TwapAllBase {
   static network = "fantom";
 
   constructor() {
-    super("0x85253417E9BF576980318E7882147618C4980969");
+    super("0xBb9F828E34A1327607c3e4eA3dD35891398DD5EE");
   }
 }
