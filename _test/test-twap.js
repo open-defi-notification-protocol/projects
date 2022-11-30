@@ -1,49 +1,44 @@
 const Web3 = require('web3');
-const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3Polygon));
+const web3 = new Web3("");
+const address = '';
 
-async function testTwap(address, type, network) {
+async function testTwap(address, network, type) {
 
-    const TwapNotification = require(`../twap/twap-${type}-${network}`);
-    const twapNotification = new TwapNotification();
+	const TwapNotification = require(`../twap/twap-${network}-${type}`);
+	const twapNotification = new TwapNotification();
 
-    // simulate init event
-    await twapNotification.onInit({
-        web3
-    });
+	// simulate init event
+	await twapNotification.onInit({
+		web3
+	});
 
-    // simulate subscribe form event
-    const form = await twapNotification.onSubscribeForm({
-        web3,
-        address
-    });
+	// simulate subscribe form event
+	const form = await twapNotification.onSubscribeForm({
+		web3,
+		address
+	});
 
-    console.log(form);
+	console.log(form);
 
-    // simulate on blocks event
-    return twapNotification.onBlocks({
-        web3,
-        address,
-        subscription: {},
-        fromBlock: 32492682,
-        toBlock: 32492699
-    });
+	// simulate on blocks event
+	return twapNotification.onBlocks({
+		web3,
+		address,
+		subscription: {},
+		fromBlock: 51345045,
+		toBlock: 51623000
+	});
 
 }
 
 async function main() {
-
-    console.log('Running manual test:');
-
-    const address = '';
-
-    console.log(await testTwap(address, "all", "ftm"));
-    console.log(await testTwap(address, "all", "polygon"));
-
-    console.log(await testTwap(address, "order-completed", "ftm"));
-    console.log(await testTwap(address, "order-completed", "polygon"));
-
+	console.log('Running manual test:');
+	console.log(await testTwap(address, "fantom", "all"));
+	console.log(await testTwap(address, "polygon", "all"));
+	console.log(await testTwap(address, "fantom", "completed"));
+	console.log(await testTwap(address, "polygon", "completed"));
 }
 
-main();
+main().catch(console.error);
 
 

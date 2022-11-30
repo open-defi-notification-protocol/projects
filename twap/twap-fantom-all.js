@@ -1,11 +1,11 @@
-const TwapAllBase = require("./twap-all-base");
+const TwapBase = require("./twap-base");
 
-module.exports = class TwapAllFtm extends TwapAllBase {
+module.exports = class extends TwapBase {
   static displayName = "TWAP All Events";
   static description = "Get notified for all events regarding your TWAP orders (Fantom)";
   static network = "fantom";
 
   constructor() {
-    super("0xBb9F828E34A1327607c3e4eA3dD35891398DD5EE");
+    super("fantom");
   }
 }
