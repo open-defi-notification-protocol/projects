@@ -35,8 +35,10 @@ async function main() {
 	console.log('Running manual test:');
 	console.log(await testTwap(address, "fantom", "all"));
 	console.log(await testTwap(address, "polygon", "all"));
+	console.log(await testTwap(address, "avalanche", "all"));
 	console.log(await testTwap(address, "fantom", "completed"));
 	console.log(await testTwap(address, "polygon", "completed"));
+	console.log(await testTwap(address, "avalanche", "completed"));
 }
 
 main().catch(console.error);
