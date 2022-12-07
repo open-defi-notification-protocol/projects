@@ -1,0 +1,10 @@
+{
+  "name": "Common",
+  "category": "blockchain",
+  "website": "https://defi.org",
+  "logo": "logo.png",
+  "background": "#ffffff",
+  "foreground": "#333333",
+  "network": "ethereum",
+  "dev": true
+}
