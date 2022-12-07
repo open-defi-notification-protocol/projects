@@ -3,10 +3,6 @@ const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
 class WalletBalanceBase {
 
-    static displayName = "Wallet Balance";
-    static description = "Get notified when your wallet's balance in ETH is above or below a certain threshold";
-    static displayIcon = "hand";
-
     /**
      *
      * @param nativeCurrentySymbol
