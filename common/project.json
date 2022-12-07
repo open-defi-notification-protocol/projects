@@ -3,8 +3,8 @@
   "category": "blockchain",
   "website": "https://defi.org",
   "logo": "logo.png",
-  "background": "#ffffff",
-  "foreground": "#333333",
+  "background": "#ab17aa",
+  "foreground": "#ffffff",
   "network": "ethereum",
   "dev": true
 }
