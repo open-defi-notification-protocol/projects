@@ -13,7 +13,7 @@ class StakingUnlock {
 
         this.voteEscrowContract = new args.web3.eth.Contract(ABIs.voteEscrow, "0xC128a9954e6c874eA3d62ce62B468bA073093F25");
 
-        this.veBALDecimals = await this.voteEscrowContract.methods.decimals().call();
+        this.veCRVDecimals = await this.voteEscrowContract.methods.decimals().call();
 
     }
 
@@ -42,14 +42,16 @@ class StakingUnlock {
 
     async onBlocks(args) {
 
-        const dateUnlocked = await this.voteEscrowContract.methods.locked__end(args.address).call();
+        let lockedParameters = await this.voteEscrowContract.methods.locked(args.address).call();
+
+        const dateUnlocked = lockedParameters.end;
 
         if (new Date().getTime() > (parseInt(dateUnlocked) * 1000)) {
 
             const balanceBN = new BN(await this.voteEscrowContract.methods.balanceOf(args.address).call());
 
             return [{
-                notification: `Your staking position of ${amountFormatter.format(balanceBN.dividedBy("1e" + this.veBALDecimals))} veBAL is unlocked, go to app.balancer.fi to claim it`
+                notification: `Your staking position of ${amountFormatter.format(balanceBN.dividedBy("1e" + this.veCRVDecimals))} veCRV is unlocked, go to curve.fi to claim it`
             }];
 
 
