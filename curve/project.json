@@ -1,0 +1,10 @@
+{
+  "name": "Curve",
+  "category": "dex",
+  "website": "https://curve.fi",
+  "logo": "logo.png",
+  "background": "#a5a4ce",
+  "foreground": "#000000",
+  "network": "ethereum",
+  "dev": true
+}

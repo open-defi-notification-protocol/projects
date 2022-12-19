@@ -56,7 +56,7 @@ async function testStakingUnlocked(address) {
     });
 
     // simulate subscribe form event
-    const form = await stakingUnlocked.onSubscribeForm({
+    await stakingUnlocked.onSubscribeForm({
         web3,
         address
     });
