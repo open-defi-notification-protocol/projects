@@ -41,6 +41,36 @@ async function testPendingRewards(address, minimum) {
 
 /**
  *
+ * @param address
+ * @param minimum
+ * @returns {Promise<*>}
+ */
+async function testStakingUnlocked(address) {
+
+    const StakingUnlocked = require('../balancer/staking-unlocked');
+    const stakingUnlocked = new StakingUnlocked();
+
+    // simulate init event
+    await stakingUnlocked.onInit({
+        web3
+    });
+
+    // simulate subscribe form event
+    const form = await stakingUnlocked.onSubscribeForm({
+        web3,
+        address
+    });
+
+    // simulate on blocks event
+    return stakingUnlocked.onBlocks({
+        web3,
+        address,
+        subscription: {}
+    });
+}
+
+/**
+ *
  * @returns {Promise<void>}
  */
 async function main() {
@@ -52,6 +82,10 @@ async function main() {
     console.log(await testPendingRewards(
         address,
         '0.000001'
+    ));
+
+    console.log(await testStakingUnlocked(
+        address
     ));
 
 }
