@@ -3,7 +3,7 @@
   "category": "dex",
   "website": "https://curve.fi",
   "logo": "logo.png",
-  "background": "#35d1d3",
+  "background": "#3465a4",
   "foreground": "#000000",
   "network": "ethereum",
   "dev": true
