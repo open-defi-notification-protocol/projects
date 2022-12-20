@@ -1,0 +1,10 @@
+{
+  "name": "Convex",
+  "category": "dex",
+  "website": "https://www.convexfinance.com",
+  "logo": "logo.png",
+  "background": "#202020",
+  "foreground": "#ffffff",
+  "network": "ethereum",
+  "dev": true
+}
