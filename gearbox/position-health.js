@@ -4,8 +4,7 @@ const EthereumMulticall = require("ethereum-multicall");
 
 const amountFormatter = Intl.NumberFormat('en');
 
-const DEPLOYER_CONTRACT_ADDRESS = "0x5d6e79Bcf90140585CE88c7119b7E43CAaA67044";
-const FRAXLEND_PAIR_HELPER_ADDRESS = "0x26fa88b783cE712a2Fa10E91296Caf3daAE0AB37";
+const DATA_COMPRESSOR = "0x0a2CA503153Cd5CB2892a0928ac0F71F49a3c194";
 
 class PositionHealth {
 
@@ -20,11 +19,22 @@ class PositionHealth {
      */
     async onInit(args) {
 
-        this.deployerContract = new args.web3.eth.Contract(
-            ABIs.deployer,
-            DEPLOYER_CONTRACT_ADDRESS
+        this.dataCompressorContract = new args.web3.eth.Contract(
+            ABIs.dataCompressor,
+            DATA_COMPRESSOR
         );
 
+        this.creditManagers = [];
+
+        let creditManagers = await this.dataCompressorContract.methods.getCreditManagersList().call();
+
+        for (const creditManager of creditManagers) {
+
+            this.creditManagers.push(
+                creditManagers.addr
+            );
+
+        }
 
     }
 
@@ -36,14 +46,12 @@ class PositionHealth {
      */
     async onSubscribeForm(args) {
 
-        const pairs = await this._getAllUserPairs(args);
-
         return [
             {
                 type: "input-select",
-                id: "pair",
-                label: "Pair (Current Position LTV)",
-                values: pairs
+                id: "creditManager",
+                label: "Credit Manager",
+                values: this.creditManagers
             },
             {
                 type: "input-number",

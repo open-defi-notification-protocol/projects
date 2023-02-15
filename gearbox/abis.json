@@ -1,1301 +1,4 @@
 {
-  "yieldDistributor": [
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_owner",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_emittedToken",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_timelock_address",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_veFXS_address",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    },
-    {
-      "anonymous": false,
-      "inputs": [],
-      "name": "DefaultInitialization",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "user",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "yield",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "token_address",
-          "type": "address"
-        }
-      ],
-      "name": "OldYieldCollected",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "oldOwner",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "newOwner",
-          "type": "address"
-        }
-      ],
-      "name": "OwnerChanged",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "newOwner",
-          "type": "address"
-        }
-      ],
-      "name": "OwnerNominated",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "token",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "RecoveredERC20",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "reward",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "yieldRate",
-          "type": "uint256"
-        }
-      ],
-      "name": "RewardAdded",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "user",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "yield",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "token_address",
-          "type": "address"
-        }
-      ],
-      "name": "YieldCollected",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "newDuration",
-          "type": "uint256"
-        }
-      ],
-      "name": "YieldDurationUpdated",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "token",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "yieldRate",
-          "type": "uint256"
-        }
-      ],
-      "name": "YieldPeriodRenewed",
-      "type": "event"
-    },
-    {
-      "inputs": [],
-      "name": "acceptOwnership",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "checkpoint",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "user_addr",
-          "type": "address"
-        }
-      ],
-      "name": "checkpointOtherUser",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        }
-      ],
-      "name": "earned",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "account",
-          "type": "address"
-        }
-      ],
-      "name": "eligibleCurrentVeFXS",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "eligible_vefxs_bal",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "stored_ending_timestamp",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "emittedToken",
-      "outputs": [
-        {
-          "internalType": "contract ERC20",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "emitted_token_address",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "fractionParticipating",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getYield",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "yield0",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getYieldForDuration",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "greylist",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_address",
-          "type": "address"
-        }
-      ],
-      "name": "greylistAddress",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "lastTimeYieldApplicable",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "lastUpdateTime",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_owner",
-          "type": "address"
-        }
-      ],
-      "name": "nominateNewOwner",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "nominatedOwner",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "notifyRewardAmount",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "owner",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "periodFinish",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "tokenAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "tokenAmount",
-          "type": "uint256"
-        }
-      ],
-      "name": "recoverERC20",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "reward_notifiers",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bool",
-          "name": "_yieldCollectionPaused",
-          "type": "bool"
-        }
-      ],
-      "name": "setPauses",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_new_timelock",
-          "type": "address"
-        }
-      ],
-      "name": "setTimelock",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_yieldDuration",
-          "type": "uint256"
-        }
-      ],
-      "name": "setYieldDuration",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_new_rate0",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bool",
-          "name": "sync_too",
-          "type": "bool"
-        }
-      ],
-      "name": "setYieldRate",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "sync",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "timelock_address",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "notifier_addr",
-          "type": "address"
-        }
-      ],
-      "name": "toggleRewardNotifier",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "totalVeFXSParticipating",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "totalVeFXSSupplyStored",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "userIsInitialized",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "userVeFXSCheckpointed",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "userVeFXSEndpointCheckpointed",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "userYieldPerTokenPaid",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "yieldCollectionPaused",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "yieldDuration",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "yieldPerVeFXS",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "yieldPerVeFXSStored",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "yieldRate",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "yields",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    }
-  ],
-  "deployer": [
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_circuitBreaker",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_comptroller",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_timelock",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_fraxlendWhitelist",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "string",
-          "name": "_name",
-          "type": "string"
-        },
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "_address",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "_asset",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "_collateral",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "_oracleMultiply",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "_oracleDivide",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "_rateContract",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "_maxLTV",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "_liquidationFee",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "_maturityDate",
-          "type": "uint256"
-        }
-      ],
-      "name": "LogDeploy",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "previousOwner",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "newOwner",
-          "type": "address"
-        }
-      ],
-      "name": "OwnershipTransferred",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "_oldAddress",
-          "type": "address"
-        },
-        {
-          "indexed": false,
-          "internalType": "address",
-          "name": "_newAddress",
-          "type": "address"
-        }
-      ],
-      "name": "SetTimeLock",
-      "type": "event"
-    },
-    {
-      "inputs": [],
-      "name": "CIRCUIT_BREAKER_ADDRESS",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "COMPTROLLER_ADDRESS",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "DEFAULT_LIQ_FEE",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "DEFAULT_MAX_LTV",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "FRAXLEND_WHITELIST_ADDRESS",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "GLOBAL_MAX_LTV",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "TIME_LOCK_ADDRESS",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "defaultSwappers",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes",
-          "name": "_configData",
-          "type": "bytes"
-        }
-      ],
-      "name": "deploy",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "_pairAddress",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "string",
-          "name": "_name",
-          "type": "string"
-        },
-        {
-          "internalType": "bytes",
-          "name": "_configData",
-          "type": "bytes"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_maxLTV",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_liquidationFee",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_maturityDate",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_penaltyRate",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address[]",
-          "name": "_approvedBorrowers",
-          "type": "address[]"
-        },
-        {
-          "internalType": "address[]",
-          "name": "_approvedLenders",
-          "type": "address[]"
-        }
-      ],
-      "name": "deployCustom",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "_pairAddress",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "deployedPairCustomStatusByAddress",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "deployedPairsArray",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "name": "deployedPairsByName",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "name": "deployedPairsBySalt",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "deployedPairsLength",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getAllPairAddresses",
-      "outputs": [
-        {
-          "internalType": "address[]",
-          "name": "",
-          "type": "address[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address[]",
-          "name": "_addresses",
-          "type": "address[]"
-        }
-      ],
-      "name": "getCustomStatuses",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "address",
-              "name": "_address",
-              "type": "address"
-            },
-            {
-              "internalType": "bool",
-              "name": "_isCustom",
-              "type": "bool"
-            }
-          ],
-          "internalType": "struct FraxlendPairDeployer.PairCustomStatus[]",
-          "name": "_pairCustomStatuses",
-          "type": "tuple[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address[]",
-          "name": "_addresses",
-          "type": "address[]"
-        }
-      ],
-      "name": "globalPause",
-      "outputs": [
-        {
-          "internalType": "address[]",
-          "name": "_updatedAddresses",
-          "type": "address[]"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "owner",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "renounceOwnership",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "bytes",
-          "name": "_creationCode",
-          "type": "bytes"
-        }
-      ],
-      "name": "setCreationCode",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address[]",
-          "name": "_swappers",
-          "type": "address[]"
-        }
-      ],
-      "name": "setDefaultSwappers",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_newAddress",
-          "type": "address"
-        }
-      ],
-      "name": "setDefaultTimeLock",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "newOwner",
-          "type": "address"
-        }
-      ],
-      "name": "transferOwnership",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    }
-  ],
   "pair": [
     {
       "inputs": [
@@ -3559,169 +2262,206 @@
       "type": "function"
     }
   ],
-  "pairHelperAbi": [
+  "addressProvider": [
     {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_oracle",
-          "type": "address"
-        }
-      ],
-      "name": "OracleLTEZero",
-      "type": "error"
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
     },
     {
+      "anonymous": false,
       "inputs": [
         {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "service",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
           "internalType": "address",
-          "name": "_fraxlendPairAddress",
+          "name": "newAddress",
           "type": "address"
         }
       ],
-      "name": "getImmutableAddressBool",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "bool",
-              "name": "_borrowerWhitelistActive",
-              "type": "bool"
-            },
-            {
-              "internalType": "bool",
-              "name": "_lenderWhitelistActive",
-              "type": "bool"
-            },
-            {
-              "internalType": "address",
-              "name": "_assetContract",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_collateralContract",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_oracleMultiply",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_oracleDivide",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_rateContract",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_DEPLOYER_CONTRACT",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_COMPTROLLER_ADDRESS",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_FRAXLEND_WHITELIST",
-              "type": "address"
-            }
-          ],
-          "internalType": "struct FraxlendPairHelper.ImmutablesAddressBool",
-          "name": "",
-          "type": "tuple"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
+      "name": "AddressSet",
+      "type": "event"
     },
     {
+      "anonymous": false,
       "inputs": [
         {
-          "internalType": "address",
-          "name": "_fraxlendPairAddress",
-          "type": "address"
-        }
-      ],
-      "name": "getImmutableUint256",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "_oracleNormalization",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "_maxLTV",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "_liquidationFee",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "_maturityDate",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "_penaltyRate",
-              "type": "uint256"
-            }
-          ],
-          "internalType": "struct FraxlendPairHelper.ImmutablesUint256",
-          "name": "",
-          "type": "tuple"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_fraxlendPairAddress",
-          "type": "address"
-        }
-      ],
-      "name": "getPairAccounting",
-      "outputs": [
-        {
-          "internalType": "uint128",
-          "name": "_totalAssetAmount",
-          "type": "uint128"
-        },
-        {
-          "internalType": "uint128",
-          "name": "_totalAssetShares",
-          "type": "uint128"
-        },
-        {
-          "internalType": "uint128",
-          "name": "_totalBorrowAmount",
-          "type": "uint128"
-        },
-        {
-          "internalType": "uint128",
-          "name": "_totalBorrowShares",
-          "type": "uint128"
-        },
-        {
+          "indexed": false,
           "internalType": "uint256",
-          "name": "_totalCollateral",
+          "name": "user_id",
           "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "leaf",
+          "type": "bytes32"
+        }
+      ],
+      "name": "Claimed",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "ACCOUNT_FACTORY",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "ACL",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "CONTRACTS_REGISTER",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "DATA_COMPRESSOR",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "GEAR_TOKEN",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "LEVERAGED_ACTIONS",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "PRICE_ORACLE",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "TREASURY_CONTRACT",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "WETH_GATEWAY",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "WETH_TOKEN",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
         }
       ],
       "stateMutability": "view",
@@ -3730,32 +2470,390 @@
     {
       "inputs": [
         {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "addresses",
+      "outputs": [
+        {
           "internalType": "address",
-          "name": "_fraxlendPairAddress",
+          "name": "",
           "type": "address"
-        },
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getACL",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAccountFactory",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getContractsRegister",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getDataCompressor",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getGearToken",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getLeveragedActions",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getPriceOracle",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getTreasuryContract",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getWETHGateway",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getWethToken",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
         {
           "internalType": "address",
           "name": "_address",
           "type": "address"
         }
       ],
-      "name": "getUserSnapshot",
+      "name": "setACL",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "setAccountFactory",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "setContractsRegister",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "setDataCompressor",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "setGearToken",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "setLeveragedActions",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "setPriceOracle",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "setTreasuryContract",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "setWETHGateway",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_address",
+          "type": "address"
+        }
+      ],
+      "name": "setWethToken",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "version",
       "outputs": [
         {
           "internalType": "uint256",
-          "name": "_userAssetShares",
+          "name": "",
           "type": "uint256"
-        },
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "dataCompressor": [
+    {
+      "inputs": [
         {
-          "internalType": "uint256",
-          "name": "_userBorrowShares",
-          "type": "uint256"
-        },
+          "internalType": "address",
+          "name": "_addressProvider",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "NotCreditManagerException",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotPoolException",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ZeroAddressException",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "WETHToken",
+      "outputs": [
         {
-          "internalType": "uint256",
-          "name": "_userCollateralBalance",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "addressProvider",
+      "outputs": [
+        {
+          "internalType": "contract AddressProvider",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "contractsRegister",
+      "outputs": [
+        {
+          "internalType": "contract ContractsRegister",
+          "name": "",
+          "type": "address"
         }
       ],
       "stateMutability": "view",
@@ -3765,41 +2863,21 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_fraxlendPairAddress",
+          "name": "_creditManager",
           "type": "address"
-        },
-        {
-          "internalType": "uint128",
-          "name": "_sharesToLiquidate",
-          "type": "uint128"
         },
         {
           "internalType": "address",
-          "name": "_borrower",
+          "name": "_allowedContract",
           "type": "address"
         }
       ],
-      "name": "previewLiquidatePure",
+      "name": "getAdapter",
       "outputs": [
         {
-          "internalType": "uint128",
-          "name": "_amountLiquidatorToRepay",
-          "type": "uint128"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_collateralForLiquidator",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint128",
-          "name": "_sharesToSocialize",
-          "type": "uint128"
-        },
-        {
-          "internalType": "uint128",
-          "name": "_amountToSocialize",
-          "type": "uint128"
+          "internalType": "address",
+          "name": "adapter",
+          "type": "address"
         }
       ],
       "stateMutability": "view",
@@ -3809,31 +2887,140 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_fraxlendPairAddress",
+          "name": "_creditManager",
           "type": "address"
         },
         {
-          "internalType": "uint256",
-          "name": "_timestamp",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_blockNumber",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "borrower",
+          "type": "address"
         }
       ],
-      "name": "previewRateInterest",
+      "name": "getCreditAccountData",
       "outputs": [
         {
-          "internalType": "uint256",
-          "name": "_interestEarned",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_newRate",
-          "type": "uint256"
+          "components": [
+            {
+              "internalType": "address",
+              "name": "addr",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "borrower",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "inUse",
+              "type": "bool"
+            },
+            {
+              "internalType": "address",
+              "name": "creditManager",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "underlying",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "borrowedAmountPlusInterest",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "borrowedAmountPlusInterestAndFees",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "totalValue",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "healthFactor",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "borrowRate",
+              "type": "uint256"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "token",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "balance",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isAllowed",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isEnabled",
+                  "type": "bool"
+                }
+              ],
+              "internalType": "struct TokenBalance[]",
+              "name": "balances",
+              "type": "tuple[]"
+            },
+            {
+              "internalType": "uint256",
+              "name": "repayAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "liquidationAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "canBeClosed",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "borrowedAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "cumulativeIndexAtOpen",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "since",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "version",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint256",
+              "name": "enabledTokenMask",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct CreditAccountData",
+          "name": "result",
+          "type": "tuple"
         }
       ],
       "stateMutability": "view",
@@ -3843,41 +3030,135 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_fraxlendPairAddress",
+          "name": "borrower",
           "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_timestamp",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_blockNumber",
-          "type": "uint256"
         }
       ],
-      "name": "previewRateInterestFees",
+      "name": "getCreditAccountList",
       "outputs": [
         {
-          "internalType": "uint256",
-          "name": "_interestEarned",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_feesAmount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_feesShare",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_newRate",
-          "type": "uint256"
+          "components": [
+            {
+              "internalType": "address",
+              "name": "addr",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "borrower",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "inUse",
+              "type": "bool"
+            },
+            {
+              "internalType": "address",
+              "name": "creditManager",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "underlying",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "borrowedAmountPlusInterest",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "borrowedAmountPlusInterestAndFees",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "totalValue",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "healthFactor",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "borrowRate",
+              "type": "uint256"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "token",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "balance",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isAllowed",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isEnabled",
+                  "type": "bool"
+                }
+              ],
+              "internalType": "struct TokenBalance[]",
+              "name": "balances",
+              "type": "tuple[]"
+            },
+            {
+              "internalType": "uint256",
+              "name": "repayAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "liquidationAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "canBeClosed",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "borrowedAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "cumulativeIndexAtOpen",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "since",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "version",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint256",
+              "name": "enabledTokenMask",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct CreditAccountData[]",
+          "name": "result",
+          "type": "tuple[]"
         }
       ],
       "stateMutability": "view",
@@ -3887,15 +3168,549 @@
       "inputs": [
         {
           "internalType": "address",
-          "name": "_fraxlendPairAddress",
+          "name": "_creditManager",
           "type": "address"
         }
       ],
-      "name": "previewUpdateExchangeRate",
+      "name": "getCreditManagerData",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "addr",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "underlying",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "pool",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "isWETH",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "canBorrow",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "borrowRate",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "minAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxLeverageFactor",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "availableLiquidity",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address[]",
+              "name": "collateralTokens",
+              "type": "address[]"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "allowedContract",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "adapter",
+                  "type": "address"
+                }
+              ],
+              "internalType": "struct ContractAdapter[]",
+              "name": "adapters",
+              "type": "tuple[]"
+            },
+            {
+              "internalType": "uint256[]",
+              "name": "liquidationThresholds",
+              "type": "uint256[]"
+            },
+            {
+              "internalType": "uint8",
+              "name": "version",
+              "type": "uint8"
+            },
+            {
+              "internalType": "address",
+              "name": "creditFacade",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "creditConfigurator",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "isDegenMode",
+              "type": "bool"
+            },
+            {
+              "internalType": "address",
+              "name": "degenNFT",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "isIncreaseDebtForbidden",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "forbiddenTokenMask",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "maxEnabledTokensLength",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint16",
+              "name": "feeInterest",
+              "type": "uint16"
+            },
+            {
+              "internalType": "uint16",
+              "name": "feeLiquidation",
+              "type": "uint16"
+            },
+            {
+              "internalType": "uint16",
+              "name": "liquidationDiscount",
+              "type": "uint16"
+            },
+            {
+              "internalType": "uint16",
+              "name": "feeLiquidationExpired",
+              "type": "uint16"
+            },
+            {
+              "internalType": "uint16",
+              "name": "liquidationDiscountExpired",
+              "type": "uint16"
+            }
+          ],
+          "internalType": "struct CreditManagerData",
+          "name": "result",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getCreditManagersList",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "addr",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "underlying",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "pool",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "isWETH",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "canBorrow",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "borrowRate",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "minAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxLeverageFactor",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "availableLiquidity",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address[]",
+              "name": "collateralTokens",
+              "type": "address[]"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "allowedContract",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "adapter",
+                  "type": "address"
+                }
+              ],
+              "internalType": "struct ContractAdapter[]",
+              "name": "adapters",
+              "type": "tuple[]"
+            },
+            {
+              "internalType": "uint256[]",
+              "name": "liquidationThresholds",
+              "type": "uint256[]"
+            },
+            {
+              "internalType": "uint8",
+              "name": "version",
+              "type": "uint8"
+            },
+            {
+              "internalType": "address",
+              "name": "creditFacade",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "creditConfigurator",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "isDegenMode",
+              "type": "bool"
+            },
+            {
+              "internalType": "address",
+              "name": "degenNFT",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "isIncreaseDebtForbidden",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "forbiddenTokenMask",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "maxEnabledTokensLength",
+              "type": "uint8"
+            },
+            {
+              "internalType": "uint16",
+              "name": "feeInterest",
+              "type": "uint16"
+            },
+            {
+              "internalType": "uint16",
+              "name": "feeLiquidation",
+              "type": "uint16"
+            },
+            {
+              "internalType": "uint16",
+              "name": "liquidationDiscount",
+              "type": "uint16"
+            },
+            {
+              "internalType": "uint16",
+              "name": "feeLiquidationExpired",
+              "type": "uint16"
+            },
+            {
+              "internalType": "uint16",
+              "name": "liquidationDiscountExpired",
+              "type": "uint16"
+            }
+          ],
+          "internalType": "struct CreditManagerData[]",
+          "name": "result",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_pool",
+          "type": "address"
+        }
+      ],
+      "name": "getPoolData",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "addr",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "isWETH",
+              "type": "bool"
+            },
+            {
+              "internalType": "address",
+              "name": "underlying",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "dieselToken",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "linearCumulativeIndex",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "availableLiquidity",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "expectedLiquidity",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "expectedLiquidityLimit",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "totalBorrowed",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "depositAPY_RAY",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "borrowAPY_RAY",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "dieselRate_RAY",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "withdrawFee",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "cumulativeIndex_RAY",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "timestampLU",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "version",
+              "type": "uint8"
+            }
+          ],
+          "internalType": "struct PoolData",
+          "name": "result",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getPoolsList",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "addr",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "isWETH",
+              "type": "bool"
+            },
+            {
+              "internalType": "address",
+              "name": "underlying",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "dieselToken",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "linearCumulativeIndex",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "availableLiquidity",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "expectedLiquidity",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "expectedLiquidityLimit",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "totalBorrowed",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "depositAPY_RAY",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "borrowAPY_RAY",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "dieselRate_RAY",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "withdrawFee",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "cumulativeIndex_RAY",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "timestampLU",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint8",
+              "name": "version",
+              "type": "uint8"
+            }
+          ],
+          "internalType": "struct PoolData[]",
+          "name": "result",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_creditManager",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "borrower",
+          "type": "address"
+        }
+      ],
+      "name": "hasOpenedCreditAccount",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "version",
       "outputs": [
         {
           "internalType": "uint256",
-          "name": "_exchangeRate",
+          "name": "",
           "type": "uint256"
         }
       ],

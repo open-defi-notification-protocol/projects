@@ -35,7 +35,7 @@ const BigNumber = require("bignumber.js");
 
 class LowHealth {
 
-  static displayName = "Low Health";
+  static displayName = "Low PositionHealth";
   static description = "Get notified when health factor is getting low (below 1.1)";
 
   async onInit(args) {
@@ -46,7 +46,7 @@ class LowHealth {
   async onBlocks(args) {
     const position = await this.contract.methods.getPositionData(args.address).call();
     if (new BigNumber(position.healthFactor).dividedBy("1e18").toNumber() < 1.1) return {
-      notification: "Health factor dropped below 1.1"
+      notification: "PositionHealth factor dropped below 1.1"
     };
   }
 

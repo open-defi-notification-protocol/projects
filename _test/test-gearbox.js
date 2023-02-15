@@ -1,6 +1,6 @@
 const Web3 = require('web3');
 const web3 = new Web3(
-  new Web3.providers.HttpProvider(require('./dev-keys.json').web3avalanche)
+  new Web3.providers.HttpProvider(require('./dev-keys.json').web3)
 );
 
 /**
@@ -27,8 +27,7 @@ async function testGearboxLowHealth(address) {
 
   // simulate user filling in the subscription form in the app
   const subscription = {
-    // pair: form.find((o) => o.id === 'pair').values[0].value,
-    // minimum: minimum,
+    creditManager: form.find((o) => o.id === 'creditManager').values[0].value
   };
 
   // simulate on blocks event
@@ -44,7 +43,7 @@ async function main() {
 
   console.log(
     await testGearboxLowHealth(
-      '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005'
+      '0xBababB47c2A3543a13719a4BfA5a2cc03d1D1936'
     )
   );
 }
