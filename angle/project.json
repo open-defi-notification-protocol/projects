@@ -1,0 +1,10 @@
+{
+  "name": "Angle",
+  "category": "vault",
+  "website": "https://app.angle.money",
+  "logo": "logo.png",
+  "background": "#202433",
+  "foreground": "#feceab",
+  "network": "ethereum",
+  "dev": true
+}
