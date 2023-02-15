@@ -1,12 +1,22 @@
 const Web3 = require('web3');
-const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3fantom));
+const web3s = {
+    ethereum: new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3)),
+    fantom: new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3fantom)),
+    avalanche: new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3avalanche)),
+    arbitrum: new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3Arbitrum)),
+    polygon: new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3Polygon)),
+    bsc: new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3bsc)),
+    cronos: new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3cronos))
+}
 
 
-async function testWalletBalance(networkNotificationFileSuffix, address, above, threshold) {
+async function testWalletBalance(networkName, address, above, threshold) {
 
-    const WalletBalance = require('../common/wallet-balance-' + networkNotificationFileSuffix);
+    const WalletBalance = require('../common/wallet-balance-' + networkName);
 
     const walletBalance = new WalletBalance();
+
+    const web3 = web3s[networkName]
 
     // simulate init event
     await walletBalance.onInit({
@@ -41,43 +51,50 @@ async function main() {
 
     let address = '0x3dacC571356e7D5dFB3b475d6922442Ec06B9005';
 
-    console.log(await testWalletBalance(
-        'ethereum',
-        address,
-        true,
-        '0.0001'
-    ));
+        console.log(await testWalletBalance(
+            'ethereum',
+            address,
+            true,
+            '0.0001'
+        ));
+
+        console.log(await testWalletBalance(
+            'fantom',
+            address,
+            true,
+            '0.0001'
+        ));
+
+        console.log(await testWalletBalance(
+            'avalanche',
+            address,
+            true,
+            '0.0001'
+        ));
+
+        console.log(await testWalletBalance(
+            'arbitrum',
+            address,
+            true,
+            '0.0001'
+        ));
+
+        console.log(await testWalletBalance(
+            'polygon',
+            address,
+            true,
+            '0.0001'
+        ));
+
+        console.log(await testWalletBalance(
+            'bsc',
+            address,
+            true,
+            '0.0001'
+        ));
 
     console.log(await testWalletBalance(
-        'fantom',
-        address,
-        true,
-        '0.0001'
-    ));
-
-    console.log(await testWalletBalance(
-        'avalanche',
-        address,
-        true,
-        '0.0001'
-    ));
-
-    console.log(await testWalletBalance(
-        'arbitrum',
-        address,
-        true,
-        '0.0001'
-    ));
-
-    console.log(await testWalletBalance(
-        'polygon',
-        address,
-        true,
-        '0.0001'
-    ));
-
-    console.log(await testWalletBalance(
-        'bsc',
+        'cronos',
         address,
         true,
         '0.0001'

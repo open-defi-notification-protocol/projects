@@ -23,7 +23,7 @@ export abstract class Notification {
 export type DisplayIcon = "hand" | "wallet" | "up-arrow" | "down-arrow"; // TODO: add more
 
 // network the project is running on
-export type Network = "ethereum" | "bsc" | "polygon" | "avalanche" | "fantom"; // TODO: add more
+export type Network = "ethereum" | "bsc" | "polygon" | "avalanche" | "fantom" | "cronos" | "arbitrum"; // TODO: add more
 
 // arguments for onInit()
 export interface OnInitArgs {
