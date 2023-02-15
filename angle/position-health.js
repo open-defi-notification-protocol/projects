@@ -3,7 +3,10 @@ const ABIs = require('./abis.json');
 const EthereumMulticall = require('ethereum-multicall');
 const fetch = require("node-fetch");
 
-const amountFormatter = Intl.NumberFormat('en');
+const amountFormatter = Intl.NumberFormat('en',{
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+});
 
 class PositionHealth {
 
