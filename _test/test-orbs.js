@@ -53,8 +53,8 @@ async function testRewardsClaim(web3, notificationModule, address) {
         web3,
         address: address,
         subscription: {},
-        fromBlock: 29770000,
-        toBlock: 29772309
+        fromBlock: 40279091,
+        toBlock: 40279496
     });
 }
 
