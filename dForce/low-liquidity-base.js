@@ -5,8 +5,6 @@ const addresses = require("./addresses.json");
 const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
 module.exports = class dForceBase {
-    static displayName = "Low Liquidity";
-    static description = "Get notified when getting close to liquidation";
     static displayIcon = "hand";
 
 	constructor(network) {
