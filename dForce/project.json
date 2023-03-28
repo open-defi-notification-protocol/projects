@@ -1,0 +1,10 @@
+{
+  "name": "dForce",
+  "category": "lending",
+  "website": "https://dforce.network",
+  "logo": "logo.png",
+  "background": "#070a0e",
+  "foreground": "#ffffff",
+  "network": "ethereum",
+  "dev": true
+}
