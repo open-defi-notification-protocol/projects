@@ -1,31 +1,31 @@
 const BN = require("bignumber.js");
 const ABIs = require("./abis.json");
-
-const COMPTROLLER_ADDRESS = '0x8B53Ab2c0Df3230EA327017C91Eb909f815Ad113'
+const addresses = require("./addresses.json");
 
 const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
-class LowLiquidity {
-
+module.exports = class dForceBase {
     static displayName = "Low Liquidity";
     static description = "Get notified when getting close to liquidation";
     static displayIcon = "hand";
 
-    /**
-     * runs when class is initialized
-     *
-     * @param args
-     * @returns {Promise<void>}
-     */
-    async onInit(args) {
+	constructor(network) {
+        this.network = network;
+		this.controllerAddress = addresses[network];
+	}
 
-        this.comptrollerContract = new args.web3.eth.Contract(
-            ABIs.comptroller,
-            COMPTROLLER_ADDRESS
-        );
-    }
+	/**
+	 * runs when class is initialized
+	 *
+	 * @param args
+	 * @returns {Promise<void>}
+	 */
+	async onInit(args) {
+		const web3 = args.web3;
+		this.controllerContract = new web3.eth.Contract(ABIs.controller, this.controllerAddress);
+	}
 
-    /**
+	/**
      * runs right before user subscribes to new notifications and populates subscription form
      *
      * @param args
@@ -33,7 +33,7 @@ class LowLiquidity {
      */
     async onSubscribeForm(args) {
 
-        const result = await this.comptrollerContract.methods.calcAccountEquity(args.address).call();
+        const result = await this.controllerContract.methods.calcAccountEquity(args.address).call();
 
         let liquidity = new BN(result[0]);
         const shortfall = parseInt(result[1]);
@@ -41,8 +41,8 @@ class LowLiquidity {
         liquidity = liquidity.dividedBy('1e36');
 
         const comment = shortfall ?
-            `CAUTION: you are currently in risk of liquidation` :
-            `Your current excess liquidity is ~${amountFormatter.format(liquidity)} USD`;
+            `CAUTION: you are currently in risk of liquidation on ${this.network}` :
+            `Your current excess liquidity is ~${amountFormatter.format(liquidity)} USD on ${this.network}`;
 
         return [
             {
@@ -67,7 +67,7 @@ class LowLiquidity {
 
         const thresholdUSD = new BN(minLiquidity).multipliedBy('1e36')
 
-        const result = await this.comptrollerContract.methods.calcAccountEquity(args.address).call();
+        const result = await this.controllerContract.methods.calcAccountEquity(args.address).call();
 
         let liquidity = new BN(result[0]);
 
@@ -75,20 +75,20 @@ class LowLiquidity {
 
         if (thresholdUSD.isGreaterThanOrEqualTo(liquidity)) {
 
-            const uniqueId = "liquidity-" + thresholdUSD;
+            const uniqueId = `liquidity-${this.network}-` + thresholdUSD;
 
             if (shortfall) {
 
                 return {
                     uniqueId: uniqueId,
-                    notification: `Act now! You are under-collateralized and about to be liquidated`
+                    notification: `Act now! You are under-collateralized and about to be liquidated on ${this.network}`
                 }
 
             } else {
 
                 return {
                     uniqueId: uniqueId,
-                    notification: `Excess liquidity (~${amountFormatter.format(liquidity.dividedBy('1e36'))}) dropped below your safe minimum of ${minLiquidity} USD`
+                    notification: `Excess liquidity (~${amountFormatter.format(liquidity.dividedBy('1e36'))}) dropped below your safe minimum of ${minLiquidity} USD on ${this.network}`
                 }
 
             }
@@ -97,5 +97,3 @@ class LowLiquidity {
         return [];
     }
 }
-
-module.exports = LowLiquidity;

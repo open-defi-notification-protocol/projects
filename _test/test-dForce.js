@@ -1,9 +1,12 @@
 const Web3 = require('web3');
-const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3));
+const networks = require('./api-keys.json');
+const address = "0x6e1C24586d0DFEB608E0442a8A1Ce772afEC03a6";
 
-async function testdForceLowHealth(address) {
-    const LowHealth = require('../dForce/low-liquidity');
-    const lowHealth = new LowHealth();
+async function testdForce(address, network) {
+	const LowHealth = require(`../dForce/low-liquidity_${network}`);
+	const lowHealth = new LowHealth();
+
+    const web3 = new Web3(new Web3.providers.HttpProvider(networks[network]));
 
     // simulate init event
     await lowHealth.onInit({
@@ -24,17 +27,12 @@ async function testdForceLowHealth(address) {
     });
 }
 
-
 async function main() {
-
-    console.log('Running manual test:');
-
-    const address = '0x6e1C24586d0DFEB608E0442a8A1Ce772afEC03a6';
-
-    console.log(await testdForceLowHealth(
-        address
-    ));
-
+	console.log('Running manual test:');
+	console.log(await testdForce(address, "arbitrum"));
+	console.log(await testdForce(address, "bsc"));
+	console.log(await testdForce(address, "ethereum"));
+	console.log(await testdForce(address, "polygon"));
 }
 
-main();
+main().catch(console.error);
