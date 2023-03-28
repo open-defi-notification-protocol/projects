@@ -1,9 +1,9 @@
 const dForceBase = require("./low-liquidity-base");
 
 module.exports = class extends dForceBase {
-  static network = "bsc";
+  static network = "ethereum";
 
   constructor() {
-    super("bsc");
+    super("ethereum");
   }
 }
