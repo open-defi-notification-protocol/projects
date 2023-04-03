@@ -25,14 +25,47 @@ async function testMarketCreated() {
     // simulate on blocks event
     return marketCreated.onBlocks({
         web3,
-        fromBlock:74014108,
-        toBlock:74016108
+        fromBlock:74015797,
+        toBlock:76540287
+    });
+}
+
+/**
+ * testing pending rewards notification
+ *
+ */
+async function testEpochCreated() {
+
+    const EpochCreated = require('../y2k/epoch-created');
+    const epochCreated = new EpochCreated();
+
+    // simulate init event
+    await epochCreated.onInit({
+        web3
+    });
+
+    // simulate subscribe form event
+    const form = await epochCreated.onSubscribeForm({
+        web3
+    });
+
+    console.log(form);
+
+    // simulate on blocks event
+    return epochCreated.onBlocks({
+        web3,
+        fromBlock:74015797,
+        toBlock:76540287
     });
 }
 
 async function main() {
 
     console.log('Running manual test:');
+
+    console.log(
+        await testEpochCreated()
+    );
 
     console.log(
         await testMarketCreated()
