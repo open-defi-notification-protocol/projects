@@ -15,10 +15,6 @@ module.exports = class TVL {
 
   async onInit(args) {
     this.tvls = {};
-    const web3 = args.web3;
-    this.router = new web3.eth.Contract(ABIs.router, this.config.router);
-    this.factoryAddress = await this.router.methods.factory().call();
-    this.mc = new Multicall({ web3Instance: web3, tryAggregate: true });
   }
 
   async onSubscribeForm(args) {
@@ -78,7 +74,11 @@ module.exports = class TVL {
 
   async _getPoolInfo(web3, poolAddress) {
     console.log("Getting pool info for " + poolAddress);
-    let { results } = await this.mc.call([
+    const router = new web3.eth.Contract(ABIs.router, this.config.router);
+    const factoryAddress = await router.methods.factory().call();
+    const mc = new Multicall({ web3Instance: web3, tryAggregate: true });
+
+    let { results } = await mc.call([
       {
         reference: "pool",
         abi: ABIs.lp,
@@ -97,7 +97,7 @@ module.exports = class TVL {
     const token1 = this._token(web3, results.pool.callsReturnContext.find((c) => c.reference === "token1")?.returnValues[0]);
 
     results = (
-      await this.mc.call([
+      await mc.call([
         {
           reference: "token0",
           abi: ABIs.erc20,
@@ -135,11 +135,11 @@ module.exports = class TVL {
       price1 = new BN(1);
       price0 = reserve1.div(reserve0);
     } else {
-      const allPairs = await this.mc.call([
+      const allPairs = await mc.call([
         {
           reference: "factory",
           abi: ABIs.factory,
-          contractAddress: this.factoryAddress,
+          contractAddress: factoryAddress,
           calls: this.bases
             .map((b) => ({ reference: `${b.name}/${symbol0}`, methodName: "getPair", methodParameters: [token0.options.address, b.address] }))
             .concat(this.bases.map((b) => ({ reference: `${b.name}/${symbol1}`, methodName: "getPair", methodParameters: [token1.options.address, b.address] }))),
