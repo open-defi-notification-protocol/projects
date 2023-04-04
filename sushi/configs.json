@@ -1,0 +1,22 @@
+{
+  "ethereum": {
+    "router": "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F",
+    "bases": [
+      { "name": "WETH", "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "decimals": 18 },
+      { "name": "WBTC", "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", "decimals": 8 },
+      { "name": "USDC", "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", "decimals": 6, "stable": true },
+      { "name": "USDT", "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7", "decimals": 6, "stable": true },
+      { "name": "DAI", "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F", "decimals": 18, "stable": true }
+    ]
+  },
+  "arbitrum": {
+    "router": "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506",
+    "bases": [
+      { "name": "WETH", "address": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", "decimals": 18 },
+      { "name": "WBTC", "address": "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f", "decimals": 8 },
+      { "name": "USDC", "address": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8", "decimals": 6, "stable": true },
+      { "name": "USDT", "address": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9", "decimals": 6, "stable": true },
+      { "name": "DAI", "address": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1", "decimals": 18, "stable": true }
+    ]
+  }
+}
