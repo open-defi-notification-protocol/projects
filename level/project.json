@@ -1,0 +1,10 @@
+{
+  "name": "Level",
+  "category": "dex",
+  "website": "https://app.level.finance/",
+  "logo": "logo.png",
+  "background": "#161618",
+  "foreground": "#ffb313",
+  "network": "bsc",
+  "dev": true
+}
