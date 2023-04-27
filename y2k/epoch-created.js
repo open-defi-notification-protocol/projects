@@ -4,6 +4,7 @@ const BN = require("bignumber.js");
 const VAULT_FACTORY = "0x984E0EB8fB687aFa53fc8B33E12E04967560E092";
 
 const amountFormatter = Intl.NumberFormat('en');
+const dateFormatter = Intl.DateTimeFormat('en', {dateStyle: 'medium', timeStyle: 'medium'});
 
 class EpochCreated {
 
@@ -78,15 +79,16 @@ class EpochCreated {
                     const {decimals, symbol} = await this._fetchTokenDetails(args.web3, returnValues.token);
 
                     const strikePrice = new BN(returnValues.strikePrice).dividedBy('1e' + decimals);
+                    const startEpoch = new Date(returnValues.startEpoch * 1000)
 
                     const uniqueId = "mIndex-event-" + mIndex;
 
                     notifications.push({
                         uniqueId: uniqueId,
-                        notification: `New Epoch created - ${symbol} (strike price: ${amountFormatter.format(strikePrice)})! Go to https://y2k.finance to participate.`
+                        notification: `New Epoch created - ${symbol} (strike price: ${amountFormatter.format(strikePrice)})! Epoch starts at ${dateFormatter.format(startEpoch)}, Go to https://y2k.finance to participate.`
                     });
 
-                }catch (e){
+                } catch (e) {
 
                     console.log('y2k-epochcreated - ' + returnValues.token + ' is not a token')
 
