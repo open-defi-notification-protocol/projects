@@ -2,7 +2,7 @@ const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider(require('./dev-keys.json').web3));
 
 async function testMintyardLowHealth(address, threshold) {
-    const LowHealth = require('../mintyard/low-health');
+    const LowHealth = require('../lootbridge/low-health');
     const lowHealth = new LowHealth();
 
     // simulate init event
