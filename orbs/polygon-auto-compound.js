@@ -26,6 +26,7 @@ class AutoCompound {
         compounders = Object.keys(json.Payload.Guardians).map(function(key) {
             return `0x${json.Payload.Guardians[key].OrbsAddress}`;
         });
+        compounders.push("0x216ff847e6e1cf55618faf443874450f734885e0") // original compounder (used by Heroku);
 
     }
 
@@ -44,7 +45,7 @@ class AutoCompound {
             for (const event of events) {
                 const tx = await args.web3.eth.getTransaction(event.transactionHash);
 
-                if (compounders.includes(tx.from.toLowerCase())) {
+                if (compounders.includes(tx.from.toLowerCase()) && event.returnValues.claimedDelegatorRewards) {
 
                     const claimedRewards = new BN(event.returnValues.claimedDelegatorRewards).dividedBy("1e18");
                     const uniqueId = 'polygon-auto-compound';
