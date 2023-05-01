@@ -9,7 +9,7 @@ class LowHealth {
   async onInit(args) {
     this.contract = new args.web3.eth.Contract(
       ABIs.lendingPool,
-      "0x10BF9BCFb4fbef40774a8C61ac70b2ab94dd2426"
+      "0x2133C6f93Cf7A303394D58BE514894FBf545b20E"
     );
   }
 
