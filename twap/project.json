@@ -3,7 +3,7 @@
   "category": "twap",
   "website": "https://orbs.com",
   "logo": "logo.png",
-  "background": "#ffe4ca",
-  "foreground": "#000000",
+  "background": "#ffffff",
+  "foreground": "#6f1b71",
   "network": "ethereum"
 }
