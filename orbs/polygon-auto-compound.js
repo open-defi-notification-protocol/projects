@@ -22,6 +22,8 @@ class AutoCompound {
         );
 
         const response = await fetch('http://54.95.108.148/services/management-service/status');
+        console.log('**** polygon-auto-compound init ****')
+        console.log(response)
         const json = await response.json();
         compounders = Object.keys(json.Payload.Guardians).map(function(key) {
             return `0x${json.Payload.Guardians[key].OrbsAddress}`;
@@ -44,6 +46,13 @@ class AutoCompound {
 
             for (const event of events) {
                 const tx = await args.web3.eth.getTransaction(event.transactionHash);
+
+                console.log('**** polygon-auto-compound onblocks ****')
+                console.log(compounders)
+                console.log(args)
+                console.log(event)
+                console.log(compounders.includes(tx.from.toLowerCase()))
+                console.log(event.returnValues.claimedDelegatorRewards)
 
                 if (compounders.includes(tx.from.toLowerCase()) && event.returnValues.claimedDelegatorRewards) {
 
