@@ -1,5 +1,6 @@
 const BigNumber = require("bignumber.js");
 const ABIs = require("./abis.json");
+const BN = require("bignumber.js");
 
 class LowHealth {
   static displayName = "Low Health";
