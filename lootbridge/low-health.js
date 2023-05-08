@@ -12,7 +12,7 @@ class LowHealth {
     );
   }
 
-  async onSubscribeForm(args) {
+  async onSubscribeForm(_args) {
     return [
       {
         id: 'allow-subscribe',
