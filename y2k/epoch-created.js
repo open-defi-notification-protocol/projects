@@ -111,7 +111,7 @@ class EpochCreated {
 
         const tokenContract = new web3.eth.Contract(ABIs.erc20, address);
 
-        const decimals = await tokenContract.methods.decimals().call();
+        const decimals = "18";
         const symbol = await tokenContract.methods.symbol().call();
 
         return {decimals, symbol}
