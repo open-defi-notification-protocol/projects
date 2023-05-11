@@ -5,6 +5,5 @@
   "logo": "logo.png",
   "background": "#000000",
   "foreground": "#ffffff",
-  "network": "arbitrum",
-  "dev": "true"
+  "network": "arbitrum"
 }
