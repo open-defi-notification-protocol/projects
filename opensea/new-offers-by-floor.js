@@ -29,14 +29,14 @@ class NewOffersByFloor {
     async onSubscribeForm() {
 
         return [
-            {
+           /* {
                 type: "input-number",
                 id: "floor-threshold",
                 label: "Floor price threshold",
                 default: "90",
                 suffix: "%",
                 description: "Set an offer price threshold in percentage from the collection's floor price"
-            }
+            }*/
         ];
 
     }
@@ -72,22 +72,26 @@ class NewOffersByFloor {
 
         const thresholdPercBN = new BN(thresholdPerc);
 
-        for (const order of orders) {
+        if (orders) {
 
-            const offerPriceEthBN = new BN(order.base_price).dividedBy('1e18');
+            for (const order of orders) {
 
-            const asset = order.asset;
+                const offerPriceEthBN = new BN(order.base_price).dividedBy('1e18');
 
-            const floor = new BN(await this.getCollectionFloor(asset.collection.slug));
+                const asset = order.asset;
 
-            if (floor.multipliedBy(thresholdPercBN.dividedBy(100)).isLessThan(offerPriceEthBN)) {
+                const floor = new BN(await this.getCollectionFloor(asset.collection.slug));
 
-                const uniqueId = thresholdPerc + "-" + asset.id + "-" + order.id;
+                if (floor.multipliedBy(thresholdPercBN.dividedBy(100)).isLessThan(offerPriceEthBN)) {
 
-                notifications.push({
-                    uniqueId: uniqueId,
-                    notification: `You have a new offer of ${amountFormatter.format(offerPriceEthBN)} ETH for ${asset.name}${order.quantity !== '1' ? ` (quantity:${order.quantity})` : ''} of collection ${asset.collection.name} (floor ${amountFormatter.format(floor)} ETH)`
-                });
+                    const uniqueId = thresholdPerc + "-" + asset.id + "-" + order.id;
+
+                    notifications.push({
+                        uniqueId: uniqueId,
+                        notification: `You have a new offer of ${amountFormatter.format(offerPriceEthBN)} ETH for ${asset.name}${order.quantity !== '1' ? ` (quantity:${order.quantity})` : ''} of collection ${asset.collection.name} (floor ${amountFormatter.format(floor)} ETH)`
+                    });
+
+                }
 
             }
 

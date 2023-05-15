@@ -2,6 +2,7 @@
 const BN = require("bignumber.js");
 const fetch = require("node-fetch");
 const Common = require("./common");
+const sdk = require('api')('@opensea/v2.0#12tucyd5lhf2fs4e');
 
 const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
@@ -22,7 +23,7 @@ class NewOffers {
     async onSubscribeForm(args) {
 
         return [
-            {
+            /*{
                 type: "input-select",
                 id: "collection",
                 label: "Collection",
@@ -42,7 +43,7 @@ class NewOffers {
                 optional: true,
                 default: "",
                 description: "If this collection is missing from the list you can paste the OpenSea collection URL here instead"
-            }
+            }*/
         ];
 
     }
@@ -69,7 +70,9 @@ class NewOffers {
             listed_after: Math.floor(Date.now()) - (LISTED_AFTER__IN_MINUTES * 60 * 1000)
         };
 
-        const result = await (await fetch(`https://api.opensea.io/wyvern/v1/orders?limit=${params.limit}&side=${params.side}&owner=${params.owner}&listed_after=${params.listed_after}`, {
+        await Common.getWalletCollections(args)
+
+            const result = await (await fetch(`https://api.opensea.io/v2/offers/collection/${collectionSlug}/all`, {
                 method: 'GET',
                 headers: {'X-API-KEY': args.platformKeys.opensea}
             })
@@ -81,22 +84,26 @@ class NewOffers {
 
         const thresholdPriceEthBN = new BN(price);
 
-        for (const order of orders) {
+        if (orders) {
 
-            if (collectionSlug === order.asset.collection.slug) {
+            for (const order of orders) {
 
-                const offerPriceEthBN = new BN(order.base_price).dividedBy('1e18');
+                if (collectionSlug === order.asset.collection.slug) {
 
-                if (offerPriceEthBN.gt(thresholdPriceEthBN)) {
+                    const offerPriceEthBN = new BN(order.base_price).dividedBy('1e18');
 
-                    const asset = order.asset;
+                    if (offerPriceEthBN.gt(thresholdPriceEthBN)) {
 
-                    const uniqueId = asset.id + "-" + order.id;
+                        const asset = order.asset;
 
-                    notifications.push({
-                        uniqueId: uniqueId,
-                        notification: `You have a new offer of ${amountFormatter.format(offerPriceEthBN)} ETH for ${asset.name}${order.quantity !== '1' ? ` (quantity:${order.quantity})` : ''} of collection ${asset.collection.name}`
-                    });
+                        const uniqueId = asset.id + "-" + order.id;
+
+                        notifications.push({
+                            uniqueId: uniqueId,
+                            notification: `You have a new offer of ${amountFormatter.format(offerPriceEthBN)} ETH for ${asset.name}${order.quantity !== '1' ? ` (quantity:${order.quantity})` : ''} of collection ${asset.collection.name}`
+                        });
+
+                    }
 
                 }
 
