@@ -2,7 +2,6 @@
 const BN = require("bignumber.js");
 const fetch = require("node-fetch");
 const Common = require("./common");
-const sdk = require('api')('@opensea/v2.0#12tucyd5lhf2fs4e');
 
 const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
@@ -15,7 +14,7 @@ class NewOffers {
     static displayIcon = "hand";
 
     // runs when class is initialized
-    async onInit(args) {
+    async onInit(args) {    
 
     }
 
@@ -72,7 +71,7 @@ class NewOffers {
 
         await Common.getWalletCollections(args)
 
-            const result = await (await fetch(`https://api.opensea.io/v2/offers/collection/${collectionSlug}/all`, {
+            const result = await (await fetch(`https://api.opensea.io/v2/offers/collection/${collectionSlug}`, {
                 method: 'GET',
                 headers: {'X-API-KEY': args.platformKeys.opensea}
             })
