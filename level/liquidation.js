@@ -2,7 +2,8 @@ const BN = require("bignumber.js");
 const ABIs = require('./abis.json');
 const EthereumMulticall = require("ethereum-multicall");
 
-const amountFormatter = Intl.NumberFormat('en');
+const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
+const priceFormatter = Intl.NumberFormat('en');
 
 const POOL_CONTRACT_ADDRESS = "0xA5aBFB56a78D2BD4689b25B8A77fd49Bb0675874";
 const ORDER_MANAGER_CONTRACT_ADDRESS = "0xf584A17dF21Afd9de84F47842ECEAF6042b1Bb5b";
@@ -67,15 +68,30 @@ class Liquidation {
 
         const positionKey = args.subscription["position"];
 
-        const threshold = args.subscription["threshold"];
+        const events = await this.poolContract.getPastEvents('LiquidatePosition', {
+            fromBlock: args.fromBlock,
+            toBlock: args.toBlock,
+            filter: {key: positionKey},
+        });
 
-        if (userLTVBN.isGreaterThan(threshold)) {
+        if (events.length && events[0].returnValues) {
 
-            const pairLabel = await this._getPairLabel(args, pairAddress, userLTVBN);
+            const returnValues = events[0].returnValues;
+
+            const positionKeys = this._generatePositionsKeysForAddress(args.address, args.web3);
+
+            const positionLabel = await this._getPositionLabel(
+                args,
+                returnValues.side,
+                returnValues.indexToken,
+                returnValues.collateralToken,
+                returnValues.size,
+                returnValues.collateralValue
+            );
 
             return {
-                uniqueId: positionKey + "-" + threshold,
-                notification: `The LTV of your position in ${pairLabel} is above the threshold of ${args.subscription["threshold"]}`
+                uniqueId: positionKey,
+                notification: `${positionLabel} has been liquidated! Liquidation price: ${priceFormatter.format(new BN(returnValues.indexPrice).dividedBy('1e12'))}$`
             };
 
         } else {
@@ -91,43 +107,7 @@ class Liquidation {
      */
     async _getAllUserPositions(args) {
 
-        /*
-                const orderIds = (await this.orderManagerContract.methods.getOrders(
-                    args.address,
-                    0,
-                    100
-                ).call())[0]
-        */
-
-        const positionKeys = {}
-
-        for (const indexToken of this.indexTokens) {
-
-            const longPosKey = args.web3.utils.keccak256(args.web3.eth.abi.encodeParameters(
-                ["address", "address", "address", "uint8"],
-                [args.address, indexToken, indexToken, 0]));
-
-            positionKeys[longPosKey] = {
-                indexToken,
-                collateralToken: indexToken,
-                side: 0
-            };
-
-            for (const stableToken of this.stableTokens) {
-
-                let shortPosKey = args.web3.utils.keccak256(args.web3.eth.abi.encodeParameters(
-                    ["address", "address", "address", "uint8"],
-                    [args.address, indexToken, stableToken, 1]));
-
-                positionKeys[shortPosKey] = {
-                    indexToken,
-                    collateralToken: stableToken,
-                    side: 1
-                };
-
-            }
-
-        }
+        const positionKeys = this._generatePositionsKeysForAddress(args.address, args.web3);
 
         const positions = [];
 
@@ -160,15 +140,20 @@ class Liquidation {
 
                 const positionKey = result.originalContractCallContext.context.positionKey;
 
-                const poolLabel = await this._getPairLabel(
+                const positionInfo = positionKeys[positionKey];
+
+                const positionLabel = await this._getPositionLabel(
                     args,
-                    positionKeys[positionKey],
-                    positionValues
+                    positionInfo.side,
+                    positionInfo.indexToken,
+                    positionInfo.collateralToken,
+                    positionValues[0].hex,
+                    positionValues[1].hex,
                 );
 
                 positions.push({
                     value: positionKey,
-                    label: poolLabel
+                    label: positionLabel
                 });
 
             }
@@ -179,6 +164,12 @@ class Liquidation {
 
     }
 
+    /**
+     *
+     * @param web3
+     * @returns {Promise<{indexTokens: *[], stableTokens: *[]}>}
+     * @private
+     */
     async _getTokensList(web3) {
 
         const assetCount = parseInt(await web3.eth.getStorageAt(POOL_CONTRACT_ADDRESS, '0xa2')); // read length of assets array
@@ -207,20 +198,65 @@ class Liquidation {
     /**
      *
      */
-    async _getPairLabel(args, positionInfo, positionValues) {
+    async _getPositionLabel(args, side, indexToken, collateralToken, positionSize, positionCollateral) {
 
-        const indexTokenContract = new args.web3.eth.Contract(ABIs.erc20, positionInfo.indexToken);
-        const collateralTokenContract = new args.web3.eth.Contract(ABIs.erc20, positionInfo.collateralToken);
+        const indexTokenContract = new args.web3.eth.Contract(ABIs.erc20, indexToken);
+        const collateralTokenContract = new args.web3.eth.Contract(ABIs.erc20, collateralToken);
 
         const indexTokenLabel = await indexTokenContract.methods.symbol().call();
         const collateralTokenLabel = await collateralTokenContract.methods.symbol().call();
 
-        const sizeValue = amountFormatter.format(new BN(positionValues[0].hex).dividedBy('1e30').toFixed());
-        const collateralValue = amountFormatter.format(new BN(positionValues[1].hex).dividedBy('1e30').toFixed());
+        const sizeText = amountFormatter.format(new BN(positionSize).dividedBy('1e30').toFixed());
+        const collateralText = amountFormatter.format(new BN(positionCollateral).dividedBy('1e30').toFixed());
 
-        return `${positionInfo.side === 1 ? 'Short' : 'Long'} position, Size: ${sizeValue} ${indexTokenLabel}, Collateral: ${collateralValue} ${collateralTokenLabel}`;
+        return `${side === 1 ? 'Short' : 'Long'} position (${indexTokenLabel}/${collateralTokenLabel}), Size: ${sizeText}$, Collateral: ${collateralText}$`;
 
     }
+
+    /**
+     * generates all possible position keys for an address
+     *
+     * @returns {{}}
+     * @private
+     * @param address
+     * @param web3
+     */
+    _generatePositionsKeysForAddress(address, web3) {
+
+        const positionKeys = {}
+
+        for (const indexToken of this.indexTokens) {
+
+            const longPosKey = web3.utils.keccak256(web3.eth.abi.encodeParameters(
+                ["address", "address", "address", "uint8"],
+                [address, indexToken, indexToken, 0]));
+
+            positionKeys[longPosKey] = {
+                indexToken,
+                collateralToken: indexToken,
+                side: 0
+            };
+
+            for (const stableToken of this.stableTokens) {
+
+                let shortPosKey = web3.utils.keccak256(web3.eth.abi.encodeParameters(
+                    ["address", "address", "address", "uint8"],
+                    [address, indexToken, stableToken, 1]));
+
+                positionKeys[shortPosKey] = {
+                    indexToken,
+                    collateralToken: stableToken,
+                    side: 1
+                };
+
+            }
+
+        }
+
+        return positionKeys;
+
+    }
+
 }
 
 module.exports = Liquidation;
