@@ -20,22 +20,14 @@ class PendingReward {
 
         this.gauges = [];
 
-        try {
+        const response = await fetch("https://api.thegraph.com/subgraphs/name/balancer-labs/balancer-gauges", {
+            "body": "{\"query\":\"query { liquidityGauges (first: 999) { id symbol poolId totalSupply factory { id } } }\"}",
+            "method": "POST"
+        });
 
-            const response = await fetch("https://api.thegraph.com/subgraphs/name/balancer-labs/balancer-gauges", {
-                "body": "{\"query\":\"query { liquidityGauges (first: 999) { id symbol poolId totalSupply factory { id } } }\"}",
-                "method": "POST"
-            });
+        this.gauges = (await response.json()).data.liquidityGauges;
 
-            this.gauges = (await response.json()).data.liquidityGauges;
-
-            this.balDecimals = 18;
-
-        } catch (error) {
-
-            console.warn(error)
-
-        }
+        this.balDecimals = 18;
 
     }
 
