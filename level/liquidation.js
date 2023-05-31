@@ -6,7 +6,6 @@ const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 const priceFormatter = Intl.NumberFormat('en');
 
 const POOL_CONTRACT_ADDRESS = "0xA5aBFB56a78D2BD4689b25B8A77fd49Bb0675874";
-const ORDER_MANAGER_CONTRACT_ADDRESS = "0xf584A17dF21Afd9de84F47842ECEAF6042b1Bb5b";
 
 class Liquidation {
 
@@ -29,12 +28,6 @@ class Liquidation {
         const {indexTokens, stableTokens} = await this._getTokensList(args.web3);
         this.indexTokens = indexTokens;
         this.stableTokens = stableTokens;
-
-        this.orderManagerContract = new args.web3.eth.Contract(
-            ABIs.orderManager,
-            ORDER_MANAGER_CONTRACT_ADDRESS
-        );
-
 
     }
 
@@ -77,8 +70,6 @@ class Liquidation {
         if (events.length && events[0].returnValues) {
 
             const returnValues = events[0].returnValues;
-
-            const positionKeys = this._generatePositionsKeysForAddress(args.address, args.web3);
 
             const positionLabel = await this._getPositionLabel(
                 args,
