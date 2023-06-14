@@ -1,0 +1,9 @@
+{
+  "name": "Sommelier finance",
+  "category": "vault",
+  "website": "https://app.sommelier.finance/",
+  "logo": "logo.png",
+  "background": "#121214",
+  "foreground": "#ffffff",
+  "network": "ethereum"
+}
