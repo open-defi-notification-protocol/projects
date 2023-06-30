@@ -35,6 +35,7 @@ async function testPendle(network, fromBlock, toBlock) {
 async function main() {
     console.log(await testPendle("ethereum", 17364256, 17364258));
     console.log(await testPendle("arbitrum", 103714827, 103714829));
+    console.log(await testPendle("bsc", 29485024, 29485026));
 }
 
 main().catch(console.error);
