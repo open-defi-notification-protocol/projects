@@ -150,6 +150,10 @@ class PendingReward {
 
         for (const result of Object.values(results)) {
 
+            if (result.callsReturnContext[0].returnValues.length === 0) {
+                continue
+            }
+
             const userStakedBalanceBN = new BN(result.callsReturnContext[0].returnValues[0].hex);
 
             if (userStakedBalanceBN.isGreaterThan("0")) {
