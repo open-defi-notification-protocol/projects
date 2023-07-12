@@ -1,0 +1,10 @@
+{
+  "name": "Overnight",
+  "category": "defi",
+  "website": "https://overnight.fi",
+  "logo": "logo.png",
+  "background": "#418aca",
+  "foreground": "#ffffff",
+  "network": "arbitrum",
+  "dev": true
+}
