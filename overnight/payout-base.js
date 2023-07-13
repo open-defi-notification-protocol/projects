@@ -9,7 +9,7 @@ class PayoutBase {
      */
     constructor(network) {
         this.network = network;
-        this.usdPlusContractAddress = addresses[network];
+        this.exchangeContractAddress = addresses["Exchange"][network];
     }
 
     /**
@@ -18,7 +18,7 @@ class PayoutBase {
      * @returns {Promise<void>}
      */
     async onInit(args) {
-        this.usdPlusContract = new args.web3.eth.Contract(ABIs.usdPlus, this.usdPlusContractAddress);
+        this.exchangeContract = new args.web3.eth.Contract(ABIs.exchange, this.exchangeContractAddress);
     }
 
     async onSubscribeForm() {
@@ -31,7 +31,7 @@ class PayoutBase {
     }
 
     async onBlocks(args) {
-        const events = await this.usdPlusContract.getPastEvents("LiquidityIndexUpdated", {
+        const events = await this.exchangeContract.getPastEvents("PayoutEvent", {
             fromBlock: args.fromBlock,
             toBlock: args.toBlock,
         });
@@ -39,7 +39,7 @@ class PayoutBase {
         if (events.length) {
             return {
                 uniqueId: events[0].transactionHash,
-                notification: `New USD+ payout event on ${this.network.charAt(0).toUpperCase() + this.network.slice(1)}`
+                notification: `New payout event on ${this.network.charAt(0).toUpperCase() + this.network.slice(1)}`
             }
         }
     }
