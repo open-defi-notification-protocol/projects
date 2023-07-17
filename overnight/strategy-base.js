@@ -15,10 +15,9 @@ class StrategyBase {
 
     async _getStrategies() {
         const result = await (await fetch(`https://api.overnight.fi/${this.network}/usd+/dict/strategies`)).json();
-        return result.reduce((acc, curr) => {
-            acc[curr.fullName] = curr.address;
-            return acc;
-        }, {});
+        return result.map(
+            x => {return {value: x.address, label: x.fullName}}
+        )
     }
 
     /**
@@ -38,7 +37,7 @@ class StrategyBase {
                 id: "strategy",
                 label: "Strategy",
                 description: "Select a strategy you wish to get alerts for",
-                values: Object.keys(this.strategies)
+                values: this.strategies
             }
         ];
     }
@@ -46,7 +45,7 @@ class StrategyBase {
     async onBlocks(args) {
         const notifications = [];
 
-        const selectedStrategy = args.subscription["strategy"]
+        const selectedStrategyAddress = args.subscription["strategy"];
 
         const events = await this.portMgrContract.getPastEvents("StrategyWeightUpdated", {
             fromBlock: args.fromBlock,
@@ -55,10 +54,11 @@ class StrategyBase {
 
         if (events.length > 0) {
             for (const event of events) {
-                if (event.returnValues.strategy === this.strategies[selectedStrategy]) {
+                if (event.returnValues.strategy === selectedStrategyAddress) {
+                    const selectedStrategyName = this.strategies.find(s => s.value === selectedStrategyAddress).label
                     notifications.push({
                         uniqueId: `${event.transactionHash}${event.returnValues.strategy}`,
-                        notification: `Strategy '${selectedStrategy}' has been updated (${this.network.charAt(0).toUpperCase() + this.network.slice(1)})`
+                        notification: `Strategy '${selectedStrategyName}' has been updated (${this.network.charAt(0).toUpperCase() + this.network.slice(1)})`
                     })
                 }
             }
