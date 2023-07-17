@@ -31,7 +31,7 @@ async function testPayout(network, fromBlock, toBlock) {
 
 }
 
-async function testStrategy(network, strategyName, fromBlock, toBlock) {
+async function testStrategy(network, fromBlock, toBlock) {
 
     const providerUrl = require("./dev-keys.json")[`web3${network}`]
 
@@ -52,7 +52,7 @@ async function testStrategy(network, strategyName, fromBlock, toBlock) {
     const form = await strategyNotification.onSubscribeForm({});
 
     const subscription = {
-        strategy: strategyName,
+        strategy: form.find(o => o.id === 'strategy').values[0].value,
     };
 
     console.log(form);
@@ -74,11 +74,11 @@ async function main() {
     console.log(await testPayout("optimism", 106155876, 106155878));
     // console.log(await testPayout("zksync", 730251, 730253));
 
-    console.log(await testStrategy("polygon", "Balancer USDC", 44512809, 44512809));
-    console.log(await testStrategy("arbitrum", "Sushiswap USDC/USDT", 110392139, 110392141));
-    console.log(await testStrategy("bsc", "Thena USDC/USDT", 29875608, 29875608));
-    console.log(await testStrategy("optimism", "Pika v4", 106777666, 106777666));
-    // console.log(await testStrategy("zksync", "Nexon USDC", 2279899, 2279899));
+    console.log(await testStrategy("polygon", 44512809, 44512809));
+    console.log(await testStrategy("arbitrum", 110392139, 110392141));
+    console.log(await testStrategy("bsc", 29875608, 29875608));
+    console.log(await testStrategy("optimism", 106777666, 106777666));
+    // console.log(await testStrategy("zksync", 2279899, 2279899));
 }
 
 
