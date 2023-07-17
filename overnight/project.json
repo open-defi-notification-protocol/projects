@@ -3,8 +3,8 @@
   "category": "defi",
   "website": "https://overnight.fi",
   "logo": "logo.png",
-  "background": "#418aca",
-  "foreground": "#ffffff",
+  "background": "#15141D",
+  "foreground": "#28A0F0",
   "network": "arbitrum",
   "dev": true
 }
