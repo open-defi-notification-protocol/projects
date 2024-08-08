@@ -1,0 +1,9 @@
+{
+  "name": "Fungify",
+  "category": "lending",
+  "website": "https://fungify.it/",
+  "logo": "logo.png",
+  "background": "#070a0e",
+  "foreground": "#ffffff",
+  "network": "ethereum"
+}
