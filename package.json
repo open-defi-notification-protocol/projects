@@ -4,7 +4,8 @@
   "description": "",
   "main": "test-helper.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "exeute-deploy": "git tag -d @@deploy-to-production@@ ; git tag -a @@deploy-to-production@@ -m '' ; git push origin --tags --force"
   },
   "author": "",
   "license": "ISC",
