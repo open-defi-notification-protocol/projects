@@ -1,9 +1,0 @@
-{
-  "name": "OpenSea",
-  "category": "nft",
-  "website": "https://opensea.io",
-  "logo": "logo.png",
-  "background": "#0081e9",
-  "foreground": "#ffffff",
-  "network": "http"
-}

@@ -1,0 +1,10 @@
+{
+  "name": "LootBridge",
+  "category": "lending",
+  "website": "https://d170ve8yxtkuzk.cloudfront.net",
+  "logo": "logo.png",
+  "background": ["#2D09A6", "#510E74"],
+  "foreground": "#ffffff",
+  "network": "ethereum",
+  "dev": true
+}

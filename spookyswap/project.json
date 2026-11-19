@@ -1,0 +1,9 @@
+{
+  "name": "SpookySwap",
+  "category": "amm",
+  "website": "https://spooky.fi/",
+  "logo": "logo.png",
+  "background": "#18163c",
+  "foreground": "#f0f2f7",
+  "network": "fantom"
+}

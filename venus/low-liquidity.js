@@ -1,9 +1,7 @@
 const BN = require("bignumber.js");
-const Contract = require('web3-eth-contract');
 const ABIs = require("./abis.json");
 
 const COMPTROLLER_ADDRESS = '0xfD36E2c2a6789Db23113685031d7F16329158384';
-const BUSD_DECIMALS = 18;
 
 const amountFormatter = Intl.NumberFormat('en', {notation: 'compact'});
 
@@ -16,7 +14,10 @@ class LowLiquidity {
     // runs when class is initialized
     async onInit(args) {
 
-        this.comptrollerContract = new args.web3.eth.Contract(ABIs.comptroller, COMPTROLLER_ADDRESS);
+        this.comptrollerContract = new args.web3.eth.Contract(
+            ABIs.comptroller,
+            COMPTROLLER_ADDRESS
+        );
 
     }
 
@@ -33,7 +34,7 @@ class LowLiquidity {
         let liquidity = new BN(result[1]);
         const shortfall = parseInt(result[2]);
 
-        liquidity = liquidity.dividedBy('1e' + BUSD_DECIMALS);
+        liquidity = liquidity.dividedBy('1e18');
 
         const comment = shortfall ?
             `CAUTION: you are currently in risk of liquidation` :
@@ -60,7 +61,7 @@ class LowLiquidity {
 
         const minLiquidity = args.subscription['minLiquidity'];
 
-        const minBUSD = new BN(minLiquidity).multipliedBy('1e' + BUSD_DECIMALS)
+        const thresholdUSD = new BN(minLiquidity).multipliedBy('1e18')
 
         const result = await this.comptrollerContract.methods.getAccountLiquidity(args.address).call();
 
@@ -68,9 +69,9 @@ class LowLiquidity {
 
         const shortfall = parseInt(result[2]);
 
-        if (minBUSD.isGreaterThanOrEqualTo(liquidity)) {
+        if (thresholdUSD.isGreaterThanOrEqualTo(liquidity)) {
 
-            const uniqueId = "liquidity-" + minBUSD;
+            const uniqueId = "liquidity-" + thresholdUSD;
 
             if (shortfall) {
 
@@ -83,7 +84,7 @@ class LowLiquidity {
 
                 return {
                     uniqueId: uniqueId,
-                    notification: `Excess liquidity dropped below your safe minimum of ${minLiquidity} USD (~${amountFormatter.format(liquidity.dividedBy('1e' + BUSD_DECIMALS))})`
+                    notification: `Excess liquidity (~${amountFormatter.format(liquidity.dividedBy('1e18'))}) dropped below your safe minimum of ${minLiquidity} USD`
                 }
 
             }

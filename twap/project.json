@@ -1,0 +1,9 @@
+{
+  "name": "TWAP",
+  "category": "twap",
+  "website": "https://orbs.com",
+  "logo": "logo.png",
+  "background": "#ffffff",
+  "foreground": "#6f1b71",
+  "network": "ethereum"
+}

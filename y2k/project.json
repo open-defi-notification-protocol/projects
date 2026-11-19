@@ -1,0 +1,9 @@
+{
+  "name": "Y2K",
+  "category": "lending",
+  "website": "https://www.y2k.finance",
+  "logo": "logo.png",
+  "background": "#000000",
+  "foreground": "#ffffff",
+  "network": "arbitrum"
+}

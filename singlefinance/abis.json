@@ -1,0 +1,66 @@
+{
+  "bank": [
+    {
+      "type": "event",
+      "name": "Liquidate",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "positionId",
+          "internalType": "uint256",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "collateralSize",
+          "internalType": "uint256",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "collToken",
+          "internalType": "address",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "collId",
+          "internalType": "uint256",
+          "indexed": false
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "StopLoss",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "positionId",
+          "internalType": "uint256",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "collateralSize",
+          "internalType": "uint256",
+          "indexed": false
+        },
+        {
+          "type": "address",
+          "name": "collToken",
+          "internalType": "address",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "collId",
+          "internalType": "uint256",
+          "indexed": false
+        }
+      ],
+      "anonymous": false
+    }
+  ]
+}

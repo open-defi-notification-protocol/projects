@@ -1,0 +1,10 @@
+{
+  "name": "meshswap",
+  "category": "amm",
+  "website": "https://meshswap.fi/",
+  "logo": "logo.png",
+  "background": "#823fe5",
+  "foreground": "#ffffff",
+  "network": "polygon",
+  "dev": true
+}

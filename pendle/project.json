@@ -1,0 +1,9 @@
+{
+  "name": "Pendle",
+  "category": "defi",
+  "website": "https://www.pendle.finance",
+  "logo": "logo.png",
+  "background": "#07C1B6",
+  "foreground": "#ffffff",
+  "network": "ethereum"
+}
